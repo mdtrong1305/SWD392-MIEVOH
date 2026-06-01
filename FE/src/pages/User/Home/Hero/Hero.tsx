@@ -25,17 +25,17 @@ export default function Hero() {
                 <div className="absolute bottom-0 left-0 right-0 p-8 sm:p-12 lg:p-16 max-w-2xl flex flex-col items-start text-white">
                     {/* Badge */}
                     <span className="inline-block rounded-full bg-white/20 backdrop-blur-md px-4 py-1 text-xs font-semibold uppercase tracking-wider text-purple-200 mb-4 border border-white/10 animate__animated animate__fadeInDown">
-                        Khám phá ngay
+                        Explore Now
                     </span>
 
                     {/* Movie Title */}
                     <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-white drop-shadow-md animate__animated animate__fadeInLeft">
-                        Hành Trình Vô Tận
+                        Infinite Journey
                     </h1>
 
                     {/* Description */}
                     <p className="mt-4 text-base sm:text-lg text-gray-300 leading-relaxed drop-shadow-sm font-medium animate__animated animate__fadeInLeft animate__delay-1s">
-                        Một kiệt tác điện ảnh khoa học viễn tưởng đưa bạn đến những vì sao xa xôi. Khám phá bí ẩn của vũ trụ trong một cuộc phiêu lưu đầy cảm xúc và hình ảnh tuyệt mỹ.
+                        A sci-fi cinematic masterpiece taking you to the most distant stars. Discover the mysteries of the universe in a journey full of emotions and stunning visuals.
                     </p>
 
                     {/* Action Buttons */}

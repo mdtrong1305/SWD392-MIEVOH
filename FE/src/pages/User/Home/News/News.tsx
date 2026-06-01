@@ -10,26 +10,26 @@ interface Article {
 const articles: Article[] = [
     {
         id: 1,
-        title: "Top 5 bộ phim không thể bỏ lỡ trong tháng này",
-        description: "Điểm qua những bom tấn điện ảnh đang khuấy đảo phòng vé mà bạn không thể bỏ qua.",
+        title: "Top 5 must-watch movies this month",
+        description: "A roundup of the cinematic blockbusters rocking the box office that you can't miss.",
         image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80",
-        category: "Tin tức",
+        category: "News",
         date: "15/10/2024",
     },
     {
         id: 2,
-        title: "Phỏng vấn độc quyền với đạo diễn của \"Hành Trình Vô Tận\"",
-        description: "Khám phá quá trình sáng tạo sau một kiệt tác viễn tưởng đang làm mưa làm gió hiện nay.",
+        title: "Exclusive interview with the director of \"Infinite Journey\"",
+        description: "Discover the creative process behind the sci-fi masterpiece that is currently taking the world by storm.",
         image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80",
-        category: "Phỏng vấn",
+        category: "Interview",
         date: "10/10/2024",
     },
     {
         id: 3,
-        title: "Bật mí những bí mật hậu trường chưa từng công bố",
-        description: "Cùng xem những điều thú vị xảy ra phía sau ống kính của các dự án điện ảnh lớn.",
+        title: "Revealing never-before-seen behind-the-scenes secrets",
+        description: "Let's take a look at the interesting things happening behind the scenes of major cinematic projects.",
         image: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=600&q=80",
-        category: "Hậu trường",
+        category: "Behind the scenes",
         date: "08/10/2024",
     },
 ];
@@ -41,13 +41,13 @@ export default function News() {
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                    Tin Tức Điện Ảnh
+                    Movie News
                 </h2>
                 <a 
                     href="/news" 
                     className="text-sm font-semibold text-[#6D28D9] hover:text-[#5B21B6] transition-colors flex items-center gap-1 group"
                 >
-                    <span>Xem tất cả</span>
+                    <span>See All</span>
                     <span className="transform translate-x-0 group-hover:translate-x-1 transition-transform">→</span>
                 </a>
             </div>

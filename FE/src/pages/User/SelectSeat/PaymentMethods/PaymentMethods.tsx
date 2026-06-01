@@ -1,0 +1,160 @@
+import { ChevronLeft } from "lucide-react";
+
+interface PaymentMethodsProps {
+    paymentMethod: string;
+    setPaymentMethod: (method: string) => void;
+    isAuthenticated: boolean;
+    guestName: string;
+    guestPhone: string;
+    guestEmail: string;
+    guestErrors: { name?: string; phone?: string; email?: string };
+    handleGuestChange: (name: "name" | "phone" | "email", value: string) => void;
+    setActiveStep: (step: number) => void;
+}
+
+export default function PaymentMethods({
+    paymentMethod,
+    setPaymentMethod,
+    isAuthenticated,
+    guestName,
+    guestPhone,
+    guestEmail,
+    guestErrors,
+    handleGuestChange,
+    setActiveStep
+}: PaymentMethodsProps) {
+    return (
+        <div className="flex flex-col gap-6 animate__animated animate__fadeIn">
+            <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm flex flex-col gap-6">
+                <h3 className="text-base font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                    💳 Payment Methods
+                </h3>
+ 
+                {/* Payment Options list */}
+                <div className="flex flex-col gap-3">
+                    {[
+                        { 
+                            id: "qr", 
+                            name: "QR Code Bank Transfer", 
+                            desc: "Scan QR code via banking app to pay", 
+                            icon: (
+                                <svg className="w-5 h-5 text-violet-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="3" y="3" width="7" height="7" />
+                                    <rect x="14" y="3" width="7" height="7" />
+                                    <rect x="14" y="14" width="7" height="7" />
+                                    <rect x="3" y="14" width="7" height="7" />
+                                    <rect x="7" y="7" width="1" height="1" />
+                                    <rect x="16" y="7" width="1" height="1" />
+                                    <rect x="7" y="16" width="1" height="1" />
+                                </svg>
+                            ) 
+                        },
+                        { id: "momo", name: "MoMo Wallet", desc: "Quick payment via MoMo e-wallet", icon: <span className="text-lg">🔴</span> },
+                        { id: "zalopay", name: "ZaloPay Wallet", desc: "Pay via ZaloPay with special promotions", icon: <span className="text-lg">🔵</span> },
+                        { id: "atm", name: "Local ATM Card", desc: "Payment via local banks", icon: <span className="text-lg">🏦</span> }
+                    ].map(method => {
+                        const isSelected = paymentMethod === method.id;
+                        return (
+                            <div 
+                                key={method.id}
+                                onClick={() => setPaymentMethod(method.id)}
+                                className={`p-4.5 border rounded-2xl cursor-pointer flex items-center justify-between transition-all duration-200 ${
+                                    isSelected ? "border-[#8E7EFE] bg-violet-50/20" : "border-slate-100 hover:border-slate-200 bg-slate-50/20"
+                                }`}
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 flex items-center justify-center shadow-inner shrink-0">
+                                        {method.icon}
+                                    </div>
+                                    <div>
+                                        <h4 className="text-base font-extrabold text-slate-850">{method.name}</h4>
+                                        <p className="text-sm text-slate-500 font-medium mt-0.5 leading-snug">{method.desc}</p>
+                                    </div>
+                                </div>
+                                <div className={`w-5.5 h-5.5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                                    isSelected ? "border-[#8E7EFE]" : "border-slate-350"
+                                }`}>
+                                    {isSelected && <div className="w-3.5 h-3.5 rounded-full bg-[#8E7EFE]" />}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Navigation buttons */}
+                <div className="border-t border-slate-100 pt-6 flex justify-start">
+                    <button
+                        onClick={() => setActiveStep(2)}
+                        className="px-5 py-2.5 border border-slate-200 hover:border-slate-300 text-slate-600 hover:text-slate-800 font-extrabold text-xs rounded-2xl transition-all cursor-pointer flex items-center gap-2 hover:bg-slate-50"
+                    >
+                        <ChevronLeft className="h-4 w-4" />
+                        Go back to combos
+                    </button>
+                </div>
+            </div>
+
+            {!isAuthenticated && (
+                <div className="bg-white border border-slate-100 rounded-3xl shadow-sm flex flex-col overflow-hidden">
+                    <div className="bg-slate-50 border-b border-slate-100 px-6 py-4">
+                        <h3 className="text-sm font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                            👤 Personal Information
+                        </h3>
+                    </div>
+                    <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div>
+                            <label className="text-[11px] font-black uppercase text-slate-400 block mb-2 tracking-wider">Full Name</label>
+                            <input 
+                                type="text" 
+                                placeholder="Enter your full name" 
+                                value={guestName}
+                                onChange={(e) => handleGuestChange("name", e.target.value)}
+                                className={`w-full bg-slate-50/50 border rounded-2xl px-4 py-3 text-sm font-extrabold text-slate-880 outline-none focus:bg-white transition-all ${
+                                    guestErrors.name ? "border-red-400 focus:border-red-500" : "border-slate-200/80 focus:border-[#8E7EFE]"
+                                }`}
+                            />
+                            {guestErrors.name && (
+                                <p className="mt-1.5 ml-1 text-xs text-red-500 flex items-center gap-1 font-semibold animate__animated animate__fadeIn">
+                                    <span>⚠️</span> {guestErrors.name}
+                                </p>
+                            )}
+                        </div>
+                        <div>
+                            <label className="text-[11px] font-black uppercase text-slate-400 block mb-2 tracking-wider">Phone Number</label>
+                            <input 
+                                type="tel" 
+                                placeholder="Enter your phone number" 
+                                value={guestPhone}
+                                onChange={(e) => handleGuestChange("phone", e.target.value)}
+                                className={`w-full bg-slate-50/50 border rounded-2xl px-4 py-3 text-sm font-extrabold text-slate-880 outline-none focus:bg-white transition-all ${
+                                    guestErrors.phone ? "border-red-400 focus:border-red-500" : "border-slate-200/80 focus:border-[#8E7EFE]"
+                                }`}
+                            />
+                            {guestErrors.phone && (
+                                <p className="mt-1.5 ml-1 text-xs text-red-500 flex items-center gap-1 font-semibold animate__animated animate__fadeIn">
+                                    <span>⚠️</span> {guestErrors.phone}
+                                </p>
+                            )}
+                        </div>
+                        <div>
+                            <label className="text-[11px] font-black uppercase text-slate-400 block mb-2 tracking-wider">Email Address</label>
+                            <input 
+                                type="email" 
+                                placeholder="Enter your email address" 
+                                value={guestEmail}
+                                onChange={(e) => handleGuestChange("email", e.target.value)}
+                                className={`w-full bg-slate-50/50 border rounded-2xl px-4 py-3 text-sm font-extrabold text-slate-880 outline-none focus:bg-white transition-all ${
+                                    guestErrors.email ? "border-red-400 focus:border-red-500" : "border-slate-200/80 focus:border-[#8E7EFE]"
+                                }`}
+                            />
+                            {guestErrors.email && (
+                                <p className="mt-1.5 ml-1 text-xs text-red-500 flex items-center gap-1 font-semibold animate__animated animate__fadeIn">
+                                    <span>⚠️</span> {guestErrors.email}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}

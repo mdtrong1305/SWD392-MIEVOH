@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Users, Ticket, GraduationCap } from "lucide-react";
 import Button from "../../../../components/Button/Button.tsx";
 import Slider from "react-slick";
-import { slickPromotionsSettings } from "../../../../config/slick/slickConfig.ts";
+import { slickPromotionsSettings } from "../../../../config/slick/slickConfig.tsx";
 
 interface Promotion {
     id: number;
@@ -15,36 +15,36 @@ interface Promotion {
 const promotions: Promotion[] = [
     {
         id: 1,
-        title: "Chủ Nhật Gia Đình",
-        description: "Giảm giá 20% cho combo gia đình khi xem phim vào ngày Chủ nhật hàng tuần.",
+        title: "Family Sunday",
+        description: "Get 20% off family combo when watching movies on Sundays.",
         type: "family",
         image: "https://images.unsplash.com/photo-1585647347483-22b66260dfff?auto=format&fit=crop&w=600&q=80",
     },
     {
         id: 2,
-        title: "Thành Viên Giảm 20%",
-        description: "Ưu đãi đặc biệt giảm 20% giá vé cho thành viên VIP của mievoh.",
+        title: "20% Member Discount",
+        description: "Special offer: 20% discount on ticket prices for VIP members of mievoh.",
         type: "vip",
         image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80",
     },
     {
         id: 3,
-        title: "Ưu Đãi Sinh Viên",
-        description: "Đồng giá vé 45K cho học sinh, sinh viên các ngày trong tuần thứ 2 - thứ 5.",
+        title: "Student Special",
+        description: "Flat rate of 45K for students on weekdays from Monday to Thursday.",
         type: "student",
         image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80",
     },
     {
         id: 4,
-        title: "Vé Khuya Đồng Giá",
-        description: "Đồng giá vé 50K cho các suất chiếu sau 22:00 mỗi ngày dành cho các 'cú đêm'.",
+        title: "Late Night Ticket",
+        description: "Flat rate of 50K for showtimes after 22:00 daily for night owls.",
         type: "vip",
         image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80",
     },
     {
         id: 5,
-        title: "Combo Đôi Ngọt Ngào",
-        description: "Giảm ngay 10% khi mua Combo Đôi (2 nước + 1 bắp lớn) tại quầy bắp nước.",
+        title: "Sweet Couple Combo",
+        description: "Save 10% when purchasing a Couple Combo (2 drinks + 1 large popcorn) at the concession stand.",
         type: "family",
         image: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=600&q=80",
     },
@@ -80,7 +80,7 @@ export default function Promotions() {
             {/* Header */}
             <div className="mb-8">
                 <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                    Khuyến Mãi Hấp Dẫn
+                    Special Promotions
                 </h2>
             </div>
 
@@ -130,7 +130,7 @@ export default function Promotions() {
                                                     : ""
                                             }`}
                                         >
-                                            {isClaimed ? "Đã Nhận ✓" : "Nhận Ưu Đãi"}
+                                            {isClaimed ? "Claimed ✓" : "Claim Code"}
                                         </Button>
                                     </div>
                                 </div>

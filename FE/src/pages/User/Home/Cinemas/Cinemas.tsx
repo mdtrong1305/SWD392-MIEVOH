@@ -15,35 +15,35 @@ interface Cinema {
 const cinemas: Cinema[] = [
     {
         id: 1,
-        name: "CGV Vincom Center Bà Triệu",
+        name: "CGV Vincom Center Ba Trieu",
         logo: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=120&q=80",
         rating: 4.8,
         votes: "1.2k+",
-        address: "Tầng 6, Vincom Center, 191 Bà Triệu, Lê Đại Hành, Hai Bà Trưng, Hà Nội",
+        address: "Floor 6, Vincom Center, 191 Ba Trieu, Le Dai Hang, Hai Ba Trung, Hanoi",
     },
     {
         id: 2,
-        name: "BHD Star Thảo Điền",
+        name: "BHD Star Thao Dien",
         logo: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=120&q=80",
         rating: 4.5,
         votes: "850+",
-        address: "Tầng 5, Vincom Mega Mall Thảo Điền, 159 Xa lộ Hà Nội, Quận 2, TP.HCM",
+        address: "Floor 5, Vincom Mega Mall Thao Dien, 159 Xa lo Ha Noi, District 2, HCMC",
     },
     {
         id: 3,
-        name: "Cinestar Quốc Thanh",
+        name: "Cinestar Quoc Thanh",
         logo: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=120&q=80",
         rating: 4.3,
         votes: "620+",
-        address: "271 Nguyễn Trãi, Phường Nguyễn Cư Trinh, Quận 1, TP.HCM",
+        address: "271 Nguyen Trai, Nguyen Cu Trinh Ward, District 1, HCMC",
     },
     {
         id: 4,
-        name: "Lotte Cinema Nam Sài Gòn",
+        name: "Lotte Cinema Nam Sai Gon",
         logo: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=120&q=80",
         rating: 4.7,
         votes: "950+",
-        address: "Tầng 3, Lotte Mart Nam Sài Gòn, 469 Nguyễn Hữu Thọ, Quận 7, TP.HCM",
+        address: "Floor 3, Lotte Mart Nam Sai Gon, 469 Nguyen Huu Tho, District 7, HCMC",
     },
 ];
 
@@ -72,13 +72,13 @@ export default function Cinemas() {
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                    Rạp Chiếu Nổi Bật
+                    Featured Cinemas
                 </h2>
                 <a 
                     href="/cinemas" 
                     className="text-sm font-semibold text-[#6D28D9] hover:text-[#5B21B6] transition-colors flex items-center gap-1 group"
                 >
-                    <span>Xem tất cả</span>
+                    <span>See All</span>
                     <span className="transform translate-x-0 group-hover:translate-x-1 transition-transform">→</span>
                 </a>
             </div>
@@ -139,7 +139,7 @@ export default function Cinemas() {
                                     size="sm"
                                     className="w-full text-center border-gray-200 hover:border-[#6D28D9]"
                                 >
-                                    Xem lịch chiếu
+                                    View Showtimes
                                 </Button>
                             </div>
                         </div>

@@ -1,4 +1,3 @@
-
 import { Outlet } from "react-router-dom";
 import Header from "../components/header_user/Header.tsx";
 import Footer from "../components/footer.user/Footer.tsx";

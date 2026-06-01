@@ -10,7 +10,7 @@ export default function Newsletter() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!email || !email.includes("@")) {
-            setError("Email không hợp lệ. Vui lòng thử lại.");
+            setError("Invalid email. Please try again.");
             return;
         }
 
@@ -31,17 +31,17 @@ export default function Newsletter() {
 
                 <div className="relative mx-auto max-w-2xl">
                     <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight sm:text-3xl">
-                        Nhận Tin Tức Mới Nhất
+                        Get the Latest Updates
                     </h2>
                     
                     <p className="mx-auto mt-3 max-w-lg text-sm text-gray-500 leading-relaxed">
-                        Đăng ký nhận bản tin để không bỏ lỡ các ưu đãi độc quyền, tin tức điện ảnh và thông tin về các bộ phim sắp ra mắt.
+                        Subscribe to our newsletter to stay updated on exclusive deals, cinema news, and upcoming movies.
                     </p>
 
                     {isSubscribed ? (
                         <div className="mt-8 rounded-2xl bg-green-50 p-4 border border-green-200 animate-scale-up">
                             <p className="text-sm font-semibold text-green-700">
-                                ✓ Đăng ký thành công! Cảm ơn bạn đã quan tâm tới mievoh.
+                                ✓ Subscribed successfully! Thank you for your interest in mievoh.
                             </p>
                             <button
                                 onClick={() => {
@@ -50,7 +50,7 @@ export default function Newsletter() {
                                 }}
                                 className="mt-2 text-xs font-semibold text-green-600 underline hover:text-green-700"
                             >
-                                Đăng ký email khác
+                                Subscribe another email
                             </button>
                         </div>
                     ) : (
@@ -60,7 +60,7 @@ export default function Newsletter() {
                                 <input
                                     id="newsletter-email"
                                     type="email"
-                                    placeholder="Nhập email của bạn..."
+                                    placeholder="Enter your email..."
                                     value={email}
                                     onChange={(e) => {
                                         setEmail(e.target.value);
@@ -88,10 +88,10 @@ export default function Newsletter() {
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                         </svg>
-                                        Đang Đăng Ký
+                                        Subscribing
                                     </span>
                                 ) : (
-                                    "Đăng Ký"
+                                    "Subscribe"
                                 )}
                             </Button>
                         </form>

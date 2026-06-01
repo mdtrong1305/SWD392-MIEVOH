@@ -54,7 +54,7 @@ export const loginUser = createAsyncThunk<
 
             // Verify basic fields are provided
             if (!credentials.email || !credentials.password) {
-                return rejectWithValue("Email và mật khẩu không được để trống");
+                return rejectWithValue("Email and password cannot be empty");
             }
 
             const username = credentials.email.split('@')[0];
@@ -74,7 +74,7 @@ export const loginUser = createAsyncThunk<
                 }
             };
         } catch (err: any) {
-            return rejectWithValue(err.message || "Đăng nhập thất bại");
+            return rejectWithValue(err.message || "Login failed");
         }
     }
 );
@@ -137,7 +137,7 @@ const loginSlice = createSlice({
             })
             .addCase(loginUser.rejected, (state, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
-                state.error = action.payload ?? "Đăng nhập thất bại";
+                state.error = action.payload ?? "Login failed";
                 state.isAuthenticated = false;
             });
     },

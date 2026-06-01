@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { API_BASE_URL } from '../config/constant/constant.tsx'
+import { API_BASE_URL } from '../constant/constant.tsx'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
