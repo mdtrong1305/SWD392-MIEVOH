@@ -13,14 +13,14 @@ export const ToastContainer: React.FC = () => {
             toastOptions={{
                 success: {
                     iconTheme: {
-                        primary: '#8b5cf6', // Violet icon for success
-                        secondary: '#ffffff',
+                        primary: '#ffffff', // White icon background
+                        secondary: '#8E7EFE', // Purple icon foreground
                     }
                 },
                 error: {
                     iconTheme: {
-                        primary: '#ec4899', // Pink icon for error
-                        secondary: '#ffffff',
+                        primary: '#ffffff', // White icon background
+                        secondary: '#E13D53', // Red icon foreground
                     }
                 }
             }}
@@ -31,10 +31,10 @@ export const ToastContainer: React.FC = () => {
                         t.visible ? 'toast-enter' : 'toast-exit'
                     } ${
                         t.type === 'success'
-                            ? 'bg-purple-50/98 border-purple-300/50 text-purple-950 shadow-purple-500/10'
+                            ? 'bg-[#8E7EFE] border-[#8E7EFE]/30 !text-white shadow-lg shadow-[#8E7EFE]/20'
                             : t.type === 'error'
-                            ? 'bg-pink-50/98 border-pink-300/50 text-pink-950 shadow-pink-500/10'
-                            : 'bg-violet-50/98 border-violet-300/50 text-violet-950 shadow-violet-500/10'
+                            ? 'bg-[#E13D53] border-[#E13D53]/30 !text-white shadow-lg shadow-[#E13D53]/20'
+                            : 'bg-violet-50/98 dark:bg-zinc-900/98 border-violet-300/50 dark:border-zinc-800/80 text-violet-950 dark:!text-zinc-100 shadow-violet-500/10'
                     }`}
                 >
                     <span className="flex-shrink-0 flex items-center justify-center">
@@ -47,7 +47,11 @@ export const ToastContainer: React.FC = () => {
                     
                     <button
                         onClick={() => toast.dismiss(t.id)}
-                        className="text-violet-950/40 hover:text-violet-950 transition-colors ml-1 p-0.5 rounded-lg hover:bg-violet-500/10"
+                        className={`transition-colors ml-1 p-0.5 rounded-lg ${
+                            t.type === 'success' || t.type === 'error'
+                                ? '!text-white/70 hover:!text-white hover:bg-white/10'
+                                : 'text-violet-950/40 dark:text-zinc-400 hover:text-violet-950 dark:hover:text-white hover:bg-violet-500/10 dark:hover:bg-zinc-800'
+                        }`}
                     >
                         ✕
                     </button>

@@ -78,10 +78,10 @@ export default function MovieShowtimesList({ selectedDate, cinemaName }: MovieSh
                 return (
                     <div
                         key={movie.id}
-                        className="bg-white border border-slate-100/80 rounded-3xl p-6 shadow-md shadow-slate-100/50 hover:shadow-xl hover:shadow-indigo-100/20 hover:border-indigo-200/50 transition-all duration-300 flex flex-col md:flex-row gap-6 group"
+                        className="bg-white dark:bg-zinc-900/50 border border-slate-100/80 dark:border-zinc-800/80 rounded-3xl p-6 shadow-md shadow-slate-100/50 dark:shadow-none hover:shadow-xl hover:shadow-indigo-100/20 hover:border-indigo-200/50 dark:hover:border-zinc-700/80 transition-all duration-300 flex flex-col md:flex-row gap-6 group"
                     >
                         {/* Poster with hover scale and age tag */}
-                        <div className="w-full md:w-32 aspect-[2/3] md:h-48 rounded-2xl overflow-hidden shrink-0 shadow-md relative group/poster border border-slate-100">
+                        <div className="w-full md:w-32 aspect-[2/3] md:h-48 rounded-2xl overflow-hidden shrink-0 shadow-md relative group/poster border border-slate-100 dark:border-zinc-800">
                             <img
                                 src={movie.image}
                                 alt={movie.title}
@@ -102,34 +102,34 @@ export default function MovieShowtimesList({ selectedDate, cinemaName }: MovieSh
                         {/* Details & Showtimes */}
                         <div className="flex-grow flex flex-col justify-between">
                             <div>
-                                <h3 className="text-2xl font-extrabold text-slate-900 mb-3 group-hover:text-[#6C5CE7] transition-colors duration-200">
+                                <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-3 group-hover:text-[#6C5CE7] dark:group-hover:text-violet-400 transition-colors duration-200">
                                     {movie.title}
                                 </h3>
 
                                 {/* Info tags row */}
                                 <div className="flex flex-wrap gap-2.5 mb-5">
-                                    <span className="flex items-center gap-1.5 bg-amber-50 border border-amber-200/50 text-amber-800 font-bold px-3 py-1.5 rounded-xl text-xs">
+                                    <span className="flex items-center gap-1.5 bg-amber-50 border border-amber-200/50 text-amber-800 dark:bg-amber-500/10 dark:border-amber-500/30 dark:text-amber-400 font-bold px-3 py-1.5 rounded-xl text-xs">
                                         <Clock className="h-3.5 w-3.5 text-amber-600" />
                                         {details.duration}
                                     </span>
-                                    <span className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200/50 text-indigo-800 font-bold px-3 py-1.5 rounded-xl text-xs">
+                                    <span className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200/50 text-indigo-800 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400 font-bold px-3 py-1.5 rounded-xl text-xs">
                                         <Film className="h-3.5 w-3.5 text-indigo-600" />
                                         {movie.genres.join(", ")}
                                     </span>
-                                    <span className="flex items-center gap-1.5 bg-slate-100 border border-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-xl text-xs">
+                                    <span className="flex items-center gap-1.5 bg-slate-100 border border-slate-200 text-slate-700 dark:bg-zinc-800 dark:border-zinc-700/80 dark:text-zinc-300 font-bold px-3 py-1.5 rounded-xl text-xs">
                                         <User className="h-3.5 w-3.5 text-slate-500" />
                                         Director: {details.director}
                                     </span>
                                 </div>
 
                                 {/* Formats & time buttons grid */}
-                                <div className="space-y-5 pt-5 border-t border-slate-100">
+                                <div className="space-y-5 pt-5 border-t border-slate-100 dark:border-zinc-800/80">
                                     {/* 2D Long Tieng - only shown if hasDubbing is true */}
                                     {hasDubbing && (
                                         <div>
                                             <div className="flex items-center gap-2 mb-3">
                                                 <span className="h-3 w-1.5 bg-[#6C5CE7] rounded-full animate-pulse" />
-                                                <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                                                <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
                                                     2D Dubbed
                                                 </h4>
                                             </div>
@@ -142,8 +142,8 @@ export default function MovieShowtimesList({ selectedDate, cinemaName }: MovieSh
                                                             disabled={expired}
                                                             onClick={() => handleSelectShowtime(movie.id, "2D Dubbed", time)}
                                                             className={`px-5.5 py-2.5 text-xs font-black rounded-xl border transition-all duration-200 ${expired
-                                                                    ? "bg-slate-50 border-slate-100/65 text-slate-300 cursor-not-allowed line-through text-[11px] font-bold"
-                                                                    : "bg-slate-50/80 border-slate-200 text-slate-900 hover:bg-[#6C5CE7] hover:border-[#6C5CE7] hover:text-white hover:scale-[1.03] cursor-pointer shadow-sm active:scale-95"
+                                                                    ? "bg-slate-50 border-slate-100/65 text-slate-300 dark:bg-zinc-800/20 dark:border-zinc-800/55 dark:text-zinc-600 dark:line-through cursor-not-allowed line-through text-[11px] font-bold"
+                                                                    : "bg-slate-50/80 border-slate-200 text-slate-900 dark:bg-zinc-800/50 dark:border-zinc-700/80 dark:text-zinc-200 dark:hover:bg-[#6C5CE7] dark:hover:border-[#6C5CE7] dark:hover:text-white hover:bg-[#6C5CE7] hover:border-[#6C5CE7] hover:text-white hover:scale-[1.03] cursor-pointer shadow-sm active:scale-95"
                                                                 }`}
                                                         >
                                                             {time}
@@ -158,7 +158,7 @@ export default function MovieShowtimesList({ selectedDate, cinemaName }: MovieSh
                                     <div>
                                         <div className="flex items-center gap-2 mb-3">
                                             <span className="h-3 w-1.5 bg-[#6C5CE7] rounded-full animate-pulse" />
-                                            <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                                            <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
                                                 2D Subbed
                                             </h4>
                                         </div>
@@ -171,8 +171,8 @@ export default function MovieShowtimesList({ selectedDate, cinemaName }: MovieSh
                                                         disabled={expired}
                                                         onClick={() => handleSelectShowtime(movie.id, "2D Subbed", time)}
                                                         className={`px-5.5 py-2.5 text-xs font-black rounded-xl border transition-all duration-200 ${expired
-                                                                ? "bg-slate-50 border-slate-100/65 text-slate-300 cursor-not-allowed line-through text-[11px] font-bold"
-                                                                : "bg-slate-50/80 border-slate-200 text-slate-900 hover:bg-[#6C5CE7] hover:border-[#6C5CE7] hover:text-white hover:scale-[1.03] cursor-pointer shadow-sm active:scale-95"
+                                                                ? "bg-slate-50 border-slate-100/65 text-slate-300 dark:bg-zinc-800/20 dark:border-zinc-800/55 dark:text-zinc-600 dark:line-through cursor-not-allowed line-through text-[11px] font-bold"
+                                                                : "bg-slate-50/80 border-slate-200 text-slate-900 dark:bg-zinc-800/50 dark:border-zinc-700/80 dark:text-zinc-200 dark:hover:bg-[#6C5CE7] dark:hover:border-[#6C5CE7] dark:hover:text-white hover:bg-[#6C5CE7] hover:border-[#6C5CE7] hover:text-white hover:scale-[1.03] cursor-pointer shadow-sm active:scale-95"
                                                             }`}
                                                     >
                                                         {time}

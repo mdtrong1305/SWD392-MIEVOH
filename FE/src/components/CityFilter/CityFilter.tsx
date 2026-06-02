@@ -33,7 +33,7 @@ export default function CityFilter({
             )}
 
             {label && (
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider filter-header-gradient">
                     {label}
                 </span>
             )}
@@ -41,8 +41,8 @@ export default function CityFilter({
                 onClick={() => setIsCityOpen(!isCityOpen)}
                 className={`w-full flex items-center justify-between pl-4 pr-4 py-2.5 rounded-2xl text-sm font-bold transition-all duration-300 cursor-pointer outline-none border relative z-50 ${
                     isCityOpen 
-                        ? "bg-white border-[#6C5CE7] text-[#6C5CE7] shadow-sm" 
-                        : "bg-[#F5F3F7]/80 border-violet-100 hover:bg-[#EBE8F0] text-gray-700"
+                        ? "bg-white border-[#6C5CE7] text-gray-600 shadow-sm dark:bg-zinc-800 dark:border-violet-400 dark:!text-white" 
+                        : "bg-[#F5F3F7]/80 border-violet-100 hover:bg-[#EBE8F0] text-gray-600 dark:bg-zinc-800/40 dark:border-zinc-800 dark:hover:bg-zinc-700/50 dark:!text-white"
                 }`}
             >
                 <div className="flex items-center gap-2.5">
@@ -54,13 +54,13 @@ export default function CityFilter({
 
             {/* Dropdown Options List */}
             {isCityOpen && (
-                <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white border border-violet-200/90 shadow-2xl shadow-violet-955/15 rounded-2xl py-2 z-55 animate__animated animate__fadeIn max-h-60 overflow-y-auto">
+                <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white dark:bg-zinc-800 border border-violet-200/90 dark:border-zinc-700 shadow-2xl shadow-violet-955/15 rounded-2xl py-2 z-55 animate__animated animate__fadeIn max-h-60 overflow-y-auto">
                     <button
                         onClick={() => handleSelectCity("All")}
                         className={`w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-left transition-colors duration-150 cursor-pointer ${
                             selectedCity === "All" 
-                                ? "bg-violet-50 text-[#6C5CE7]" 
-                                : "text-gray-700 hover:bg-violet-50/60 hover:text-[#6C5CE7]"
+                                ? "bg-violet-50 text-[#6C5CE7] dark:bg-zinc-700/50 dark:!text-violet-400" 
+                                : "text-gray-700 hover:bg-violet-50/60 hover:text-[#6C5CE7] dark:!text-zinc-200 dark:hover:bg-zinc-700 dark:hover:!text-violet-400"
                         }`}
                     >
                         <span>All Locations</span>
@@ -72,8 +72,8 @@ export default function CityFilter({
                             onClick={() => handleSelectCity(city)}
                             className={`w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-left transition-colors duration-150 cursor-pointer ${
                                 selectedCity === city 
-                                    ? "bg-violet-50 text-[#6C5CE7]" 
-                                    : "text-gray-700 hover:bg-violet-50/60 hover:text-[#6C5CE7]"
+                                    ? "bg-violet-50 text-[#6C5CE7] dark:bg-zinc-700/50 dark:!text-violet-400" 
+                                    : "text-gray-700 hover:bg-violet-50/60 hover:text-[#6C5CE7] dark:!text-zinc-200 dark:hover:bg-zinc-700 dark:hover:!text-violet-400"
                             }`}
                         >
                             <span>{city}</span>

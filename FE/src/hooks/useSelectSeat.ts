@@ -255,7 +255,7 @@ export default function useSelectSeat() {
         
         setShowQRTransfer(true);
         setPaymentTimeLeft(600);
-        toast("Payment transaction initiated!");
+        toast.success("Payment transaction initiated!");
     };
 
     const userPhone = authUser?.soDT || authUser?.phone || "Not updated";

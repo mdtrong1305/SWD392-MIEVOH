@@ -119,3 +119,100 @@
 .auth-container.right-panel-active .overlay-right {
   transform: translateX(20%);
 }
+
+/* ==========================================
+   DARK MODE OVERRIDES FOR LOGIN PAGE
+   ========================================== */
+.dark .auth-container {
+  background-color: #121026 !important;
+  border-color: #3b306b !important;
+  box-shadow: 0 25px 50px -12px rgba(10, 8, 20, 0.8) !important;
+}
+
+/* Form backgrounds (desktop and mobile) */
+.dark .form-container form,
+.dark .md\:hidden > div {
+  background-color: #181533 !important;
+  border-color: #3b306b !important;
+}
+
+/* Titles and subtitle */
+.dark form h2 {
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-text-fill-color: initial !important;
+}
+
+.dark form p {
+  color: #c4b5fd !important; /* light purple/lavender subtitle */
+}
+
+/* Form input elements */
+.dark form input {
+  background-color: #0c0a1c !important; /* deep dark purple input background */
+  border-color: #31275c !important; /* violet border */
+  color: #ffffff !important; /* white typed text */
+}
+
+.dark form input::placeholder {
+  color: rgba(255, 255, 255, 0.65) !important; /* white placeholder with opacity */
+}
+
+/* Icons inside input fields */
+.dark form .relative span,
+.dark form .relative button svg,
+.dark form .relative button {
+  color: #a78bfa !important;
+}
+
+.dark form input:focus {
+  border-color: #8E7EFE !important;
+  box-shadow: 0 0 0 2px rgba(142, 126, 254, 0.1) !important;
+}
+
+/* Link elements */
+.dark form a {
+  color: #a78bfa !important; /* light purple link text */
+}
+
+.dark form a:hover {
+  color: #c084fc !important;
+}
+
+/* Buttons under forms */
+.dark form button[type="button"].text-violet-600 {
+  color: #a78bfa !important;
+}
+.dark form button[type="button"].text-violet-600:hover {
+  color: #c084fc !important;
+}
+
+/* Divider "OR" / "or" */
+.dark form .relative.my-4 span,
+.dark form .relative.my-5 span {
+  background-color: #181533 !important;
+  color: #a78bfa !important;
+}
+
+.dark form .relative.my-4 .flex-grow,
+.dark form .relative.my-5 .flex-grow {
+  border-color: #3b306b !important;
+}
+
+/* Google Sign-in button */
+.dark form button[type="button"].border-violet-200 {
+  border-color: #3b306b !important;
+  color: #e2e8f0 !important; /* light text */
+  background-color: rgba(24, 21, 51, 0.4) !important;
+}
+
+.dark form button[type="button"].border-violet-200:hover {
+  background-color: rgba(24, 21, 51, 0.8) !important;
+  border-color: #8E7EFE !important;
+}
+
+/* Validation warning texts */
+.dark form p.text-violet-950,
+.dark form p.text-red-600 {
+  color: #fca5a5 !important; /* red-300 warn text */
+}

@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from '../components/Toast/Toast.tsx';
 import { loginUser, clearError } from '../pages/User/Login/slice.ts';
 import type { AppDispatch } from '../store/index.tsx';
+import { validateEmail, validatePassword, validateConfirmPassword } from '../validation/validation';
 
 export interface LoginForm {
     email: string;
@@ -67,19 +68,11 @@ export default function useLogin(initialSliding: boolean) {
         setLoginForm(prev => ({ ...prev, [name]: value }));
     };
 
-    const validateEmail = (email: string) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    };
-
     const handleVerifyEmail = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!forgotEmail.trim()) {
-            setForgotErrors({ email: 'Email is required' });
-            return;
-        }
-        if (!validateEmail(forgotEmail)) {
-            setForgotErrors({ email: 'Invalid email address' });
+        const emailErr = validateEmail(forgotEmail);
+        if (emailErr) {
+            setForgotErrors({ email: emailErr });
             return;
         }
         
@@ -103,13 +96,15 @@ export default function useLogin(initialSliding: boolean) {
     const handleResetPassword = async (e: React.FormEvent) => {
         e.preventDefault();
         const errs: typeof forgotErrors = {};
-        if (!forgotNewPassword.trim()) {
-            errs.password = 'Password is required';
+        
+        const newPasswordError = validatePassword(forgotNewPassword);
+        if (newPasswordError) {
+            errs.password = newPasswordError;
         }
-        if (!forgotConfirmPassword.trim()) {
-            errs.confirmPassword = 'Confirm Password is required';
-        } else if (forgotConfirmPassword !== forgotNewPassword) {
-            errs.confirmPassword = 'Passwords do not match';
+        
+        const confirmError = validateConfirmPassword(forgotNewPassword, forgotConfirmPassword);
+        if (confirmError) {
+            errs.confirmPassword = confirmError;
         }
 
         if (Object.keys(errs).length > 0) {
@@ -135,12 +130,9 @@ export default function useLogin(initialSliding: boolean) {
 
     const handleLoginSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!loginForm.email.trim()) {
-            toast.error("Email is required!");
-            return;
-        }
-        if (!validateEmail(loginForm.email)) {
-            toast.error("Invalid email address!");
+        const emailErr = validateEmail(loginForm.email);
+        if (emailErr) {
+            toast.error(emailErr);
             return;
         }
         if (!loginForm.password.trim()) {
