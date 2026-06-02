@@ -64,6 +64,11 @@ mievoh/
    # Ví dụ MongoDB Atlas: mongodb+srv://<username>:<password_encoded>@<cluster_url>/<database_name>?appName=<app_name>
    # Ví dụ MongoDB Local: mongodb://localhost:27017/cinema-booking
    DATABASE_URL="mongodb://localhost:27017/cinema-booking"
+
+   # Cấu hình Passport Google OAuth2
+   GOOGLE_CLIENT_ID="<nhập_client_id_của_bạn>"
+   GOOGLE_CLIENT_SECRET="<nhập_client_secret_của_bạn>"
+   GOOGLE_CALLBACK_URL="http://localhost:3069/api/auth/google/callback"
    ```
 
 4. Đồng bộ Prisma Client:
