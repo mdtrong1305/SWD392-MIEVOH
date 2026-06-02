@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { PORT } from './common/constant/app.constant';
 import { ValidationPipe } from '@nestjs/common';
@@ -20,10 +21,31 @@ async function bootstrap() {
   app.useGlobalInterceptors(new LoggingInterceptor());
   // đăng ký global interceptor để chuẩn hóa response success toàn bộ ứng dụng
   app.useGlobalInterceptors(new ResponseSuccessInterceptor());
-  // response error đã được nestjs xử lý sẵn thông qua exception filter
+  // Cấu hình Swagger
+  const config = new DocumentBuilder()
+    .setTitle('Mievoh Booking API')
+    .setDescription('Tài liệu API cho hệ thống đặt vé xem phim')
+    .setVersion('1.0')
+    .addTag('Authentication', 'Xác thực và đăng ký')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'JWT-auth',
+    )
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api-docs', app, document);
+
   const port = PORT || 3069;
   await app.listen(port, () => {
     console.log(`[SERVER] Server online at: ${port}`);
+    console.log(`[SERVER] Swagger API docs: http://localhost:${port}/api-docs`);
   });
 }
 bootstrap();

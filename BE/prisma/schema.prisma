@@ -26,6 +26,13 @@ model User {
 
   userType String? @default("user") // "user", "staff", "admin"
 
+  // Thông tin cá nhân bổ sung (mặc định null)
+  dateOfBirth DateTime?
+  address     String?
+  gender      String? // "Nam", "Nữ", "Khác"
+  cccd        String? @unique // Căn cước công dân
+
+
   isSubscribedToPromo Boolean? @default(true)
   isActive            Boolean? @default(true)
   favoriteGenres      String[] @default([])
