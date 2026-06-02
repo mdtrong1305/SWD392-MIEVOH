@@ -11,6 +11,7 @@ import BookTicket from "../pages/User/BookTicket/BookTicket.tsx";
 import SelectSeat from "../pages/User/SelectSeat/SelectSeat.tsx";
 import Cinemas from "../pages/User/Cinemas/Cinemas.tsx";
 import CinemaDetail from "../pages/User/CinemaDetail/CinemaDetail.tsx";
+import Profile from "../pages/User/Profile/Profile.tsx";
 
 export type AppRoute = {
   path: string;
@@ -50,6 +51,10 @@ export const routes: AppRoute[] = [
       {
         path: "cinemas/:id",
         element: <CinemaDetail />,
+      },
+      {
+        path: "profile",
+        element: <Profile />,
       },
     ],
   },

@@ -3,16 +3,19 @@ import { routes, generateRoutes } from './router/router.tsx'
 import { Provider } from 'react-redux'
 import { store } from './store/index.tsx'
 import { ToastContainer } from './components/Toast/Toast.tsx'
+import { ThemeProvider } from './contextAPI/ThemeContext.tsx'
 
 function App() {
   return (
     <Provider store={store}> 
-      <BrowserRouter>
-        <Routes>
-          {generateRoutes(routes)}
-        </Routes>
-        <ToastContainer />
-      </BrowserRouter>
+      <ThemeProvider>
+        <BrowserRouter>
+          <Routes>
+            {generateRoutes(routes)}
+          </Routes>
+          <ToastContainer />
+        </BrowserRouter>
+      </ThemeProvider>
     </Provider>
   )
 }

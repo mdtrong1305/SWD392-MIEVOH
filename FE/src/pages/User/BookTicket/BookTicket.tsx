@@ -25,60 +25,60 @@ interface ChainTheme {
 
 const CHAIN_THEMES: Record<string, ChainTheme> = {
     cgv: {
-        bgGradient: "from-violet-50/60 to-violet-50/30", titleColor: "text-slate-800 group-hover:text-[#8E7EFE]",
-        textColor: "group-hover:text-[#8E7EFE] text-[#8E7EFE]/80",
+        bgGradient: "from-violet-50/60 to-violet-50/30", titleColor: "text-slate-800 dark:text-white group-hover:text-[#8E7EFE] dark:group-hover:text-violet-400",
+        textColor: "group-hover:text-[#8E7EFE] text-[#8E7EFE]/80 dark:text-violet-400",
         badgeBg: "bg-[#8E7EFE]/10",
         badgeText: "text-[#8E7EFE]",
         buttonActive: "hover:bg-[#6C5CE7] hover:border-[#6C5CE7] hover:text-white",
-        borderColor: "border-violet-100 hover:border-violet-200",
-        glowColor: "#8E7EFE", branchBg: "bg-white hover:bg-violet-50/10"
+        borderColor: "border-violet-100 dark:border-zinc-800/80 hover:border-violet-200 dark:hover:border-zinc-700",
+        glowColor: "#8E7EFE", branchBg: "bg-white dark:bg-zinc-900/40 hover:bg-violet-50/10 dark:hover:bg-zinc-800/30"
     },
     bhd: {
-        bgGradient: "from-violet-50/60 to-violet-50/30", titleColor: "text-slate-800 group-hover:text-[#8E7EFE]",
-        textColor: "group-hover:text-[#8E7EFE] text-[#8E7EFE]/80",
+        bgGradient: "from-violet-50/60 to-violet-50/30", titleColor: "text-slate-800 dark:text-white group-hover:text-[#8E7EFE] dark:group-hover:text-violet-400",
+        textColor: "group-hover:text-[#8E7EFE] text-[#8E7EFE]/80 dark:text-violet-400",
         badgeBg: "bg-[#8E7EFE]/10",
         badgeText: "text-[#8E7EFE]",
         buttonActive: "hover:bg-[#6C5CE7] hover:border-[#6C5CE7] hover:text-white",
-        borderColor: "border-violet-100 hover:border-violet-200",
-        glowColor: "#8E7EFE", branchBg: "bg-white hover:bg-violet-50/10"
+        borderColor: "border-violet-100 dark:border-zinc-800/80 hover:border-violet-200 dark:hover:border-zinc-700",
+        glowColor: "#8E7EFE", branchBg: "bg-white dark:bg-zinc-900/40 hover:bg-violet-50/10 dark:hover:bg-zinc-800/30"
     },
     lotte: {
-        bgGradient: "from-violet-50/60 to-violet-50/30", titleColor: "text-slate-800 group-hover:text-[#8E7EFE]",
-        textColor: "group-hover:text-[#8E7EFE] text-[#8E7EFE]/80",
+        bgGradient: "from-violet-50/60 to-violet-50/30", titleColor: "text-slate-800 dark:text-white group-hover:text-[#8E7EFE] dark:group-hover:text-violet-400",
+        textColor: "group-hover:text-[#8E7EFE] text-[#8E7EFE]/80 dark:text-violet-400",
         badgeBg: "bg-[#8E7EFE]/10",
         badgeText: "text-[#8E7EFE]",
         buttonActive: "hover:bg-[#6C5CE7] hover:border-[#6C5CE7] hover:text-white",
-        borderColor: "border-violet-100 hover:border-violet-200",
-        glowColor: "#8E7EFE", branchBg: "bg-white hover:bg-violet-50/10"
+        borderColor: "border-violet-100 dark:border-zinc-800/80 hover:border-violet-200 dark:hover:border-zinc-700",
+        glowColor: "#8E7EFE", branchBg: "bg-white dark:bg-zinc-900/40 hover:bg-violet-50/10 dark:hover:bg-zinc-800/30"
     },
     cinestar: {
-        bgGradient: "from-violet-50/60 to-violet-50/30", titleColor: "text-slate-800 group-hover:text-[#8E7EFE]",
-        textColor: "group-hover:text-[#8E7EFE] text-[#8E7EFE]/80",
+        bgGradient: "from-violet-50/60 to-violet-50/30", titleColor: "text-slate-800 dark:text-white group-hover:text-[#8E7EFE] dark:group-hover:text-violet-400",
+        textColor: "group-hover:text-[#8E7EFE] text-[#8E7EFE]/80 dark:text-violet-400",
         badgeBg: "bg-[#8E7EFE]/10",
         badgeText: "text-[#8E7EFE]",
         buttonActive: "hover:bg-[#6C5CE7] hover:border-[#6C5CE7] hover:text-white",
-        borderColor: "border-violet-100 hover:border-violet-200",
-        glowColor: "#8E7EFE", branchBg: "bg-white hover:bg-violet-50/10"
+        borderColor: "border-violet-100 dark:border-zinc-800/80 hover:border-violet-200 dark:hover:border-zinc-700",
+        glowColor: "#8E7EFE", branchBg: "bg-white dark:bg-zinc-900/40 hover:bg-violet-50/10 dark:hover:bg-zinc-800/30"
     },
     beta: {
-        bgGradient: "from-violet-50/60 to-violet-50/30", titleColor: "text-slate-800 group-hover:text-[#8E7EFE]",
-        textColor: "group-hover:text-[#8E7EFE] text-[#8E7EFE]/80",
+        bgGradient: "from-violet-50/60 to-violet-50/30", titleColor: "text-slate-800 dark:text-white group-hover:text-[#8E7EFE] dark:group-hover:text-violet-400",
+        textColor: "group-hover:text-[#8E7EFE] text-[#8E7EFE]/80 dark:text-violet-400",
         badgeBg: "bg-[#8E7EFE]/10",
         badgeText: "text-[#8E7EFE]",
         buttonActive: "hover:bg-[#6C5CE7] hover:border-[#6C5CE7] hover:text-white",
-        borderColor: "border-violet-100 hover:border-violet-200",
-        glowColor: "#8E7EFE", branchBg: "bg-white hover:bg-violet-50/10"
+        borderColor: "border-violet-100 dark:border-zinc-800/80 hover:border-violet-200 dark:hover:border-zinc-700",
+        glowColor: "#8E7EFE", branchBg: "bg-white dark:bg-zinc-900/40 hover:bg-violet-50/10 dark:hover:bg-zinc-800/30"
     }
 };
 
 const DEFAULT_THEME: ChainTheme = {
-    bgGradient: "from-violet-50/60 to-violet-50/30", titleColor: "text-slate-800 group-hover:text-[#8E7EFE]",
-    textColor: "group-hover:text-[#8E7EFE] text-[#8E7EFE]/80",
+    bgGradient: "from-violet-50/60 to-violet-50/30", titleColor: "text-slate-800 dark:text-white group-hover:text-[#8E7EFE] dark:group-hover:text-violet-400",
+    textColor: "group-hover:text-[#8E7EFE] text-[#8E7EFE]/80 dark:text-violet-400",
     badgeBg: "bg-[#8E7EFE]/10",
     badgeText: "text-[#8E7EFE]",
     buttonActive: "hover:bg-[#6C5CE7] hover:border-[#6C5CE7] hover:text-white",
-    borderColor: "border-violet-100 hover:border-violet-200",
-    glowColor: "#8E7EFE", branchBg: "bg-white hover:bg-violet-50/10"
+    borderColor: "border-violet-100 dark:border-zinc-800/80 hover:border-violet-200 dark:hover:border-zinc-700",
+    glowColor: "#8E7EFE", branchBg: "bg-white dark:bg-zinc-900/40 hover:bg-violet-50/10 dark:hover:bg-zinc-800/30"
 };
 
 export default function BookTicket() {
@@ -230,7 +230,7 @@ export default function BookTicket() {
     return (
         <div className="w-full bg-[#EFEBF4] min-h-screen pb-16 font-sans">
             {/* Header info banner with blurred backdrop image */}
-            <div className="relative w-full overflow-hidden bg-[#0F0C15] text-white py-8 sm:py-10 border-b border-violet-950/20">
+            <div className="relative w-full overflow-hidden bg-[#0F0C15] text-white py-8 sm:py-10 border-b border-violet-955/20">
                 {/* Backdrop Underlay */}
                 <div 
                     className="absolute inset-0 bg-cover bg-center filter blur-[6px] scale-105 opacity-55 pointer-events-none"
@@ -290,26 +290,26 @@ export default function BookTicket() {
             <div className="max-w-5xl mx-auto px-4 mt-8 flex flex-col gap-6">
                 
                 {/* 1. Date Selector Block */}
-                <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-sm animate__animated animate__fadeIn">
-                    <div className="flex items-center gap-2 mb-4 text-slate-800">
+                <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-3xl p-5 shadow-sm animate__animated animate__fadeIn">
+                    <div className="flex items-center gap-2 mb-4 text-slate-800 dark:text-zinc-300">
                         <Calendar className="h-5 w-5 text-[#8E7EFE]" />
-                        <span className="text-sm font-extrabold uppercase tracking-wider text-slate-900">Select Date</span>
+                        <span className="text-sm font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">Select Date</span>
                     </div>
 
-                    <div className="flex items-center md:justify-center gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+                    <div className="flex items-center md:justify-center gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent">
                         {dates.map((dateOpt) => {
                             const isSelected = selectedDate?.dateString === dateOpt.dateString;
                             return (
                                 <button
                                     key={dateOpt.dateString}
                                     onClick={() => setSelectedDate(dateOpt)}
-                                    className={`flex flex-col items-center justify-center min-w-[80px] py-3 px-4 rounded-2xl border transition-all duration-300 cursor-pointer ${
+                                    className={`flex flex-col items-center justify-center min-w-[80px] py-3 px-4 rounded-2xl border transition-all duration-350 cursor-pointer ${
                                         isSelected
                                             ? "bg-[#8E7EFE] border-[#8E7EFE] text-white shadow-md shadow-[#8E7EFE]/20 scale-[1.02]"
-                                            : "bg-slate-50/50 border-slate-100 hover:bg-slate-100 hover:text-slate-900 text-slate-600 hover:border-slate-200"
+                                            : "bg-slate-50/50 border-slate-100 text-slate-600 hover:bg-slate-100 hover:text-slate-900 hover:border-slate-200 dark:bg-zinc-800/40 dark:border-zinc-850 dark:text-zinc-400 dark:hover:bg-zinc-700/60 dark:hover:text-white dark:hover:border-zinc-700"
                                     }`}
                                 >
-                                    <span className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${isSelected ? "text-indigo-100" : "text-slate-400"}`}>
+                                    <span className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${isSelected ? "text-indigo-100" : "text-slate-400 dark:text-zinc-500"}`}>
                                         {dateOpt.label}
                                     </span>
                                     <span className="text-sm font-extrabold">
@@ -322,9 +322,9 @@ export default function BookTicket() {
                 </div>
 
                 {/* 2. City Filter Panel */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/70 border border-white/60 backdrop-blur-md rounded-2xl px-5 py-4 shadow-sm relative z-30">
-                    <div className="flex items-center gap-2 text-slate-700">
-                        <span className="text-sm font-black uppercase tracking-wider text-slate-800">Cinema Locations</span>
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/70 dark:bg-zinc-900/50 border border-white/60 dark:border-zinc-800/80 backdrop-blur-md rounded-2xl px-5 py-4 shadow-sm relative z-30">
+                    <div className="flex items-center gap-2 text-slate-700 dark:text-zinc-300">
+                        <span className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-white">Cinema Locations</span>
                     </div>
                     
                     <CityFilter
@@ -338,10 +338,10 @@ export default function BookTicket() {
                 {/* 3. Theater Chains & Branches & Showtimes List */}
                 <div className="space-y-8">
                     {groupedChains.length === 0 ? (
-                        <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm flex flex-col items-center">
+                        <div className="bg-white dark:bg-zinc-900/50 rounded-3xl p-12 text-center border border-slate-100 dark:border-zinc-800/80 shadow-sm flex flex-col items-center">
                             <span className="text-4xl mb-3">📍</span>
-                            <h3 className="text-base font-extrabold text-slate-900 mb-1">No cinemas available</h3>
-                            <p className="text-slate-500 font-medium text-xs">Please change your location filter or select another showtime date.</p>
+                            <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-1">No cinemas available</h3>
+                            <p className="text-slate-500 dark:text-zinc-450 font-medium text-xs">Please change your location filter or select another showtime date.</p>
                         </div>
                     ) : (
                         groupedChains.map(chain => {
@@ -350,7 +350,7 @@ export default function BookTicket() {
                             return (
                                 <div
                                     key={chain.chainId}
-                                    className={`relative overflow-hidden bg-white/70 border border-white/60 backdrop-blur-md shadow-sm animate__animated animate__fadeIn transition-all duration-300 ${
+                                    className={`relative overflow-hidden bg-white/70 dark:bg-zinc-900/50 border border-white/60 dark:border-zinc-800/80 backdrop-blur-md shadow-sm animate__animated animate__fadeIn transition-all duration-300 ${
                                         isChainExpanded ? "p-6 rounded-3xl space-y-6" : "p-3 px-4 rounded-2xl"
                                     }`}
                                 >
@@ -360,7 +360,7 @@ export default function BookTicket() {
                                         <div
                                             onClick={() => toggleChain(chain.chainId)}
                                             className={`flex items-center justify-between cursor-pointer select-none group transition-all duration-300 ${
-                                                isChainExpanded ? "pb-4 border-b border-slate-100" : "pb-0"
+                                                isChainExpanded ? "pb-4 border-b border-slate-100 dark:border-zinc-800/80" : "pb-0"
                                             }`}
                                         >
                                             <div className="flex items-center gap-3">
@@ -398,7 +398,7 @@ export default function BookTicket() {
                                                                             <h3 className={`text-base font-extrabold ${theme.titleColor} leading-snug transition-colors`}>
                                                                                 {branch.name}
                                                                             </h3>
-                                                                            <p className="text-slate-500 font-medium text-xs mt-1 truncate">
+                                                                            <p className="text-slate-500 dark:text-zinc-400 font-medium text-xs mt-1 truncate">
                                                                                 {branch.address}
                                                                             </p>
                                                                         </div>
@@ -408,13 +408,13 @@ export default function BookTicket() {
 
                                                                 {/* Showtimes Formats */}
                                                                 {isBranchExpanded && (
-                                                                    <div className="space-y-5 mt-5 pt-5 border-t border-slate-100 animate__animated animate__fadeIn">
+                                                                    <div className="space-y-5 mt-5 pt-5 border-t border-slate-100 dark:border-zinc-800/80 animate__animated animate__fadeIn">
                                                                         {/* 2D Dubbed - conditionally rendered */}
                                                                         {hasDubbing && (
                                                                             <div>
                                                                                 <div className="flex items-center gap-2 mb-3">
                                                                                     <span className="h-3 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: theme.glowColor }} />
-                                                                                    <h4 className="text-xs font-black text-slate-700 uppercase tracking-wider">
+                                                                                    <h4 className="text-xs font-black text-slate-700 dark:text-white uppercase tracking-wider">
                                                                                         2D Dubbed
                                                                                     </h4>
                                                                                 </div>
@@ -428,8 +428,8 @@ export default function BookTicket() {
                                                                                                 onClick={() => handleSelectShowtime(branch.name, "2D Dubbed", time)}
                                                                                                 className={`px-5.5 py-2.5 text-xs font-black rounded-xl border transition-all duration-200 ${
                                                                                                     expired
-                                                                                                        ? "bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed line-through text-[11px] font-bold"
-                                                                                                        : `bg-white border-slate-200 text-slate-800 ${theme.buttonActive} hover:scale-[1.03] cursor-pointer shadow-sm active:scale-95`
+                                                                                                        ? "bg-slate-50 border-slate-100 text-slate-300 dark:bg-zinc-800/20 dark:border-zinc-805 dark:text-zinc-600 dark:line-through cursor-not-allowed line-through text-[11px] font-bold"
+                                                                                                        : `bg-white border-slate-200 text-slate-800 dark:bg-zinc-800/50 dark:border-zinc-700/80 dark:text-zinc-200 ${theme.buttonActive} hover:scale-[1.03] cursor-pointer shadow-sm active:scale-95`
                                                                                                 }`}
                                                                                             >
                                                                                                 {time}
@@ -444,7 +444,7 @@ export default function BookTicket() {
                                                                         <div>
                                                                             <div className="flex items-center gap-2 mb-3">
                                                                                 <span className="h-3 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: theme.glowColor }} />
-                                                                                <h4 className="text-xs font-black text-slate-700 uppercase tracking-wider">
+                                                                                <h4 className="text-xs font-black text-slate-700 dark:text-white uppercase tracking-wider">
                                                                                     2D Subbed
                                                                                 </h4>
                                                                             </div>
@@ -458,8 +458,8 @@ export default function BookTicket() {
                                                                                             onClick={() => handleSelectShowtime(branch.name, "2D Subbed", time)}
                                                                                             className={`px-5.5 py-2.5 text-xs font-black rounded-xl border transition-all duration-200 ${
                                                                                                 expired
-                                                                                                    ? "bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed line-through text-[11px] font-bold"
-                                                                                                    : `bg-white border-slate-200 text-slate-800 ${theme.buttonActive} hover:scale-[1.03] cursor-pointer shadow-sm active:scale-95`
+                                                                                                    ? "bg-slate-50 border-slate-100 text-slate-305 dark:bg-zinc-800/20 dark:border-zinc-805 dark:text-zinc-600 dark:line-through cursor-not-allowed line-through text-[11px] font-bold"
+                                                                                                    : `bg-white border-slate-200 text-slate-800 dark:bg-zinc-800/50 dark:border-zinc-700/80 dark:text-zinc-200 ${theme.buttonActive} hover:scale-[1.03] cursor-pointer shadow-sm active:scale-95`
                                                                                             }`}
                                                                                         >
                                                                                             {time}

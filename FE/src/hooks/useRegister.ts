@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from '../components/Toast/Toast.tsx';
+import { MOCK_USERS } from '../mockAPI/userMock.tsx';
+import { 
+    validateEmail, 
+    validatePhone, 
+    validateName, 
+    validatePassword, 
+    validateConfirmPassword 
+} from '../validation/validation';
 
 export interface RegisterForm {
     matKhau: string;
@@ -48,60 +56,64 @@ export default function useRegister(onRegisterSuccess: () => void) {
 
     const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setRegisterForm(prev => ({ ...prev, [name]: value }));
-        validateField(name as keyof RegisterForm, value);
+        
+        let filteredValue = value;
+        if (name === 'soDT') {
+            filteredValue = value.replace(/[^0-9]/g, "");
+        }
+
+        setRegisterForm(prev => ({ ...prev, [name]: filteredValue }));
+        validateField(name as keyof RegisterForm, filteredValue);
 
         if (name === 'email') {
-            if (value && validateEmail(value)) {
-                checkEmailExists(value);
+            if (filteredValue && validateEmail(filteredValue) === null) {
+                checkEmailExists(filteredValue);
             } else {
                 setEmailTaken(false);
             }
         }
     };
 
-    const validateEmail = (email: string) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    };
-
-    const validatePhone = (phone: string) => {
-        const phoneRegex = /^[0-9]{10}$/;
-        return phoneRegex.test(phone);
-    };
-
     const validateField = (fieldName: keyof RegisterForm, value: string) => {
         const newErrors: FormErrors = { ...errors };
 
         switch (fieldName) {
-            case 'matKhau':
-                if (!value.trim()) newErrors.matKhau = 'Password is required';
+            case 'matKhau': {
+                const err = validatePassword(value);
+                if (err) newErrors.matKhau = err;
                 else delete newErrors.matKhau;
-                if (registerForm.xacNhanMatKhau && value !== registerForm.xacNhanMatKhau) {
-                    newErrors.xacNhanMatKhau = 'Passwords do not match';
-                } else if (registerForm.xacNhanMatKhau) {
-                    delete newErrors.xacNhanMatKhau;
+                
+                if (registerForm.xacNhanMatKhau) {
+                    const confirmErr = validateConfirmPassword(value, registerForm.xacNhanMatKhau);
+                    if (confirmErr) newErrors.xacNhanMatKhau = confirmErr;
+                    else delete newErrors.xacNhanMatKhau;
                 }
                 break;
-            case 'xacNhanMatKhau':
-                if (!value.trim()) newErrors.xacNhanMatKhau = 'Please confirm your password';
-                else if (value !== registerForm.matKhau) newErrors.xacNhanMatKhau = 'Passwords do not match';
+            }
+            case 'xacNhanMatKhau': {
+                const confirmErr = validateConfirmPassword(registerForm.matKhau, value);
+                if (confirmErr) newErrors.xacNhanMatKhau = confirmErr;
                 else delete newErrors.xacNhanMatKhau;
                 break;
-            case 'email':
-                if (!value.trim()) newErrors.email = 'Email is required';
-                else if (!validateEmail(value)) newErrors.email = 'Invalid email address (e.g. example@gmail.com)';
+            }
+            case 'email': {
+                const err = validateEmail(value);
+                if (err) newErrors.email = err;
                 else delete newErrors.email;
                 break;
-            case 'hoTen':
-                if (!value.trim()) newErrors.hoTen = 'Full name is required';
+            }
+            case 'hoTen': {
+                const err = validateName(value);
+                if (err) newErrors.hoTen = err;
                 else delete newErrors.hoTen;
                 break;
-            case 'soDT':
-                if (!value.trim()) newErrors.soDT = 'Phone number is required';
-                else if (!validatePhone(value)) newErrors.soDT = 'Phone number must be exactly 10 digits';
+            }
+            case 'soDT': {
+                const err = validatePhone(value);
+                if (err) newErrors.soDT = err;
                 else delete newErrors.soDT;
                 break;
+            }
             default:
                 break;
         }
@@ -112,17 +124,20 @@ export default function useRegister(onRegisterSuccess: () => void) {
     const validateRegisterForm = () => {
         const newErrors: FormErrors = {};
 
-        if (!registerForm.matKhau.trim()) newErrors.matKhau = 'Password is required';
-        if (!registerForm.xacNhanMatKhau.trim()) newErrors.xacNhanMatKhau = 'Please confirm your password';
-        else if (registerForm.xacNhanMatKhau !== registerForm.matKhau) newErrors.xacNhanMatKhau = 'Passwords do not match';
+        const nameErr = validateName(registerForm.hoTen);
+        if (nameErr) newErrors.hoTen = nameErr;
 
-        if (!registerForm.email.trim()) newErrors.email = 'Email is required';
-        else if (!validateEmail(registerForm.email)) newErrors.email = 'Invalid email address (e.g. example@gmail.com)';
+        const emailErr = validateEmail(registerForm.email);
+        if (emailErr) newErrors.email = emailErr;
 
-        if (!registerForm.hoTen.trim()) newErrors.hoTen = 'Full name is required';
+        const phoneErr = validatePhone(registerForm.soDT);
+        if (phoneErr) newErrors.soDT = phoneErr;
 
-        if (!registerForm.soDT.trim()) newErrors.soDT = 'Phone number is required';
-        else if (!validatePhone(registerForm.soDT)) newErrors.soDT = 'Phone number must be exactly 10 digits';
+        const passwordErr = validatePassword(registerForm.matKhau);
+        if (passwordErr) newErrors.matKhau = passwordErr;
+
+        const confirmErr = validateConfirmPassword(registerForm.matKhau, registerForm.xacNhanMatKhau);
+        if (confirmErr) newErrors.xacNhanMatKhau = confirmErr;
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -131,7 +146,8 @@ export default function useRegister(onRegisterSuccess: () => void) {
     const checkEmailExists = async (emailStr: string) => {
         try {
             await new Promise((resolve) => setTimeout(resolve, 50));
-            setEmailTaken(emailStr.toLowerCase() === 'admin@gmail.com');
+            const exists = MOCK_USERS.some(u => u.email.toLowerCase() === emailStr.toLowerCase());
+            setEmailTaken(exists);
         } catch (err) {
             console.error(err);
         }

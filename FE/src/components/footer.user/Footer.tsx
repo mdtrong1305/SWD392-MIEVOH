@@ -15,10 +15,9 @@ export default function Footer() {
                                 alt="Mievoh Logo" 
                                 className={`h-10 w-10 rounded-full object-cover ${isAnimatedPath ? "group-hover:scale-105 transition-transform duration-200" : ""}`} 
                             />
-                            <img 
-                                src="/images/mievoh_text.png" 
-                                alt="mievoh" 
-                                className={`h-32 w-auto object-contain my-[-3.0rem] ml-[-1.0rem] ${isAnimatedPath ? "transition-transform duration-200 group-hover:scale-[1.02]" : ""}`} 
+                            <span 
+                                className={`logo-text-gradient h-32 w-auto my-[-3.0rem] ml-[-1.0rem] ${isAnimatedPath ? "transition-transform duration-200 group-hover:scale-[1.02]" : ""}`} 
+                                aria-label="mievoh"
                             />
                         </a>
                         <p className="mt-2 text-sm text-gray-500 leading-relaxed max-w-xs">
@@ -31,7 +30,7 @@ export default function Footer() {
 
                     {/* Column 2: Explore */}
                     <div>
-                        <h3 className="text-base font-bold text-gray-900 mb-4">Explore</h3>
+                        <h3 className="text-base font-bold review-header-gradient mb-4">Explore</h3>
                         <ul className="space-y-3">
                             <li>
                                 <a href="#" className={`text-sm text-gray-500 ${isAnimatedPath ? "hover:text-[#7B68EE] hover:underline transition-colors" : ""}`}>
@@ -53,7 +52,7 @@ export default function Footer() {
 
                     {/* Column 3: Support */}
                     <div>
-                        <h3 className="text-base font-bold text-gray-900 mb-4">Support</h3>
+                        <h3 className="text-base font-bold review-header-gradient mb-4">Support</h3>
                         <ul className="space-y-3">
                             <li>
                                 <a href="#" className={`text-sm text-gray-500 ${isAnimatedPath ? "hover:text-[#7B68EE] hover:underline transition-colors" : ""}`}>
@@ -75,7 +74,7 @@ export default function Footer() {
 
                     {/* Column 4: Download App */}
                     <div>
-                        <h3 className="text-base font-bold text-gray-900 mb-4">Download App</h3>
+                        <h3 className="text-base font-bold review-header-gradient mb-4">Download App</h3>
                         <ul className="space-y-3">
                             <li>
                                 <a href="#" className={`flex items-center gap-2 text-sm text-gray-500 ${isAnimatedPath ? "hover:text-[#7B68EE] transition-colors" : ""}`}>

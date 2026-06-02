@@ -39,15 +39,15 @@ export default function DateSelector({ selectedDate, onSelectDate }: DateSelecto
     }
 
     return (
-        <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-sm mb-6 animate__animated animate__fadeIn">
+        <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-3xl p-5 shadow-sm mb-6 animate__animated animate__fadeIn">
             {/* Header label */}
-            <div className="flex items-center gap-2 mb-4 text-slate-800">
+            <div className="flex items-center gap-2 mb-4 text-slate-800 dark:text-zinc-300">
                 <Calendar className="h-5 w-5 text-[#6C5CE7]" />
-                <span className="text-sm font-extrabold uppercase tracking-wider text-slate-900">Select Date</span>
+                <span className="text-sm font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">Select Date</span>
             </div>
 
             {/* Dates list row */}
-            <div className="flex items-center md:justify-center gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+            <div className="flex items-center md:justify-center gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent">
                 {dates.map((dateOpt) => {
                     const isSelected = selectedDate?.dateString === dateOpt.dateString;
                     return (
@@ -57,10 +57,10 @@ export default function DateSelector({ selectedDate, onSelectDate }: DateSelecto
                             className={`flex flex-col items-center justify-center min-w-[80px] py-3 px-4 rounded-2xl border transition-all duration-300 cursor-pointer ${
                                 isSelected
                                     ? "bg-gradient-to-tr from-[#9E90FD] to-[#806DF6] border-[#806DF6] text-white shadow-md shadow-[#806DF6]/20 scale-[1.02]"
-                                    : "bg-slate-50/50 border-slate-100 hover:bg-slate-100 hover:text-slate-900 text-slate-600 hover:border-slate-200"
+                                    : "bg-slate-50/50 border-slate-100 text-slate-600 hover:bg-slate-100 hover:text-slate-900 hover:border-slate-200 dark:bg-zinc-800/40 dark:border-zinc-850 dark:text-zinc-400 dark:hover:bg-zinc-700/60 dark:hover:text-white dark:hover:border-zinc-700"
                             }`}
                         >
-                            <span className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${isSelected ? "text-indigo-100" : "text-slate-400"}`}>
+                            <span className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${isSelected ? "text-indigo-100" : "text-slate-400 dark:text-zinc-500"}`}>
                                 {dateOpt.label}
                             </span>
                             <span className="text-sm font-extrabold">

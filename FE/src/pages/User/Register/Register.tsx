@@ -94,7 +94,7 @@ export default function Register() {
                     >
                         <div className="absolute top-6 left-8 flex items-center gap-1.5">
                             <img src="/images/mievoh_logo.png" alt="Mievoh" className="h-6 w-6 object-cover rounded-full" />
-                            <img src="/images/mievoh_text.png" alt="Mievoh" className="h-22 w-auto object-contain my-[-2.1rem] ml-[-0.7rem] filter contrast-[1.05]" />
+                            <span className="logo-text-gradient h-22 w-auto my-[-2.1rem] ml-[-0.7rem]" aria-label="Mievoh" />
                         </div>
 
                         <h2 className="text-4xl font-extrabold text-violet-950 text-center mb-1.5">Sign Up</h2>
@@ -272,7 +272,7 @@ export default function Register() {
                     >
                         <div className="absolute top-6 left-8 flex items-center gap-1.5">
                             <img src="/images/mievoh_logo.png" alt="Mievoh" className="h-6 w-6 object-cover rounded-full" />
-                            <img src="/images/mievoh_text.png" alt="Mievoh" className="h-22 w-auto object-contain my-[-2.1rem] ml-[-0.7rem]" />
+                            <span className="logo-text-gradient h-22 w-auto my-[-2.1rem] ml-[-0.7rem]" aria-label="Mievoh" />
                         </div>
 
                         {forgotStep === 'email' ? (
@@ -593,7 +593,7 @@ export default function Register() {
                         >
                             <div className="flex flex-col items-center mb-6">
                                 <img src="/images/mievoh_logo.png" alt="Mievoh Logo" className="h-14 w-14 rounded-full object-cover mb-2 shadow-sm border border-violet-100" />
-                                <img src="/images/mievoh_text.png" alt="Mievoh" className="h-32 w-auto object-contain my-[-3.2rem]" />
+                                <span className="logo-text-gradient h-32 w-auto my-[-3.2rem]" aria-label="Mievoh" />
                                 <p className="text-xs text-violet-600/80">Welcome back!</p>
                             </div>
 
@@ -856,7 +856,7 @@ export default function Register() {
                         <form onSubmit={handleRegisterSubmit} noValidate>
                             <div className="flex flex-col items-center mb-5">
                                 <img src="/images/mievoh_logo.png" alt="Mievoh Logo" className="h-14 w-14 rounded-full object-cover mb-2 shadow-sm border border-violet-100" />
-                                <img src="/images/mievoh_text.png" alt="Mievoh" className="h-32 w-auto object-contain my-[-3.2rem]" />
+                                <span className="logo-text-gradient h-32 w-auto my-[-3.2rem]" aria-label="Mievoh" />
                                 <p className="text-xs text-violet-600/80">Create a new account</p>
                             </div>
 

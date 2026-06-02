@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { Star, MessageSquarePlus } from "lucide-react";
 import Button from "../../../../components/Button/Button.tsx";
 import { toast } from "../../../../components/Toast/Toast.tsx";
@@ -17,9 +18,11 @@ interface DetailReviewsProps {
 }
 
 export default function DetailReviews({ reviews, onAddReview }: DetailReviewsProps) {
+    const { isAuthenticated, user } = useSelector((state: any) => state.login || { isAuthenticated: false, user: null });
     const [rating, setRating] = useState(5);
     const [hoverRating, setHoverRating] = useState<number | null>(null);
     const [comment, setComment] = useState("");
+    const [guestName, setGuestName] = useState("");
 
     // Calculate rating statistics
     const averageRating = reviews.length > 0 
@@ -39,34 +42,46 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         
+        let reviewerName = "";
+        if (isAuthenticated && user) {
+            reviewerName = user.name || user.hoTen || "User";
+        } else {
+            if (!guestName.trim()) {
+                toast.error("Please enter your name!");
+                return;
+            }
+            reviewerName = guestName.trim();
+        }
+
         if (!comment.trim()) {
             toast.error("Please write a comment!");
             return;
         }
 
-        onAddReview({ name: "Anonymous Guest", rating, comment });
+        onAddReview({ name: reviewerName, rating, comment });
         
         // Reset form
         setRating(5);
         setComment("");
+        setGuestName("");
         
         toast.success("Thank you for submitting your review!");
     };
 
     return (
-        <div className="w-full bg-white rounded-2xl border border-[#EAE6F0] p-6 sm:p-8 shadow-sm flex flex-col gap-8 animate__animated animate__fadeIn">
+        <div className="w-full bg-white dark:bg-zinc-900/40 rounded-2xl border border-[#EAE6F0] dark:border-zinc-800/80 p-6 sm:p-8 shadow-sm flex flex-col gap-8 animate__animated animate__fadeIn">
             {/* Header / Title */}
             <div>
-                <h2 className="text-xl font-bold text-gray-900 border-b border-[#EAE6F0] pb-3">
+                <h2 className="text-xl font-bold text-gray-900 dark:border-zinc-800/80 border-b border-[#EAE6F0] pb-3">
                     Audience Reviews ({reviews.length})
                 </h2>
             </div>
 
             {/* Ratings summary breakdown */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center bg-[#F6F3F9]/60 p-6 rounded-2xl border border-[#EAE6F0]/60">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center bg-[#F6F3F9]/60 dark:bg-zinc-900/60 p-6 rounded-2xl border border-[#EAE6F0]/60 dark:border-zinc-800/60">
                 {/* Average rating summary */}
                 <div className="text-center flex flex-col items-center">
-                    <span className="text-5xl font-black text-[#6D28D9] mb-2">
+                    <span className="text-5xl font-black text-[#6D28D9] dark:text-violet-400 mb-2">
                         {averageRating.toFixed(1)}
                     </span>
                     <div className="flex gap-0.5 text-yellow-400 mb-1">
@@ -90,7 +105,7 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
                         return (
                             <div key={stars} className="flex items-center gap-3 text-sm">
                                 <span className="w-12 font-bold text-gray-600 text-right shrink-0">{stars} stars</span>
-                                <div className="flex-grow h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                                <div className="flex-grow h-2.5 bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden">
                                     <div 
                                         className="h-full bg-gradient-to-r from-[#9370DB] to-[#7B68EE] rounded-full transition-all duration-500" 
                                         style={{ width: `${percentage}%` }}
@@ -112,7 +127,7 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
                 ) : (
                     <div className="flex flex-col gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                         {reviews.map((review) => (
-                            <div key={review.id} className="flex gap-4 p-4 rounded-xl border border-[#EAE6F0] bg-[#F6F3F9]/30">
+                            <div key={review.id} className="flex gap-4 p-4 rounded-xl border border-[#EAE6F0] dark:border-zinc-800/60 bg-[#F6F3F9]/30">
                                 {/* User avatar icon */}
                                 <div className="h-10 w-10 rounded-full bg-[#E9D5FF] text-[#6D28D9] font-black flex items-center justify-center text-sm shrink-0">
                                     {review.name.charAt(0).toUpperCase()}
@@ -146,13 +161,15 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
             </div>
 
             {/* Write a review form */}
-            <div className="border-t border-[#EAE6F0]/60 pt-6">
+            <div className="border-t border-[#EAE6F0]/60 dark:border-zinc-800/80 pt-6">
                 <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
-                    <MessageSquarePlus className="h-5 w-5 text-[#6D28D9]" />
-                    Write Your Review
+                    <MessageSquarePlus className="h-5 w-5 text-[#6D28D9] dark:text-violet-400 shrink-0" />
+                    <span className="review-header-gradient">
+                        Write Your Review
+                    </span>
                 </h3>
 
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                     {/* Star selection */}
                     <div className="flex items-center gap-3">
                         <span className="text-sm font-bold text-gray-600">Your rating:</span>
@@ -176,12 +193,25 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
                                 </button>
                             ))}
                         </div>
-                        <span className="text-xs font-bold text-[#6D28D9] bg-[#F3E8FF] px-2 py-0.5 rounded">
+                        <span className="text-xs font-bold text-[#6D28D9] dark:text-violet-300 bg-[#F3E8FF] dark:bg-violet-950/50 px-2 py-0.5 rounded">
                             {rating} / 5
                         </span>
                     </div>
 
-
+                    {/* Guest Name (only when not logged in) */}
+                    {!isAuthenticated && (
+                        <div className="flex flex-col gap-1.5 animate__animated animate__fadeIn">
+                            <label htmlFor="reviewerName" className="text-sm font-bold text-gray-600">Your Name *</label>
+                            <input
+                                type="text"
+                                id="reviewerName"
+                                value={guestName}
+                                onChange={(e) => setGuestName(e.target.value)}
+                                placeholder="Enter your name to display on your review..."
+                                className="rounded-xl border border-violet-100 bg-[#F6F3F9]/50 py-2.5 px-4 text-sm text-gray-700 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-violet-500 focus:bg-white focus:ring-2 focus:ring-violet-100 max-w-md dark:border-zinc-800 dark:bg-zinc-850/40 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:bg-zinc-800 dark:focus:ring-zinc-800"
+                            />
+                        </div>
+                    )}
 
                     {/* Comment text */}
                     <div className="flex flex-col gap-1.5">
@@ -192,7 +222,7 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
                             placeholder="Share your thoughts about this movie..."
-                            className="rounded-xl border border-violet-100 bg-[#F6F3F9]/50 py-2.5 px-4 text-sm text-gray-700 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-violet-500 focus:bg-white focus:ring-2 focus:ring-violet-100 resize-none"
+                            className="rounded-xl border border-violet-100 bg-[#F6F3F9]/50 py-2.5 px-4 text-sm text-gray-700 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-violet-500 focus:bg-white focus:ring-2 focus:ring-violet-100 resize-none dark:border-zinc-800 dark:bg-zinc-850/40 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:bg-zinc-800 dark:focus:ring-zinc-800"
                         />
                     </div>
 

@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Search, Film, ChevronDown, Check } from "lucide-react";
+import { Film, ChevronDown, Check } from "lucide-react";
 import { THEATER_CHAINS } from "../../../../mockAPI/cinemaMock.tsx";
 import type { TheaterChain } from "../../../../mockAPI/cinemaMock.tsx";
 import CityFilter from "../../../../components/CityFilter/CityFilter.tsx";
+import SearchInput from "../../../../components/SearchInput/SearchInput";
 
 interface CinemaFiltersProps {
     selectedCity: string;
@@ -35,7 +36,7 @@ export default function CinemaFilters({
     };
 
     return (
-        <div className="bg-white p-6 rounded-3xl border border-violet-100/80 shadow-xl shadow-violet-100/10 mb-8 relative z-30">
+        <div className="bg-white dark:bg-zinc-900/50 p-6 rounded-3xl border border-violet-100/80 dark:border-zinc-800/80 shadow-xl shadow-violet-100/10 mb-8 relative z-30">
             {/* Global overlay to close dropdowns when clicking outside */}
             {isChainOpen && (
                 <div 
@@ -56,7 +57,7 @@ export default function CinemaFilters({
 
                 {/* Chain Selector Dropdown */}
                 <div className="flex flex-col gap-2 relative">
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider filter-header-gradient">
                         Cinema Chain:
                     </span>
                     <button
@@ -65,8 +66,8 @@ export default function CinemaFilters({
                         }}
                         className={`w-full flex items-center justify-between pl-4 pr-4 py-2.5 rounded-2xl text-sm font-bold transition-all duration-300 cursor-pointer outline-none border ${
                             isChainOpen 
-                                ? "bg-white border-violet-500 text-violet-700 shadow-sm" 
-                                : "bg-[#F5F3F7]/80 border-violet-100 hover:bg-[#EBE8F0] text-gray-700"
+                                ? "bg-white border-violet-500 text-gray-600 shadow-sm dark:bg-zinc-800 dark:border-violet-400 dark:!text-white" 
+                                : "bg-[#F5F3F7]/80 border-violet-100 hover:bg-[#EBE8F0] text-gray-600 dark:bg-zinc-800/40 dark:border-zinc-800 dark:hover:bg-zinc-700/50 dark:!text-white"
                         }`}
                     >
                         <div className="flex items-center gap-2.5">
@@ -84,14 +85,14 @@ export default function CinemaFilters({
 
                     {/* Dropdown Options List */}
                     {isChainOpen && (
-                        <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white border border-violet-200/90 shadow-2xl shadow-violet-950/15 rounded-2xl py-2 z-50 animate__animated animate__fadeIn max-h-60 overflow-y-auto">
+                        <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white dark:bg-zinc-800 border border-violet-200/90 dark:border-zinc-700 shadow-2xl shadow-violet-955/15 rounded-2xl py-2 z-50 animate__animated animate__fadeIn max-h-60 overflow-y-auto">
                             <button
                                 onClick={() => handleSelectChain("all")}
                                 className={`w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-left transition-colors duration-150 cursor-pointer ${
                                     selectedChainId === "all" 
-                                        ? "bg-violet-50 text-violet-755" 
-                                        : "text-gray-700 hover:bg-violet-50/60 hover:text-violet-755"
-                                }}`}
+                                        ? "bg-violet-55 text-violet-755 dark:bg-zinc-700/50 dark:!text-violet-400" 
+                                        : "text-gray-700 hover:bg-violet-50/60 hover:text-violet-755 dark:!text-zinc-200 dark:hover:bg-zinc-700 dark:hover:!text-violet-400"
+                                }`}
                             >
                                 <div className="flex items-center gap-2.5">
                                     <Film className="h-6 w-6 text-gray-450 shrink-0" />
@@ -109,10 +110,10 @@ export default function CinemaFilters({
                                         disabled={count === 0}
                                         className={`w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-left transition-colors duration-150 ${
                                             count === 0 
-                                                ? "opacity-40 cursor-not-allowed text-gray-400" 
+                                                ? "opacity-40 cursor-not-allowed text-gray-400 dark:text-zinc-550" 
                                                 : isSelected 
-                                                    ? "bg-violet-50 text-violet-755 cursor-pointer" 
-                                                    : "text-gray-700 hover:bg-violet-50/60 hover:text-violet-755 cursor-pointer"
+                                                    ? "bg-violet-50 text-violet-755 cursor-pointer dark:bg-zinc-700/50 dark:!text-violet-400" 
+                                                    : "text-gray-700 hover:bg-violet-50/60 hover:text-violet-755 cursor-pointer dark:!text-zinc-200 dark:hover:bg-zinc-700 dark:hover:!text-violet-400"
                                         }`}
                                     >
                                         <div className="flex items-center gap-2.5 min-w-0">
@@ -129,19 +130,16 @@ export default function CinemaFilters({
 
                 {/* Search Input */}
                 <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider filter-header-gradient">
                         Quick Search:
                     </span>
-                    <div className="relative">
-                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-6 w-6 text-violet-500 pointer-events-none" />
-                        <input
-                            type="text"
-                            placeholder="Enter cinema name, street..."
-                            value={searchQuery}
-                            onChange={(e) => onSearchChange(e.target.value)}
-                            className="w-full pl-12 pr-4 py-2.5 bg-[#F5F3F7]/70 border border-violet-100 hover:border-violet-300 rounded-2xl text-sm font-bold text-gray-755 outline-none placeholder:text-gray-400 focus:border-violet-500 focus:bg-white focus:ring-2 focus:ring-violet-100 transition-all duration-300"
-                        />
-                    </div>
+                    <SearchInput
+                        size="lg"
+                        placeholder="Enter cinema name, street..."
+                        value={searchQuery}
+                        onChange={(e) => onSearchChange(e.target.value)}
+                        className="w-full bg-[#F5F3F7]/70 border-violet-100 hover:border-violet-300 rounded-2xl text-sm font-bold text-gray-755 focus:ring-2 focus:ring-violet-100 dark:bg-zinc-800/40 dark:border-zinc-800 dark:hover:border-zinc-700"
+                    />
                 </div>
             </div>
         </div>

@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 
+import { MOCK_USERS } from "../../../mockAPI/userMock.tsx";
+
 // Types
 export type LoginCredentials = {
     email: string;
@@ -57,10 +59,37 @@ export const loginUser = createAsyncThunk<
                 return rejectWithValue("Email and password cannot be empty");
             }
 
+            // Check if credentials match any predefined mock user
+            const foundUser = MOCK_USERS.find(
+                u => u.email.toLowerCase() === credentials.email.toLowerCase()
+            );
+
+            if (foundUser) {
+                // If it is a predefined mock user, validate password
+                if (foundUser.matKhau !== credentials.password) {
+                    return rejectWithValue("Incorrect password");
+                }
+                return {
+                    content: {
+                        user: {
+                            id: foundUser.id,
+                            email: foundUser.email,
+                            name: foundUser.hoTen,
+                            hoTen: foundUser.hoTen,
+                            soDT: foundUser.soDT,
+                            phone: foundUser.soDT,
+                            role: foundUser.role,
+                            avatar: foundUser.avatar || "/images/avatar.jpg"
+                        },
+                        token: "mock-jwt-token-xyz789"
+                    }
+                };
+            }
+
             const username = credentials.email.split('@')[0];
             const capitalizedName = username.charAt(0).toUpperCase() + username.slice(1);
 
-            // Return mock response matching Redux store expectation
+            // Return mock response matching Redux store expectation for other emails
             return {
                 content: {
                     user: {
@@ -68,7 +97,8 @@ export const loginUser = createAsyncThunk<
                         email: credentials.email,
                         name: capitalizedName,
                         hoTen: capitalizedName,
-                        role: "USER"
+                        role: "USER",
+                        avatar: "/images/avatar.jpg"
                     },
                     token: "mock-jwt-token-xyz789"
                 }
@@ -101,6 +131,14 @@ const loginSlice = createSlice({
             state.user = action.payload;
             state.isAuthenticated = !!action.payload;
             state.error = null;
+        },
+        updateUser: (state, action: PayloadAction<Partial<AuthUser>>) => {
+            if (state.user) {
+                state.user = { ...state.user, ...action.payload };
+                try {
+                    localStorage.setItem('auth_user', JSON.stringify(state.user));
+                } catch { }
+            }
         }
     },
     extraReducers: (builder) => {
@@ -143,5 +181,5 @@ const loginSlice = createSlice({
     },
 });
 
-export const { clearError, logout, setAuthenticated } = loginSlice.actions;
+export const { clearError, logout, setAuthenticated, updateUser } = loginSlice.actions;
 export default loginSlice.reducer; 

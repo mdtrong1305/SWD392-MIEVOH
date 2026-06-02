@@ -25,8 +25,8 @@ export default function PaymentMethods({
 }: PaymentMethodsProps) {
     return (
         <div className="flex flex-col gap-6 animate__animated animate__fadeIn">
-            <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm flex flex-col gap-6">
-                <h3 className="text-base font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+            <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-3xl p-6 shadow-sm flex flex-col gap-6">
+                <h3 className="text-base font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
                     💳 Payment Methods
                 </h3>
  
@@ -59,20 +59,22 @@ export default function PaymentMethods({
                                 key={method.id}
                                 onClick={() => setPaymentMethod(method.id)}
                                 className={`p-4.5 border rounded-2xl cursor-pointer flex items-center justify-between transition-all duration-200 ${
-                                    isSelected ? "border-[#8E7EFE] bg-violet-50/20" : "border-slate-100 hover:border-slate-200 bg-slate-50/20"
+                                    isSelected 
+                                        ? "border-[#8E7EFE] bg-violet-50/20 dark:bg-[#8E7EFE]/10" 
+                                        : "border-slate-100 hover:border-slate-200 bg-slate-50/20 dark:bg-zinc-800/20 dark:border-zinc-800 dark:hover:border-zinc-700"
                                 }`}
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 flex items-center justify-center shadow-inner shrink-0">
+                                    <div className="w-12 h-12 rounded-xl bg-white dark:bg-zinc-855 border border-slate-100 dark:border-zinc-750 flex items-center justify-center shadow-inner shrink-0">
                                         {method.icon}
                                     </div>
                                     <div>
-                                        <h4 className="text-base font-extrabold text-slate-850">{method.name}</h4>
-                                        <p className="text-sm text-slate-500 font-medium mt-0.5 leading-snug">{method.desc}</p>
+                                        <h4 className="text-base font-extrabold text-slate-855 dark:text-white">{method.name}</h4>
+                                        <p className="text-sm text-slate-500 dark:text-zinc-400 font-medium mt-0.5 leading-snug">{method.desc}</p>
                                     </div>
                                 </div>
                                 <div className={`w-5.5 h-5.5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                                    isSelected ? "border-[#8E7EFE]" : "border-slate-350"
+                                    isSelected ? "border-[#8E7EFE]" : "border-slate-350 dark:border-zinc-600"
                                 }`}>
                                     {isSelected && <div className="w-3.5 h-3.5 rounded-full bg-[#8E7EFE]" />}
                                 </div>
@@ -82,10 +84,10 @@ export default function PaymentMethods({
                 </div>
 
                 {/* Navigation buttons */}
-                <div className="border-t border-slate-100 pt-6 flex justify-start">
+                <div className="border-t border-slate-100 dark:border-zinc-800/80 pt-6 flex justify-start">
                     <button
                         onClick={() => setActiveStep(2)}
-                        className="px-5 py-2.5 border border-slate-200 hover:border-slate-300 text-slate-600 hover:text-slate-800 font-extrabold text-xs rounded-2xl transition-all cursor-pointer flex items-center gap-2 hover:bg-slate-50"
+                        className="px-5 py-2.5 border border-slate-200 dark:border-zinc-700 hover:border-slate-300 dark:hover:border-zinc-600 text-slate-600 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 font-extrabold text-xs rounded-2xl transition-all cursor-pointer flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-zinc-800"
                     >
                         <ChevronLeft className="h-4 w-4" />
                         Go back to combos
@@ -94,22 +96,22 @@ export default function PaymentMethods({
             </div>
 
             {!isAuthenticated && (
-                <div className="bg-white border border-slate-100 rounded-3xl shadow-sm flex flex-col overflow-hidden">
-                    <div className="bg-slate-50 border-b border-slate-100 px-6 py-4">
-                        <h3 className="text-sm font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-3xl shadow-sm flex flex-col overflow-hidden">
+                    <div className="bg-slate-50 dark:bg-zinc-900 border-b border-slate-100 dark:border-zinc-800/80 px-6 py-4">
+                        <h3 className="text-sm font-black uppercase tracking-wider text-slate-700 dark:text-white flex items-center gap-2">
                             👤 Personal Information
                         </h3>
                     </div>
                     <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-5">
                         <div>
-                            <label className="text-[11px] font-black uppercase text-slate-400 block mb-2 tracking-wider">Full Name</label>
+                            <label className="text-[11px] font-black uppercase text-slate-400 dark:!text-white block mb-2 tracking-wider">Full Name</label>
                             <input 
                                 type="text" 
                                 placeholder="Enter your full name" 
                                 value={guestName}
                                 onChange={(e) => handleGuestChange("name", e.target.value)}
-                                className={`w-full bg-slate-50/50 border rounded-2xl px-4 py-3 text-sm font-extrabold text-slate-880 outline-none focus:bg-white transition-all ${
-                                    guestErrors.name ? "border-red-400 focus:border-red-500" : "border-slate-200/80 focus:border-[#8E7EFE]"
+                                className={`w-full bg-slate-50/50 dark:bg-zinc-800/40 border rounded-2xl px-4 py-3 text-sm font-extrabold text-slate-880 dark:!text-white dark:!placeholder-zinc-300 outline-none focus:bg-white dark:focus:bg-zinc-800/80 transition-all ${
+                                    guestErrors.name ? "border-red-400 focus:border-red-500" : "border-slate-200/80 dark:border-zinc-700/80 focus:border-[#8E7EFE]"
                                 }`}
                             />
                             {guestErrors.name && (
@@ -119,14 +121,14 @@ export default function PaymentMethods({
                             )}
                         </div>
                         <div>
-                            <label className="text-[11px] font-black uppercase text-slate-400 block mb-2 tracking-wider">Phone Number</label>
+                            <label className="text-[11px] font-black uppercase text-slate-400 dark:!text-white block mb-2 tracking-wider">Phone Number</label>
                             <input 
                                 type="tel" 
                                 placeholder="Enter your phone number" 
                                 value={guestPhone}
                                 onChange={(e) => handleGuestChange("phone", e.target.value)}
-                                className={`w-full bg-slate-50/50 border rounded-2xl px-4 py-3 text-sm font-extrabold text-slate-880 outline-none focus:bg-white transition-all ${
-                                    guestErrors.phone ? "border-red-400 focus:border-red-500" : "border-slate-200/80 focus:border-[#8E7EFE]"
+                                className={`w-full bg-slate-50/50 dark:bg-zinc-800/40 border rounded-2xl px-4 py-3 text-sm font-extrabold text-slate-880 dark:!text-white dark:!placeholder-zinc-300 outline-none focus:bg-white dark:focus:bg-zinc-800/80 transition-all ${
+                                    guestErrors.phone ? "border-red-400 focus:border-red-500" : "border-slate-200/80 dark:border-zinc-700/80 focus:border-[#8E7EFE]"
                                 }`}
                             />
                             {guestErrors.phone && (
@@ -136,14 +138,14 @@ export default function PaymentMethods({
                             )}
                         </div>
                         <div>
-                            <label className="text-[11px] font-black uppercase text-slate-400 block mb-2 tracking-wider">Email Address</label>
+                            <label className="text-[11px] font-black uppercase text-slate-400 dark:!text-white block mb-2 tracking-wider">Email Address</label>
                             <input 
                                 type="email" 
                                 placeholder="Enter your email address" 
                                 value={guestEmail}
                                 onChange={(e) => handleGuestChange("email", e.target.value)}
-                                className={`w-full bg-slate-50/50 border rounded-2xl px-4 py-3 text-sm font-extrabold text-slate-880 outline-none focus:bg-white transition-all ${
-                                    guestErrors.email ? "border-red-400 focus:border-red-500" : "border-slate-200/80 focus:border-[#8E7EFE]"
+                                className={`w-full bg-slate-50/50 dark:bg-zinc-800/40 border rounded-2xl px-4 py-3 text-sm font-extrabold text-slate-880 dark:!text-white dark:!placeholder-zinc-300 outline-none focus:bg-white dark:focus:bg-zinc-800/80 transition-all ${
+                                    guestErrors.email ? "border-red-400 focus:border-red-500" : "border-slate-200/80 dark:border-zinc-700/80 focus:border-[#8E7EFE]"
                                 }`}
                             />
                             {guestErrors.email && (

@@ -121,13 +121,13 @@ export default function Promotions() {
                                     {/* Button */}
                                     <div className="mt-4 flex justify-center">
                                         <Button 
-                                            variant={isClaimed ? "outline" : "secondary"} 
+                                            variant="outline" 
                                             size="sm"
                                             onClick={() => handleClaimPromo(promo.id)}
                                             className={`px-8 py-2 w-full text-center ${
                                                 isClaimed 
                                                     ? "border-green-300 text-green-600 bg-green-50 hover:bg-green-100/50 hover:text-green-700 hover:border-green-400" 
-                                                    : ""
+                                                    : "border-gray-200 hover:border-[#6D28D9]"
                                             }`}
                                         >
                                             {isClaimed ? "Claimed ✓" : "Claim Code"}
