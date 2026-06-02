@@ -1,17 +1,21 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { Injectable } from '@nestjs/common';
+import {
+  GOOGLE_CALLBACK_URL,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+} from '../constant/app.constant';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor() {
     // Gọi hàm khởi tạo của PassportStrategy với các thông tin cấu hình từ Google
     super({
-      clientID: process.env.GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      clientID: GOOGLE_CLIENT_ID || '',
+      clientSecret: GOOGLE_CLIENT_SECRET || '',
       callbackURL:
-        process.env.GOOGLE_CALLBACK_URL ||
-        'http://localhost:3069/api/auth/google/callback', // Đường dẫn callback sau khi user xác thực xong
+        GOOGLE_CALLBACK_URL || 'http://localhost:3069/api/auth/google/callback', // Đường dẫn callback sau khi user xác thực xong
       scope: ['email', 'profile'],
     });
   }
