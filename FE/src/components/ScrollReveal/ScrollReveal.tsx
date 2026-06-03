@@ -19,8 +19,20 @@ export default function ScrollReveal({
 }: ScrollRevealProps) {
     const [hasIntersected, setHasIntersected] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
+    const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 768 : false);
 
     useEffect(() => {
+        if (typeof window === "undefined") return;
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    useEffect(() => {
+        if (isMobile) return;
+
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
@@ -42,7 +54,15 @@ export default function ScrollReveal({
                 observer.disconnect();
             }
         };
-    }, [threshold]);
+    }, [threshold, isMobile]);
+
+    if (isMobile) {
+        return (
+            <div className={className}>
+                {children}
+            </div>
+        );
+    }
 
     return (
         <div

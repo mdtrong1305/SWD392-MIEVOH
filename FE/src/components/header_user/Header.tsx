@@ -34,22 +34,33 @@ export default function Header({
     const { language, setLanguage, t } = useLanguage();
 
     const menuRef = useRef<HTMLDivElement>(null);
+    const mobileMenuRef = useRef<HTMLDivElement>(null);
+    const mobileButtonRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
                 setUserMenuOpen(false);
             }
+            if (
+                isOpen &&
+                mobileMenuRef.current &&
+                !mobileMenuRef.current.contains(event.target as Node) &&
+                mobileButtonRef.current &&
+                !mobileButtonRef.current.contains(event.target as Node)
+            ) {
+                setIsOpen(false);
+            }
         };
 
-        if (userMenuOpen) {
+        if (userMenuOpen || isOpen) {
             document.addEventListener("mousedown", handleClickOutside);
         }
 
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [userMenuOpen]);
+    }, [userMenuOpen, isOpen]);
 
     const isAnimatedPath = true;
 
@@ -88,20 +99,20 @@ export default function Header({
         } ${isVisible ? "translate-y-0" : "-translate-y-full"}`}>
             <div className="mx-auto flex max-w-[85%] items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
                 {/* Left: Logo and Brand Name */}
-                <Link to="/" className={`flex items-center gap-0 ${isAnimatedPath ? "group" : ""}`} aria-label="Mievoh Homepage">
+                <Link to="/" className={`flex items-center gap-0 shrink-0 ${isAnimatedPath ? "group" : ""}`} aria-label="Mievoh Homepage">
                     <img
                         src="/images/mievoh_logo.png"
                         alt="Mievoh Logo"
-                        className={`h-12 w-12 rounded-full object-cover ${isAnimatedPath ? "group-hover:scale-105 transition-transform duration-200" : ""}`}
+                        className={`h-8 w-8 sm:h-12 sm:w-12 rounded-full object-cover ${isAnimatedPath ? "group-hover:scale-105 transition-transform duration-200" : ""}`}
                     />
                     <span
-                        className={`logo-text-gradient h-48 w-auto my-[-4.6rem] ml-[-1.5rem] ${isAnimatedPath ? "transition-transform duration-200 group-hover:scale-[1.02]" : ""}`}
+                        className={`logo-text-gradient h-32 my-[-3.0rem] ml-[-1.0rem] sm:h-48 sm:my-[-4.6rem] sm:ml-[-1.5rem] w-auto ${isAnimatedPath ? "transition-transform duration-200 group-hover:scale-[1.02]" : ""}`}
                         aria-label="mievoh"
                     />
                 </Link>
 
                 {/* Center: Nav links */}
-                <nav className="hidden items-center gap-8 md:flex">
+                <nav className="hidden items-center gap-4 lg:gap-8 md:flex">
                     {navItems.map((item) => {
                         // Determine if current link is active
                         const isActive =
@@ -121,7 +132,7 @@ export default function Header({
                             <Link
                                 key={item.label}
                                 to={item.href}
-                                className={`relative py-2 text-base transition-all duration-200 ${isActive
+                                className={`relative py-2 text-base transition-all duration-200 whitespace-nowrap ${isActive
                                         ? "nav-active font-bold"
                                         : "text-gray-600 dark:text-violet-400 font-semibold hover:text-[#5B21B6] dark:hover:text-violet-200"
                                     }`}
@@ -136,15 +147,15 @@ export default function Header({
                 </nav>
 
                 {/* Right: Search, Auth actions and Hamburger */}
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-3 lg:gap-6">
                     {/* Search Bar (desktop only) */}
                     <SearchInput
                         containerClassName="hidden lg:flex"
-                        className="w-72 border-violet-100/80 dark:border-zinc-800 bg-violet-50/10 dark:bg-zinc-800/30 hover:border-violet-300 hover:bg-violet-50/20 hover:shadow-[0_4px_12px_rgba(124,58,237,0.05)] focus:w-[26rem] focus:ring-2 focus:ring-violet-100 dark:focus:ring-zinc-800"
+                        className="w-44 lg:w-72 border-violet-100/80 dark:border-zinc-800 bg-violet-50/10 dark:bg-zinc-800/30 hover:border-violet-300 hover:bg-violet-50/20 hover:shadow-[0_4px_12px_rgba(124,58,237,0.05)] focus:w-56 lg:focus:w-[26rem] focus:ring-2 focus:ring-violet-100 dark:focus:ring-zinc-800"
                     />
 
                     {/* Auth Actions (desktop only) */}
-                    <div className="hidden items-center gap-4 md:flex">
+                    <div className="hidden items-center gap-2.5 lg:gap-4 md:flex">
                         {/* Language Toggle Button */}
                         <button
                             onClick={() => setLanguage(language === "vi" ? "en" : "vi")}
@@ -172,14 +183,14 @@ export default function Header({
                             <div className="relative" ref={menuRef}>
                                 <button
                                     onClick={() => setUserMenuOpen((v) => !v)}
-                                    className="flex items-center gap-2.5 px-4 py-1.5 text-sm font-extrabold bg-white dark:bg-zinc-800 border border-violet-200/80 dark:border-zinc-700 hover:border-violet-300 text-violet-800 dark:!text-violet-400 hover:bg-violet-50/50 dark:hover:bg-zinc-700/50 shadow-sm rounded-full transition-all duration-300 hover:scale-[1.04] active:scale-[0.96] select-none cursor-pointer outline-none"
+                                    className="flex items-center gap-2 px-3 py-1.5 text-sm font-extrabold bg-white dark:bg-zinc-800 border border-violet-200/80 dark:border-zinc-700 hover:border-violet-300 text-violet-800 dark:!text-violet-400 hover:bg-violet-50/50 dark:hover:bg-zinc-700/50 shadow-sm rounded-full transition-all duration-300 hover:scale-[1.04] active:scale-[0.96] select-none cursor-pointer outline-none shrink-0 w-fit min-w-fit"
                                 >
                                     <img
                                         src={user?.avatar || "/images/avatar.jpg"}
                                         alt={user?.name || "avatar"}
-                                        className="h-6.5 w-6.5 rounded-full object-cover border border-violet-100 dark:border-zinc-700"
+                                        className="h-6 w-6 rounded-full object-cover border border-violet-100 dark:border-zinc-700 shrink-0"
                                     />
-                                    <span className="font-extrabold text-violet-850 dark:!text-violet-400">{user?.name || t("profile")}</span>
+                                    <span className="font-extrabold text-violet-800 dark:!text-violet-400 whitespace-nowrap">{user?.name || t("profile")}</span>
                                 </button>
                                 {userMenuOpen && (
                                     <div className="absolute right-0 mt-3 w-64 rounded-2xl border border-violet-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-2 shadow-2xl z-50 animate__animated animate__fadeIn animate__faster">
@@ -283,6 +294,7 @@ export default function Header({
 
                     {/* Mobile menu button */}
                     <button
+                        ref={mobileButtonRef}
                         type="button"
                         className="inline-flex items-center rounded-lg border border-gray-200 dark:border-zinc-800 p-2 text-gray-500 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-gray-700 dark:hover:text-zinc-200 md:hidden transition-colors cursor-pointer"
                         onClick={() => setIsOpen((v) => !v)}
@@ -296,9 +308,12 @@ export default function Header({
 
             {/* Mobile nav dropdown */}
             {isOpen && (
-                <div className={`absolute right-6 top-20 w-64 rounded-xl border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-xl z-50 md:hidden ${
-                    isAnimatedPath ? "animate-in fade-in slide-in-from-top-2 duration-200" : ""
-                }`}>
+                <div 
+                    ref={mobileMenuRef}
+                    className={`absolute right-6 top-20 w-64 rounded-xl border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-xl z-50 md:hidden ${
+                        isAnimatedPath ? "animate-in fade-in slide-in-from-top-2 duration-200" : ""
+                    }`}
+                >
                     <nav className="flex flex-col gap-2">
                         {/* Mobile Search input */}
                         <SearchInput

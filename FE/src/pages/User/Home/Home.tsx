@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Hero from "./Hero/Hero.tsx";
 import HotMovies from "./HotMovies/HotMovies.tsx";
 import Promotions from "./Promotions/Promotions.tsx";
@@ -7,6 +8,10 @@ import Newsletter from "./Newsletter/Newsletter.tsx";
 import ScrollReveal from "../../../components/ScrollReveal/ScrollReveal.tsx";
 
 export default function HomePage() {
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "instant" as any });
+    }, []);
+
     return (
         <div className="w-full bg-[#EFEBF4] pb-16">
             <Hero />

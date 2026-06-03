@@ -40,6 +40,18 @@ h2,
   padding: 16px 0 !important; /* Prevents card shadow/hover scaling from being clipped */
 }
 
+/* Prevent Flash of Unstyled Slider Content (FOUC) */
+.slick-slider:not(.slick-initialized) {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+.slick-slider.slick-initialized {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transition: opacity 0.2s ease-in-out;
+}
+
 /* Promotions Slider Center Mode Styling */
 .promotions-slider .slick-list {
   padding: 24px 0 !important;
@@ -454,4 +466,8 @@ html {
 @keyframes mievoh-spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.text-2xs {
+  font-size: 10px !important;
 }

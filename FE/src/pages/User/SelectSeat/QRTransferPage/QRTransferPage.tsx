@@ -39,7 +39,7 @@ export default function QRTransferPage({
                     <p className="text-sm text-slate-350 mt-2">{t("please_wait_moment")}</p>
                 </div>
             )}
-            <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-[2.5rem] shadow-xl overflow-hidden p-8 md:p-10">
+            <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-[2.5rem] shadow-xl overflow-hidden p-5 sm:p-8 md:p-10">
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-start">
                     {/* Left Column: Bank account details */}
                     <div className="md:col-span-3 space-y-6">
@@ -53,19 +53,19 @@ export default function QRTransferPage({
                         <div className="space-y-1">
                             <div className="py-3.5 border-b border-slate-100/80 dark:border-zinc-800/60 flex flex-col items-start gap-1">
                                 <span className="text-[10px] font-black uppercase text-slate-455 dark:!text-white/80 tracking-wider">{t("bank_label")}</span>
-                                <span className="text-slate-800 dark:!text-white font-extrabold text-base text-left">Military Commercial Joint Stock Bank (MB Bank)</span>
+                                <span className="text-slate-800 dark:!text-white font-extrabold text-sm sm:text-base text-left">Military Commercial Joint Stock Bank (MB Bank)</span>
                             </div>
                             
                             <div className="py-3.5 border-b border-slate-100/80 dark:border-zinc-800/60 flex flex-col items-start gap-1">
                                 <span className="text-[10px] font-black uppercase text-slate-455 dark:!text-white/80 tracking-wider">{t("account_number_label")}</span>
                                 <div className="flex items-center justify-between w-full">
-                                    <span className="text-slate-800 dark:!text-white font-extrabold text-base tracking-wider">86870029</span>
+                                    <span className="text-slate-800 dark:!text-white font-extrabold text-sm sm:text-base tracking-wider">86870029</span>
                                     <button 
                                         onClick={() => {
                                             navigator.clipboard.writeText("86870029");
                                             toast.success(t("toast_account_number_copied"));
                                         }}
-                                        className="px-3 py-1.5 rounded-xl bg-violet-50 dark:bg-zinc-800 hover:bg-violet-100 dark:hover:bg-zinc-700 text-[#8E7EFE] transition-colors cursor-pointer flex items-center justify-center gap-1.5 text-xs font-bold"
+                                        className="px-2.5 py-1.5 rounded-xl bg-violet-50 dark:bg-zinc-800 hover:bg-violet-100 dark:hover:bg-zinc-700 text-[#8E7EFE] transition-colors cursor-pointer flex items-center justify-center gap-1.5 text-xs font-bold flex-shrink-0"
                                     >
                                         <Copy className="h-3.5 w-3.5" />
                                         <span>{t("copy_btn")}</span>
@@ -75,19 +75,19 @@ export default function QRTransferPage({
                             
                             <div className="py-3.5 border-b border-slate-100/80 dark:border-zinc-800/60 flex flex-col items-start gap-1">
                                 <span className="text-[10px] font-black uppercase text-slate-455 dark:!text-white/80 tracking-wider">{t("account_holder_label")}</span>
-                                <span className="text-slate-800 dark:!text-white font-extrabold text-base">CONG TY TNHH MONET</span>
+                                <span className="text-slate-800 dark:!text-white font-extrabold text-sm sm:text-base">CONG TY TNHH MONET</span>
                             </div>
                             
                             <div className="py-3.5 border-b border-slate-100/80 dark:border-zinc-800/60 flex flex-col items-start gap-1">
                                 <span className="text-[10px] font-black uppercase text-slate-455 dark:!text-white/80 tracking-wider">{t("transfer_content_label")}</span>
                                 <div className="flex items-center justify-between w-full">
-                                    <span className="text-slate-805 dark:!text-white font-extrabold text-base tracking-widest bg-violet-50/50 dark:bg-zinc-800/60 px-2 py-0.5 rounded text-[#8E7EFE]">{bookingCode}</span>
+                                    <span className="text-slate-805 dark:!text-white font-extrabold text-sm sm:text-base tracking-widest bg-violet-50/50 dark:bg-zinc-800/60 px-2 py-0.5 rounded text-[#8E7EFE]">{bookingCode}</span>
                                     <button 
                                         onClick={() => {
                                             navigator.clipboard.writeText(bookingCode);
                                             toast.success(t("toast_transfer_content_copied"));
                                         }}
-                                        className="px-3 py-1.5 rounded-xl bg-violet-50 dark:bg-zinc-800 hover:bg-violet-100 dark:hover:bg-zinc-700 text-[#8E7EFE] transition-colors cursor-pointer flex items-center justify-center gap-1.5 text-xs font-bold"
+                                        className="px-2.5 py-1.5 rounded-xl bg-violet-50 dark:bg-zinc-800 hover:bg-violet-100 dark:hover:bg-zinc-700 text-[#8E7EFE] transition-colors cursor-pointer flex items-center justify-center gap-1.5 text-xs font-bold flex-shrink-0"
                                     >
                                         <Copy className="h-3.5 w-3.5" />
                                         <span>{t("copy_btn")}</span>
@@ -98,7 +98,7 @@ export default function QRTransferPage({
                             
                             <div className="py-3.5 border-b border-slate-100/80 dark:border-zinc-800/60 flex flex-col items-start gap-1">
                                 <span className="text-[10px] font-black uppercase text-slate-455 dark:!text-white/80 tracking-wider">{t("amount_label")}</span>
-                                <span className="text-slate-850 dark:!text-white font-black text-xl text-[#8E7EFE]">{formatPrice(totalPrice)}</span>
+                                <span className="text-slate-850 dark:!text-white font-black text-lg sm:text-xl text-[#8E7EFE]">{formatPrice(totalPrice)}</span>
                             </div>
                         </div>
                         
@@ -107,10 +107,10 @@ export default function QRTransferPage({
                             {t("hotline_reminder_desc")}
                         </div>
                         
-                        <div className="pt-4 flex gap-4">
+                        <div className="pt-4 flex flex-col-reverse sm:flex-row gap-3 w-full">
                             <button 
                                 onClick={() => setShowQRTransfer(false)}
-                                className="px-6 py-3.5 border border-slate-200 dark:border-zinc-700 hover:border-slate-355 dark:hover:border-zinc-600 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-650 dark:text-zinc-300 hover:text-slate-800 dark:hover:text-white font-extrabold text-sm rounded-2xl transition-all cursor-pointer"
+                                className="w-full sm:w-auto px-6 py-3.5 border border-slate-200 dark:border-zinc-700 hover:border-slate-355 dark:hover:border-zinc-600 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-650 dark:text-zinc-300 hover:text-slate-800 dark:hover:text-white font-extrabold text-sm rounded-2xl transition-all cursor-pointer text-center"
                             >
                                 {t("cancel_transaction")}
                             </button>
@@ -124,7 +124,7 @@ export default function QRTransferPage({
                                         toast.success(t("toast_payment_success"));
                                     }, 2200);
                                 }}
-                                className="flex-1 py-3.5 bg-[#8E7EFE] hover:bg-[#7d6dfc] text-white font-extrabold text-sm rounded-2xl transition-all cursor-pointer shadow-lg shadow-violet-100 dark:shadow-none text-center"
+                                className="w-full sm:flex-1 py-3.5 bg-[#8E7EFE] hover:bg-[#7d6dfc] text-white font-extrabold text-sm rounded-2xl transition-all cursor-pointer shadow-lg shadow-violet-100 dark:shadow-none text-center"
                             >
                                 {t("confirm_successful_transfer")}
                             </button>

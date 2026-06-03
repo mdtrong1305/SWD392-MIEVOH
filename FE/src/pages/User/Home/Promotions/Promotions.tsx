@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Users, Ticket, GraduationCap } from "lucide-react";
 import Button from "../../../../components/Button/Button.tsx";
 import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
@@ -17,6 +17,40 @@ interface Promotion {
 
 export default function Promotions() {
     const { t } = useLanguage();
+    const [mounted, setMounted] = useState(false);
+    const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1200);
+
+    useEffect(() => {
+        setMounted(true);
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
+        window.addEventListener("resize", handleResize);
+        handleResize();
+
+        const offsets = [50, 150, 300, 500, 1000];
+        const timers = offsets.map(delay => 
+            setTimeout(() => {
+                window.dispatchEvent(new Event('resize'));
+            }, delay)
+        );
+
+        return () => {
+            window.removeEventListener("resize", handleResize);
+            timers.forEach(clearTimeout);
+        };
+    }, []);
+
+    const getSlidesToShow = () => {
+        if (windowWidth < 768) return 1;
+        return 3;
+    };
+
+    const sliderSettings = {
+        ...slickPromotionsSettings,
+        slidesToShow: getSlidesToShow(),
+        responsive: undefined
+    };
     
 
     const promotions: Promotion[] = [
@@ -91,7 +125,8 @@ export default function Promotions() {
 
             {/* Promotions Slider */}
             <div className="relative promotions-slider">
-                <SlickSlider {...slickPromotionsSettings}>
+                {mounted && (
+                    <SlickSlider {...sliderSettings}>
                     {promotions.map((promo) => {
                         const isClaimed = claimedPromos.includes(promo.id);
                         return (
@@ -143,6 +178,7 @@ export default function Promotions() {
                         );
                     })}
                 </SlickSlider>
+                )}
             </div>
         </section>
     );

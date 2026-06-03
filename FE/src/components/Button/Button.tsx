@@ -26,7 +26,7 @@ export default function Button({
     ...props
 }: ButtonProps) {
     // Base styles with focus and transition effects
-    const baseStyle = "inline-flex items-center justify-center font-bold transition-all duration-300 focus:outline-none select-none cursor-pointer ease-out";
+    const baseStyle = "inline-flex items-center justify-center font-bold transition-all duration-300 focus:outline-none select-none cursor-pointer ease-out whitespace-nowrap";
     
     // Increased horizontal padding to make buttons longer/wider
     const sizeStyles = {
