@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { updateUser } from "../../Login/slice.ts";
 import { toast } from "../../../../components/Toast/Toast.tsx";
 import Button from "../../../../components/Button/Button.tsx";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 import { validateEmail, validatePhone, validateName, validateDateOfBirth, validateCccd } from "../../../../validation/validation";
 
 interface ProfileInfoProps {
@@ -117,6 +118,7 @@ function CustomSelect({ value, onChange, options, placeholder, className = "" }:
 }
 
 export default function ProfileInfo({ user }: ProfileInfoProps) {
+    const { t } = useLanguage();
     const dispatch = useDispatch();
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -284,7 +286,7 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
         setIsSaving(false);
         setIsSaved(true);
         setIsEditing(false);
-        toast.success("Profile updated successfully!");
+        toast.success(t("profile_updated_success"));
 
         setTimeout(() => {
             setIsSaved(false);
@@ -322,71 +324,71 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                             {/* Full Name */}
                             <div className="bg-white/95 px-5 py-4 rounded-2xl border border-violet-100 hover:border-violet-250 hover:shadow-md transition-all duration-300 flex flex-col gap-1.5 justify-center min-h-[88px]">
-                                <span className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest">Full Name</span>
+                                <span className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest">{t("full_name")}</span>
                                 <span className={`text-base font-semibold select-all ${formData.name ? "text-gray-700" : "text-gray-400 font-normal italic"}`}>
-                                    {formData.name || "No name registered"}
+                                    {formData.name || t("no_name_registered")}
                                 </span>
                             </div>
 
                             {/* Email */}
                             <div className="bg-white/95 px-5 py-4 rounded-2xl border border-violet-100 hover:border-violet-250 hover:shadow-md transition-all duration-300 flex flex-col gap-1.5 justify-center min-h-[88px]">
-                                <span className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest">Email</span>
+                                <span className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest">{t("email_address")}</span>
                                 <span className={`text-base font-semibold select-all truncate ${formData.email ? "text-gray-700" : "text-gray-400 font-normal italic"}`}>
-                                    {formData.email || "No email registered"}
+                                    {formData.email || t("no_email_registered")}
                                 </span>
                             </div>
 
                             {/* Phone Number */}
                             <div className="bg-white/95 px-5 py-4 rounded-2xl border border-violet-100 hover:border-violet-250 hover:shadow-md transition-all duration-300 flex flex-col gap-1.5 justify-center min-h-[88px]">
-                                <span className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest">Phone Number</span>
+                                <span className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest">{t("phone_number")}</span>
                                 <span className={`text-base font-semibold select-all ${formData.phone ? "text-gray-700" : "text-gray-400 font-normal italic"}`}>
-                                    {formData.phone || "No phone number registered"}
+                                    {formData.phone || t("no_phone_number_registered")}
                                 </span>
                             </div>
 
                             {/* Gender */}
                             <div className="bg-white/95 px-5 py-4 rounded-2xl border border-violet-100 hover:border-violet-250 hover:shadow-md transition-all duration-300 flex flex-col gap-1.5 justify-center min-h-[88px]">
-                                <span className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest">Gender</span>
+                                <span className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest">{t("gender")}</span>
                                 <span className={`text-base font-semibold select-all ${formData.gender ? "text-gray-700" : "text-gray-400 font-normal italic"}`}>
-                                    {formData.gender || "Gender not selected"}
+                                    {formData.gender || t("gender_not_selected")}
                                 </span>
                             </div>
 
                             {/* Age */}
                             <div className="bg-white/95 px-5 py-4 rounded-2xl border border-violet-100 hover:border-violet-250 hover:shadow-md transition-all duration-300 flex flex-col gap-1.5 justify-center min-h-[88px]">
-                                <span className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest">Age</span>
+                                <span className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest">{t("age")}</span>
                                 <span className={`text-base font-semibold select-all ${formData.age ? "text-gray-700" : "text-gray-400 font-normal italic"}`}>
-                                    {formData.age || "Age not provided"}
+                                    {formData.age || t("age_not_provided")}
                                 </span>
                             </div>
 
                             {/* Date of Birth */}
                             <div className="bg-white/95 px-5 py-4 rounded-2xl border border-violet-100 hover:border-violet-250 hover:shadow-md transition-all duration-300 flex flex-col gap-1.5 justify-center min-h-[88px]">
-                                <span className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest">Date of Birth</span>
+                                <span className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest">{t("date_of_birth")}</span>
                                 <span className={`text-base font-semibold select-all ${formData.dateOfBirth ? "text-gray-700" : "text-gray-400 font-normal italic"}`}>
-                                    {formData.dateOfBirth || "Date of birth not set"}
+                                    {formData.dateOfBirth || t("dob_not_set")}
                                 </span>
                             </div>
 
                             {/* Address */}
                             <div className="bg-white/95 px-5 py-4 rounded-2xl border border-violet-100 hover:border-violet-250 hover:shadow-md transition-all duration-300 flex flex-col gap-1.5 justify-center min-h-[88px]">
-                                <span className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest">Address</span>
+                                <span className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest">{t("address")}</span>
                                 <span className={`text-base font-semibold select-all leading-relaxed truncate-2-lines ${formData.address ? "text-gray-700" : "text-gray-400 font-normal italic"}`}>
-                                    {formData.address || "Address not set"}
+                                    {formData.address || t("address_not_set")}
                                 </span>
                             </div>
 
                             {/* CCCD */}
                             <div className="bg-white/95 px-5 py-4 rounded-2xl border border-violet-100 hover:border-violet-250 hover:shadow-md transition-all duration-300 flex flex-col gap-1.5 justify-center min-h-[88px]">
-                                <span className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest">CCCD</span>
+                                <span className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest">{t("cccd")}</span>
                                 <span className={`text-base font-semibold select-all ${formData.cccd ? "text-gray-700" : "text-gray-400 font-normal italic"}`}>
-                                    {formData.cccd || "CCCD not linked"}
+                                    {formData.cccd || t("cccd_not_linked")}
                                 </span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Edit Profile Action Button */}
+                    {/* {t("edit_profile_btn")} Action Button */}
                     <div className="flex justify-end pt-4 border-t border-[#DCD7F5]/50">
                         <Button
                             type="button"
@@ -396,7 +398,7 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
                             className="flex items-center gap-2"
                         >
                             <Edit2 className="h-4 w-4" />
-                            Edit Profile
+                            {t("edit_profile_btn")}
                         </Button>
                     </div>
                 </div>
@@ -411,13 +413,13 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
                                     ? "border-red-300 bg-red-50/10 focus-within:border-red-500" 
                                     : "border-violet-100 bg-white/95 focus-within:border-violet-500 focus-within:shadow-md"
                             }`}>
-                                <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">Full Name</label>
+                                <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">{t("full_name")}</label>
                                 <input
                                     type="text"
                                     name="name"
                                     value={formData.name}
                                     onChange={handleInputChange}
-                                    placeholder="No name registered"
+                                    placeholder={t("no_name_registered")}
                                     className="w-full bg-transparent py-1 text-base text-gray-700 outline-none"
                                 />
                                 {errors.name && <span className="text-xs font-bold text-red-500 mt-1">{errors.name}</span>}
@@ -429,13 +431,13 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
                                     ? "border-red-300 bg-red-50/10 focus-within:border-red-500" 
                                     : "border-violet-100 bg-white/95 focus-within:border-violet-500 focus-within:shadow-md"
                             }`}>
-                                <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">Email Address</label>
+                                <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">{t("email_address")}</label>
                                 <input
                                     type="email"
                                     name="email"
                                     value={formData.email}
                                     onChange={handleInputChange}
-                                    placeholder="No email registered"
+                                    placeholder={t("no_email_registered")}
                                     className="w-full bg-transparent py-1 text-base text-gray-700 outline-none"
                                 />
                                 {errors.email && <span className="text-xs font-bold text-red-500 mt-1">{errors.email}</span>}
@@ -447,13 +449,13 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
                                     ? "border-red-300 bg-red-50/10 focus-within:border-red-500" 
                                     : "border-violet-100 bg-white/95 focus-within:border-violet-500 focus-within:shadow-md"
                             }`}>
-                                <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">Phone Number</label>
+                                <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">{t("phone_number")}</label>
                                 <input
                                     type="tel"
                                     name="phone"
                                     value={formData.phone}
                                     onChange={handleInputChange}
-                                    placeholder="No phone number registered"
+                                    placeholder={t("no_phone_number_registered")}
                                     className="w-full bg-transparent py-1 text-base text-gray-700 outline-none"
                                 />
                                 {errors.phone && <span className="text-xs font-bold text-red-500 mt-1">{errors.phone}</span>}
@@ -461,24 +463,24 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
 
                             {/* Gender */}
                             <div className="p-4 px-5 rounded-2xl border border-violet-100 bg-white/95 focus-within:border-violet-500 focus-within:shadow-md transition-all duration-300 flex flex-col gap-1.5 min-h-[88px] justify-center">
-                                <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">Gender</label>
+                                <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">{t("gender")}</label>
                                 <CustomSelect
                                     value={formData.gender}
                                     onChange={(val) => setFormData(prev => ({ ...prev, gender: val }))}
-                                    options={["Male", "Female"]}
-                                    placeholder="Select Gender"
+                                    options={[t("gender_male"), t("gender_female")]}
+                                    placeholder={t("select_gender")}
                                 />
                             </div>
 
                             {/* Age (Read-only, calculated from DOB) */}
                             <div className="p-4 px-5 rounded-2xl border border-violet-100 bg-violet-50/20 transition-all duration-300 flex flex-col gap-1.5 min-h-[88px] justify-center select-none opacity-70">
-                                <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">Age (Auto-calculated)</label>
+                                <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">{t("age_auto_calculated")}</label>
                                 <input
                                     type="text"
                                     name="age"
                                     value={formData.age}
                                     readOnly
-                                    placeholder="Calculated from DOB"
+                                    placeholder={t("calculated_from_dob")}
                                     className="w-full bg-transparent py-1 text-base text-gray-500 outline-none cursor-not-allowed"
                                 />
                             </div>
@@ -489,13 +491,13 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
                                     ? "border-red-300 bg-red-50/10 focus-within:border-red-500" 
                                     : "border-violet-100 bg-white/95 focus-within:border-violet-500 focus-within:shadow-md"
                             }`}>
-                                <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">Date of Birth</label>
+                                <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">{t("date_of_birth")}</label>
                                 <div className="flex items-center gap-2 py-1">
                                     <CustomSelect
                                         value={parseDob(formData.dateOfBirth).day}
                                         onChange={(val) => handleDobSelectChange("day", val)}
                                         options={days}
-                                        placeholder="Day"
+                                        placeholder={t("dob_day")}
                                     />
                                     <span className="text-gray-300 font-light select-none">/</span>
                                     
@@ -503,7 +505,7 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
                                         value={parseDob(formData.dateOfBirth).month}
                                         onChange={(val) => handleDobSelectChange("month", val)}
                                         options={months}
-                                        placeholder="Month"
+                                        placeholder={t("dob_month")}
                                     />
                                     <span className="text-gray-300 font-light select-none">/</span>
                                     
@@ -511,7 +513,7 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
                                         value={parseDob(formData.dateOfBirth).year}
                                         onChange={(val) => handleDobSelectChange("year", val)}
                                         options={years}
-                                        placeholder="Year"
+                                        placeholder={t("dob_year")}
                                     />
                                 </div>
                                 {errors.dateOfBirth && <span className="text-xs font-bold text-red-500 mt-1">{errors.dateOfBirth}</span>}
@@ -519,13 +521,13 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
 
                             {/* Address */}
                             <div className="p-4 px-5 rounded-2xl border border-violet-100 bg-white/95 focus-within:border-violet-500 focus-within:shadow-md transition-all duration-300 flex flex-col gap-1.5 min-h-[88px] justify-center">
-                                <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">Address</label>
+                                <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">{t("address")}</label>
                                 <textarea
                                     name="address"
                                     value={formData.address}
                                     onChange={handleInputChange}
                                     rows={1}
-                                    placeholder="Address not set"
+                                    placeholder={t("address_not_set")}
                                     className="w-full bg-transparent py-1 text-base text-gray-700 outline-none resize-none"
                                 />
                             </div>
@@ -536,13 +538,13 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
                                     ? "border-red-300 bg-red-50/10 focus-within:border-red-500" 
                                     : "border-violet-100 bg-white/95 focus-within:border-violet-500 focus-within:shadow-md"
                             }`}>
-                                <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">CCCD</label>
+                                <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">{t("cccd")}</label>
                                 <input
                                     type="text"
                                     name="cccd"
                                     value={formData.cccd}
                                     onChange={handleInputChange}
-                                    placeholder="CCCD not linked"
+                                    placeholder={t("cccd_not_linked")}
                                     className="w-full bg-transparent py-1 text-base text-gray-700 outline-none"
                                 />
                                 {errors.cccd && <span className="text-xs font-bold text-red-500 mt-1">{errors.cccd}</span>}
@@ -574,17 +576,17 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
                             {isSaving ? (
                                 <>
                                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                                    Saving...
+                                    {t("saving_btn")}
                                 </>
                             ) : isSaved ? (
                                 <>
                                     <Check className="h-4 w-4" />
-                                    Saved!
+                                    {t("saved_btn")}
                                 </>
                             ) : (
                                 <>
                                     <Save className="h-4 w-4" />
-                                    Save Changes
+                                    {t("save_changes_btn")}
                                 </>
                             )}
                         </Button>

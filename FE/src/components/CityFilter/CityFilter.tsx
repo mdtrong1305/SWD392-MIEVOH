@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { MapPin, ChevronDown, Check } from "lucide-react";
 import { CITIES } from "../../mockAPI/cinemaMock.tsx";
+import { useLanguage } from "../../contextAPI/LanguageContext.tsx";
 
 interface CityFilterProps {
     selectedCity: string;
@@ -13,14 +14,17 @@ export default function CityFilter({
     selectedCity,
     onSelectCity,
     className = "",
-    label = "Select Location:"
+    label
 }: CityFilterProps) {
+    const { t } = useLanguage();
     const [isCityOpen, setIsCityOpen] = useState(false);
 
     const handleSelectCity = (city: string) => {
         onSelectCity(city);
         setIsCityOpen(false);
     };
+
+    const displayLabel = label !== undefined ? label : t("cinema_locations");
 
     return (
         <div className={`flex flex-col gap-2 relative ${className}`}>
@@ -32,9 +36,9 @@ export default function CityFilter({
                 />
             )}
 
-            {label && (
+            {displayLabel && (
                 <span className="text-xs font-bold text-gray-400 uppercase tracking-wider filter-header-gradient">
-                    {label}
+                    {displayLabel}
                 </span>
             )}
             <button
@@ -47,7 +51,7 @@ export default function CityFilter({
             >
                 <div className="flex items-center gap-2.5">
                     <MapPin className={`h-5 w-5 shrink-0 transition-colors duration-300 ${isCityOpen ? "text-[#6C5CE7]" : "text-violet-500"}`} />
-                    <span>{selectedCity === "All" ? "All Locations" : selectedCity}</span>
+                    <span>{selectedCity === "All" ? t("all_locations") : selectedCity}</span>
                 </div>
                 <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-300 ${isCityOpen ? "rotate-180 text-[#6C5CE7]" : ""}`} />
             </button>
@@ -63,7 +67,7 @@ export default function CityFilter({
                                 : "text-gray-700 hover:bg-violet-50/60 hover:text-[#6C5CE7] dark:!text-zinc-200 dark:hover:bg-zinc-700 dark:hover:!text-violet-400"
                         }`}
                     >
-                        <span>All Locations</span>
+                        <span>{t("all_locations")}</span>
                         {selectedCity === "All" && <Check className="h-4 w-4 text-[#6C5CE7]" />}
                     </button>
                     {CITIES.filter(city => city !== "All").map(city => (

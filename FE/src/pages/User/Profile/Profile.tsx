@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useSearchParams, Link } from "react-router-dom";
-import { User, Ticket, LogIn, ChevronRight, Lock, Camera, Shield } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { LogIn } from "lucide-react";
 import type { RootState } from "../../../store/index.tsx";
 import { updateUser } from "../Login/slice.ts";
 import { toast } from "../../../components/Toast/Toast.tsx";
@@ -9,8 +9,10 @@ import ProfileInfo from "./ProfileInfo/ProfileInfo.tsx";
 import BookingHistory from "./BookingHistory/BookingHistory.tsx";
 import ChangePassword from "./ChangePassword/ChangePassword.tsx";
 import Button from "../../../components/Button/Button.tsx";
+import { useLanguage } from "../../../contextAPI/LanguageContext.tsx";
 
 export default function Profile() {
+    const { t } = useLanguage();
     const dispatch = useDispatch();
     const { isAuthenticated, user } = useSelector((state: RootState) => state.login);
     const [searchParams, setSearchParams] = useSearchParams();
@@ -47,7 +49,7 @@ export default function Profile() {
                     ...user,
                     avatar: base64String
                 }));
-                toast.success("Avatar updated successfully!");
+                toast.success(t("avatar_updated_success"));
             };
             reader.readAsDataURL(file);
         }
@@ -61,9 +63,9 @@ export default function Profile() {
                         <LogIn className="h-8 w-8" />
                     </div>
                     <div className="flex flex-col gap-2">
-                        <h2 className="text-2xl font-black text-gray-900">Access Denied</h2>
+                        <h2 className="text-2xl font-black text-gray-900">{t("access_denied")}</h2>
                         <p className="text-sm text-gray-550 font-medium leading-relaxed">
-                            Please log in to view your profile dashboard and booking transactions.
+                            {t("profile_access_denied_desc")}
                         </p>
                     </div>
                     <Button 
@@ -71,7 +73,7 @@ export default function Profile() {
                         href={`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`}
                         className="w-full py-3"
                     >
-                        Log In Now
+                        {t("login_now_btn")}
                     </Button>
                 </div>
             </div>
@@ -104,7 +106,7 @@ export default function Profile() {
                     
                     <div className="flex flex-col items-center gap-1">
                         <h2 className="text-2xl font-black text-gray-900">{user?.name || user?.hoTen || "User Name"}</h2>
-                        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Click the star to select and update your avatar</p>
+                        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{t("click_star_avatar")}</p>
                     </div>
                 </div>
 
@@ -122,7 +124,7 @@ export default function Profile() {
                                         : "border-transparent text-gray-550 hover:text-violet-500 dark:text-gray-400 dark:hover:text-violet-300"
                                 }`}
                             >
-                                <span>Personal Information</span>
+                                <span>{t("personal_info")}</span>
                             </button>
                             <button
                                 onClick={() => handleTabChange("password")}
@@ -132,7 +134,7 @@ export default function Profile() {
                                         : "border-transparent text-gray-555 hover:text-violet-500 dark:text-gray-400 dark:hover:text-violet-300"
                                 }`}
                             >
-                                <span>Change Password</span>
+                                <span>{t("change_password_title")}</span>
                             </button>
                             <button
                                 onClick={() => handleTabChange("tickets")}
@@ -142,7 +144,7 @@ export default function Profile() {
                                         : "border-transparent text-gray-555 hover:text-violet-500 dark:text-gray-400 dark:hover:text-violet-300"
                                 }`}
                             >
-                                <span>Ticket History</span>
+                                <span>{t("ticket_history_title")}</span>
                             </button>
                         </div>
                     </div>

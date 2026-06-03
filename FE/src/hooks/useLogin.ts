@@ -1,3 +1,4 @@
+import { useLanguage } from "../contextAPI/LanguageContext.tsx";
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -20,6 +21,7 @@ interface LoginSliceState {
 }
 
 export default function useLogin(initialSliding: boolean) {
+    const { t } = useLanguage();
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const [params] = useSearchParams();
@@ -98,7 +100,7 @@ export default function useLogin(initialSliding: boolean) {
             // Dispatch action to update Redux store
             dispatch(setAuthenticated(userObj));
 
-            toast.success('Logged in with Google successfully!');
+            toast.success(t("toast_google_login_success"));
 
             // Clear query params by navigating to homepage or redirect target
             const redirect = params.get('redirect') || '/';
@@ -123,7 +125,7 @@ export default function useLogin(initialSliding: boolean) {
         setForgotErrors({});
         try {
             await verifyEmailApi(forgotEmail);
-            toast.success('Email verified successfully!');
+            toast.success(t("toast_email_verified_success"));
             setForgotStep('reset');
         } catch (err: any) {
             const message = err.response?.data?.message || 'Failed to verify email';
@@ -156,7 +158,7 @@ export default function useLogin(initialSliding: boolean) {
         setForgotErrors({});
         try {
             await resetPasswordApi({ email: forgotEmail, newPassword: forgotNewPassword });
-            toast.success('Password reset successfully!');
+            toast.success(t("toast_password_reset_success"));
             setForgotStep('none');
             setForgotEmail('');
             setForgotNewPassword('');
@@ -172,11 +174,11 @@ export default function useLogin(initialSliding: boolean) {
     const handleLoginSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!loginForm.username.trim()) {
-            toast.error("Username is required!");
+            toast.error(t("toast_username_required"));
             return;
         }
         if (!loginForm.password.trim()) {
-            toast.error("Password is required!");
+            toast.error(t("toast_password_required"));
             return;
         }
         dispatch(loginUser(loginForm));

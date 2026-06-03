@@ -2,10 +2,13 @@ import { Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import Button from "../../../../components/Button/Button.tsx";
 import { toast } from "../../../../components/Toast/Toast.tsx";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 
 export interface Movie {
     id: number;
     title: string;
+    title_vi?: string;
+    title_en?: string;
     image: string;
     rating: number;
     genres: string[];
@@ -17,16 +20,37 @@ interface MovieCardProps {
     movie: Movie;
 }
 
+const genreKeys: Record<string, string> = {
+    "Action": "genre_action",
+    "Sci-Fi": "genre_scifi",
+    "Romance": "genre_romance",
+    "Music": "genre_music",
+    "Mystery": "genre_mystery",
+    "Thriller": "genre_thriller",
+    "Comedy": "genre_comedy",
+    "Family": "genre_family",
+    "Adventure": "genre_adventure",
+    "Animation": "genre_animation",
+    "Crime": "genre_crime",
+    "Horror": "genre_horror",
+    "Sports": "genre_sports",
+    "Drama": "genre_drama",
+    "Documentary": "genre_documentary",
+    "Nature": "genre_nature"
+};
+
 export default function MovieCard({ movie }: MovieCardProps) {
+    const { t, language } = useLanguage();
     const isComingSoon = movie.status === "coming_soon";
+    const displayTitle = language === "vi" ? (movie.title_vi || movie.title) : (movie.title_en || movie.title);
 
     const handleAction = (e: React.MouseEvent<HTMLElement>) => {
         e.preventDefault();
         e.stopPropagation();
         if (isComingSoon) {
-            toast.success(`Subscribed to notifications for "${movie.title}" when released!`);
+            toast.success(t("subscribed_notifications", { title: displayTitle }));
         } else {
-            toast.success(`Opening ticket booking for: ${movie.title}`);
+            toast.success(t("opening_booking_for", { title: displayTitle }));
         }
     };
 
@@ -36,7 +60,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
             <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-gray-100 mb-4">
                 <img
                     src={movie.image}
-                    alt={movie.title}
+                    alt={displayTitle}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
 
@@ -44,7 +68,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
                 <div className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-xs font-bold text-white shadow-md backdrop-blur-sm ${
                     isComingSoon ? "bg-violet-600/80" : "bg-green-600/80"
                 }`}>
-                    {isComingSoon ? "Coming Soon" : "Now Showing"}
+                    {isComingSoon ? t("coming_soon") : t("now_showing")}
                 </div>
 
                 {/* Rating Badge */}
@@ -57,19 +81,23 @@ export default function MovieCard({ movie }: MovieCardProps) {
             {/* Movie Details */}
             <div className="flex flex-col flex-grow">
                 <h3 className="text-base font-bold text-gray-900 line-clamp-2 group-hover:text-[#6D28D9] transition-colors duration-200 mb-2 min-h-[48px]">
-                    {movie.title}
+                    {displayTitle}
                 </h3>
 
                 {/* Genres */}
                 <div className="flex flex-wrap gap-1.5 mb-4">
-                    {movie.genres.map((genre, idx) => (
-                        <span
-                            key={idx}
-                            className="inline-block rounded-md bg-[#F3E8FF] px-2 py-0.5 text-xs font-semibold text-[#6D28D9]"
-                        >
-                            {genre}
-                        </span>
-                    ))}
+                    {movie.genres.map((genre, idx) => {
+                        const key = genreKeys[genre];
+                        const displayGenre = key ? t(key as any) : genre;
+                        return (
+                            <span
+                                key={idx}
+                                className="inline-block rounded-md bg-[#F3E8FF] px-2 py-0.5 text-xs font-semibold text-[#6D28D9]"
+                            >
+                                {displayGenre}
+                            </span>
+                        );
+                    })}
                 </div>
 
                 {/* Release date if coming soon */}
@@ -88,7 +116,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
                     onClick={handleAction}
                     className="w-full text-center"
                 >
-                    {isComingSoon ? "Get Notified" : "Buy Ticket"}
+                    {isComingSoon ? t("get_notified") : t("buy_ticket")}
                 </Button>
             </div>
         </Link>

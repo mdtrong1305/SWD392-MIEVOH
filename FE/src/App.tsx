@@ -4,17 +4,20 @@ import { Provider } from 'react-redux'
 import { store } from './store/index.tsx'
 import { ToastContainer } from './components/Toast/Toast.tsx'
 import { ThemeProvider } from './contextAPI/ThemeContext.tsx'
+import { LanguageProvider } from './contextAPI/LanguageContext.tsx'
 
 function App() {
   return (
     <Provider store={store}> 
       <ThemeProvider>
-        <BrowserRouter>
-          <Routes>
-            {generateRoutes(routes)}
-          </Routes>
-          <ToastContainer />
-        </BrowserRouter>
+        <LanguageProvider>
+          <BrowserRouter>
+            <Routes>
+              {generateRoutes(routes)}
+            </Routes>
+            <ToastContainer />
+          </BrowserRouter>
+        </LanguageProvider>
       </ThemeProvider>
     </Provider>
   )

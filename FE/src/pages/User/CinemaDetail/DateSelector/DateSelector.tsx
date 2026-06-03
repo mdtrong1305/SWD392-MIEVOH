@@ -1,5 +1,6 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { Calendar } from "lucide-react";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 
 export interface DateOption {
     label: string;      // e.g. "29/5"
@@ -13,9 +14,13 @@ interface DateSelectorProps {
 }
 
 export default function DateSelector({ selectedDate, onSelectDate }: DateSelectorProps) {
+    const { t, language } = useLanguage();
+    
     const dates = useMemo(() => {
         const daysList: DateOption[] = [];
-        const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const weekdays = language === "vi"
+            ? ["CN", "T2", "T3", "T4", "T5", "T6", "T7"]
+            : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         
         for (let i = 0; i < 7; i++) {
             const d = new Date();
@@ -31,19 +36,29 @@ export default function DateSelector({ selectedDate, onSelectDate }: DateSelecto
             daysList.push({ label, dayOfWeek, dateString });
         }
         return daysList;
-    }, []);
+    }, [language]);
 
     // Set first day as default if not selected
     if (dates.length > 0 && !selectedDate) {
         onSelectDate(dates[0]);
     }
 
+    // Keep selectedDate language details in sync
+    useEffect(() => {
+        if (selectedDate) {
+            const matchingDate = dates.find(d => d.dateString === selectedDate.dateString);
+            if (matchingDate && (matchingDate.dayOfWeek !== selectedDate.dayOfWeek || matchingDate.label !== selectedDate.label)) {
+                onSelectDate(matchingDate);
+            }
+        }
+    }, [language, dates, selectedDate, onSelectDate]);
+
     return (
         <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-3xl p-5 shadow-sm mb-6 animate__animated animate__fadeIn">
             {/* Header label */}
             <div className="flex items-center gap-2 mb-4 text-slate-800 dark:text-zinc-300">
                 <Calendar className="h-5 w-5 text-[#6C5CE7]" />
-                <span className="text-sm font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">Select Date</span>
+                <span className="text-sm font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">{t("select_date")}</span>
             </div>
 
             {/* Dates list row */}

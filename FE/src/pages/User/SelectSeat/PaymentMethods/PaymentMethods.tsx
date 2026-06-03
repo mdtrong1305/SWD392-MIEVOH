@@ -1,4 +1,5 @@
 import { ChevronLeft } from "lucide-react";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 
 interface PaymentMethodsProps {
     paymentMethod: string;
@@ -23,11 +24,12 @@ export default function PaymentMethods({
     handleGuestChange,
     setActiveStep
 }: PaymentMethodsProps) {
+    const { t } = useLanguage();
     return (
         <div className="flex flex-col gap-6 animate__animated animate__fadeIn">
             <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-3xl p-6 shadow-sm flex flex-col gap-6">
                 <h3 className="text-base font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
-                    💳 Payment Methods
+                    💳 {t("payment_method")}
                 </h3>
  
                 {/* Payment Options list */}
@@ -35,8 +37,8 @@ export default function PaymentMethods({
                     {[
                         { 
                             id: "qr", 
-                            name: "QR Code Bank Transfer", 
-                            desc: "Scan QR code via banking app to pay", 
+                            name: t("qr_transfer_name"), 
+                            desc: t("qr_transfer_desc"), 
                             icon: (
                                 <svg className="w-5 h-5 text-violet-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                     <rect x="3" y="3" width="7" height="7" />
@@ -49,9 +51,9 @@ export default function PaymentMethods({
                                 </svg>
                             ) 
                         },
-                        { id: "momo", name: "MoMo Wallet", desc: "Quick payment via MoMo e-wallet", icon: <span className="text-lg">🔴</span> },
-                        { id: "zalopay", name: "ZaloPay Wallet", desc: "Pay via ZaloPay with special promotions", icon: <span className="text-lg">🔵</span> },
-                        { id: "atm", name: "Local ATM Card", desc: "Payment via local banks", icon: <span className="text-lg">🏦</span> }
+                        { id: "momo", name: t("momo_name"), desc: t("momo_desc"), icon: <span className="text-lg">🔴</span> },
+                        { id: "zalopay", name: t("zalopay_name"), desc: t("zalopay_desc"), icon: <span className="text-lg">🔵</span> },
+                        { id: "atm", name: t("atm_name"), desc: t("atm_desc"), icon: <span className="text-lg">🏦</span> }
                     ].map(method => {
                         const isSelected = paymentMethod === method.id;
                         return (
@@ -90,7 +92,7 @@ export default function PaymentMethods({
                         className="px-5 py-2.5 border border-slate-200 dark:border-zinc-700 hover:border-slate-300 dark:hover:border-zinc-600 text-slate-600 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 font-extrabold text-xs rounded-2xl transition-all cursor-pointer flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-zinc-800"
                     >
                         <ChevronLeft className="h-4 w-4" />
-                        Go back to combos
+                        {t("back_to_combos")}
                     </button>
                 </div>
             </div>
@@ -99,15 +101,15 @@ export default function PaymentMethods({
                 <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-3xl shadow-sm flex flex-col overflow-hidden">
                     <div className="bg-slate-50 dark:bg-zinc-900 border-b border-slate-100 dark:border-zinc-800/80 px-6 py-4">
                         <h3 className="text-sm font-black uppercase tracking-wider text-slate-700 dark:text-white flex items-center gap-2">
-                            👤 Personal Information
+                            👤 {t("personal_info")}
                         </h3>
                     </div>
                     <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-5">
                         <div>
-                            <label className="text-[11px] font-black uppercase text-slate-400 dark:!text-white block mb-2 tracking-wider">Full Name</label>
+                            <label className="text-[11px] font-black uppercase text-slate-400 dark:!text-white block mb-2 tracking-wider">{t("full_name")}</label>
                             <input 
                                 type="text" 
-                                placeholder="Enter your full name" 
+                                placeholder={t("full_name_placeholder")} 
                                 value={guestName}
                                 onChange={(e) => handleGuestChange("name", e.target.value)}
                                 className={`w-full bg-slate-50/50 dark:bg-zinc-800/40 border rounded-2xl px-4 py-3 text-sm font-extrabold text-slate-880 dark:!text-white dark:!placeholder-zinc-300 outline-none focus:bg-white dark:focus:bg-zinc-800/80 transition-all ${
@@ -121,10 +123,10 @@ export default function PaymentMethods({
                             )}
                         </div>
                         <div>
-                            <label className="text-[11px] font-black uppercase text-slate-400 dark:!text-white block mb-2 tracking-wider">Phone Number</label>
+                            <label className="text-[11px] font-black uppercase text-slate-400 dark:!text-white block mb-2 tracking-wider">{t("phone_number")}</label>
                             <input 
                                 type="tel" 
-                                placeholder="Enter your phone number" 
+                                placeholder={t("phone_number_placeholder")} 
                                 value={guestPhone}
                                 onChange={(e) => handleGuestChange("phone", e.target.value)}
                                 className={`w-full bg-slate-50/50 dark:bg-zinc-800/40 border rounded-2xl px-4 py-3 text-sm font-extrabold text-slate-880 dark:!text-white dark:!placeholder-zinc-300 outline-none focus:bg-white dark:focus:bg-zinc-800/80 transition-all ${
@@ -138,10 +140,10 @@ export default function PaymentMethods({
                             )}
                         </div>
                         <div>
-                            <label className="text-[11px] font-black uppercase text-slate-400 dark:!text-white block mb-2 tracking-wider">Email Address</label>
+                            <label className="text-[11px] font-black uppercase text-slate-400 dark:!text-white block mb-2 tracking-wider">{t("email_address")}</label>
                             <input 
                                 type="email" 
-                                placeholder="Enter your email address" 
+                                placeholder={t("email_address_placeholder")} 
                                 value={guestEmail}
                                 onChange={(e) => handleGuestChange("email", e.target.value)}
                                 className={`w-full bg-slate-50/50 dark:bg-zinc-800/40 border rounded-2xl px-4 py-3 text-sm font-extrabold text-slate-880 dark:!text-white dark:!placeholder-zinc-300 outline-none focus:bg-white dark:focus:bg-zinc-800/80 transition-all ${

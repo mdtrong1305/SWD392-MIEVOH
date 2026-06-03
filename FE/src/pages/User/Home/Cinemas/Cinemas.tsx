@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Star, MapPin } from "lucide-react";
 import Button from "../../../../components/Button/Button.tsx";
 import CountUp from "react-countup";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 
 interface Cinema {
     id: number;
@@ -64,6 +65,7 @@ const parseVotes = (votesStr: string) => {
 };
 
 export default function Cinemas() {
+    const { t } = useLanguage();
     const [selectedCinemaId, setSelectedCinemaId] = useState<number | null>(null);
     const CountUpComponent = (CountUp as any).default || CountUp;
 
@@ -72,13 +74,13 @@ export default function Cinemas() {
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                    Featured Cinemas
+                    {t("featured_cinemas")}
                 </h2>
                 <a 
                     href="/cinemas" 
                     className="text-sm font-semibold text-[#6D28D9] hover:text-[#5B21B6] transition-colors flex items-center gap-1 group"
                 >
-                    <span>See All</span>
+                    <span>{t("see_all")}</span>
                     <span className="transform translate-x-0 group-hover:translate-x-1 transition-transform">→</span>
                 </a>
             </div>
@@ -139,7 +141,7 @@ export default function Cinemas() {
                                     size="sm"
                                     className="w-full text-center border-gray-200 hover:border-[#6D28D9]"
                                 >
-                                    View Showtimes
+                                    {t("view_showtimes")}
                                 </Button>
                             </div>
                         </div>

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { INITIAL_MOVIES, MOVIES_DETAILS } from "../../../../mockAPI/movieMock.tsx";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 import type { DateOption } from "../DateSelector/DateSelector.tsx";
 import { Clock, Film, User, Star } from "lucide-react";
 
@@ -9,13 +10,36 @@ interface MovieShowtimesListProps {
     cinemaName: string;
 }
 
+const genreKeys: Record<string, string> = {
+    "Action": "genre_action",
+    "Sci-Fi": "genre_scifi",
+    "Romance": "genre_romance",
+    "Music": "genre_music",
+    "Mystery": "genre_mystery",
+    "Thriller": "genre_thriller",
+    "Comedy": "genre_comedy",
+    "Family": "genre_family",
+    "Adventure": "genre_adventure",
+    "Animation": "genre_animation",
+    "Crime": "genre_crime",
+    "Horror": "genre_horror",
+    "Sports": "genre_sports",
+    "Drama": "genre_drama",
+    "Documentary": "genre_documentary",
+    "Nature": "genre_nature"
+};
+
 export default function MovieShowtimesList({ selectedDate, cinemaName }: MovieShowtimesListProps) {
     const navigate = useNavigate();
+    const { t, language } = useLanguage();
 
     // Filter active movies
     const activeMovies = useMemo(() => {
-        return INITIAL_MOVIES.filter(movie => movie.status === "now_showing");
-    }, []);
+        return INITIAL_MOVIES.filter(movie => movie.status === "now_showing").map(movie => ({
+            ...movie,
+            title: language === "vi" ? (movie.title_vi || movie.title) : (movie.title_en || movie.title),
+        }));
+    }, [language]);
 
     // Check if selected date is today
     const isToday = useMemo(() => {
@@ -114,11 +138,14 @@ export default function MovieShowtimesList({ selectedDate, cinemaName }: MovieSh
                                     </span>
                                     <span className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200/50 text-indigo-800 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400 font-bold px-3 py-1.5 rounded-xl text-xs">
                                         <Film className="h-3.5 w-3.5 text-indigo-600" />
-                                        {movie.genres.join(", ")}
+                                        {movie.genres.map(genre => {
+                                            const key = genreKeys[genre];
+                                            return key ? t(key as any) : genre;
+                                        }).join(", ")}
                                     </span>
                                     <span className="flex items-center gap-1.5 bg-slate-100 border border-slate-200 text-slate-700 dark:bg-zinc-800 dark:border-zinc-700/80 dark:text-zinc-300 font-bold px-3 py-1.5 rounded-xl text-xs">
                                         <User className="h-3.5 w-3.5 text-slate-500" />
-                                        Director: {details.director}
+                                        {t("director")}: {details.director}
                                     </span>
                                 </div>
 
@@ -130,7 +157,7 @@ export default function MovieShowtimesList({ selectedDate, cinemaName }: MovieSh
                                             <div className="flex items-center gap-2 mb-3">
                                                 <span className="h-3 w-1.5 bg-[#6C5CE7] rounded-full animate-pulse" />
                                                 <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                                                    2D Dubbed
+                                                    {t("twod_dubbed")}
                                                 </h4>
                                             </div>
                                             <div className="flex flex-wrap gap-2.5">
@@ -159,7 +186,7 @@ export default function MovieShowtimesList({ selectedDate, cinemaName }: MovieSh
                                         <div className="flex items-center gap-2 mb-3">
                                             <span className="h-3 w-1.5 bg-[#6C5CE7] rounded-full animate-pulse" />
                                             <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                                                2D Subbed
+                                                {t("twod_subbed")}
                                             </h4>
                                         </div>
                                         <div className="flex flex-wrap gap-2.5">

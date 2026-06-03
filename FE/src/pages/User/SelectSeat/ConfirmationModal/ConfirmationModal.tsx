@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import type { MovieDetailInfo } from "../../MovieDetail/DetailHero/DetailHero.tsx";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 
 interface ConfirmationModalProps {
     showConfirmModal: boolean;
@@ -46,6 +47,7 @@ export default function ConfirmationModal({
     formatPrice,
     executeCheckout
 }: ConfirmationModalProps) {
+    const { t } = useLanguage();
     if (!showConfirmModal) return null;
 
     return (
@@ -90,7 +92,7 @@ export default function ConfirmationModal({
                 style={{ animation: isClosing ? "slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards" : "slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards" }}
             >
                 <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
-                    <h3 className="text-lg font-black text-slate-850">Order Confirmation</h3>
+                    <h3 className="text-lg font-black text-slate-850">{t("order_confirmation")}</h3>
                     <button 
                         onClick={closeModal}
                         className="w-8 h-8 rounded-full bg-slate-100 hover:bg-violet-50 hover:text-[#8E7EFE] flex items-center justify-center text-slate-500 transition-colors cursor-pointer"
@@ -100,23 +102,23 @@ export default function ConfirmationModal({
                 </div>
                 <div className="p-6 divide-y divide-slate-100 text-sm font-semibold text-slate-655">
                     <div className="py-3 flex justify-between items-start gap-4">
-                        <span className="text-slate-400 shrink-0 font-medium">Cinema</span>
+                        <span className="text-slate-400 shrink-0 font-medium">{t("booking_cinema")}</span>
                         <span className="text-slate-850 font-black text-right">{branchName}</span>
                     </div>
                     <div className="py-3 flex justify-between items-start gap-4">
-                        <span className="text-slate-400 shrink-0 font-medium">Movie</span>
+                        <span className="text-slate-400 shrink-0 font-medium">{t("booking_movie")}</span>
                         <span className="text-slate-855 font-black text-right leading-snug">{movie.title}</span>
                     </div>
                     <div className="py-3 flex justify-between items-start gap-4">
-                        <span className="text-slate-400 shrink-0 font-medium">Showtime</span>
+                        <span className="text-slate-400 shrink-0 font-medium">{t("booking_showtime")}</span>
                         <span className="text-slate-855 font-black text-right">{time} - {dayOfWeek}, {dateLabel}</span>
                     </div>
                     <div className="py-3 flex justify-between items-start gap-4">
-                        <span className="text-slate-400 shrink-0 font-medium">Seats</span>
+                        <span className="text-slate-400 shrink-0 font-medium">{t("booking_seats")}</span>
                         <span className="text-[#8E7EFE] font-black text-right bg-violet-50/80 px-2.5 py-0.5 rounded-lg text-xs">{selectedSeats.join(", ")}</span>
                     </div>
                     <div className="py-3 flex justify-between items-start gap-4">
-                         <span className="text-slate-400 shrink-0 font-medium">Personal Info</span>
+                         <span className="text-slate-400 shrink-0 font-medium">{t("personal_info")}</span>
                          <div className="text-slate-855 text-right flex flex-col items-end gap-0.5">
                              <span className="font-black text-sm">{isAuthenticated ? userFullName : guestName}</span>
                              <span className="text-slate-650 font-bold text-sm mt-0.5">{isAuthenticated ? userPhone : guestPhone}</span>
@@ -124,15 +126,15 @@ export default function ConfirmationModal({
                          </div>
                       </div>
                     <div className="py-3 flex justify-between items-start gap-4">
-                        <span className="text-slate-400 shrink-0 font-medium">Payment Method</span>
+                        <span className="text-slate-400 shrink-0 font-medium">{t("payment_method")}</span>
                         <span className="text-slate-855 font-black text-right">
-                            {paymentMethod === "qr" ? "QR Code Bank Transfer" :
-                             paymentMethod === "momo" ? "MoMo Wallet" :
-                             paymentMethod === "zalopay" ? "ZaloPay Wallet" : "Local ATM Card"}
+                            {paymentMethod === "qr" ? t("qr_transfer") :
+                             paymentMethod === "momo" ? t("momo_wallet") :
+                             paymentMethod === "zalopay" ? t("zalopay_wallet") : t("atm_card")}
                         </span>
                     </div>
                     <div className="py-4 flex justify-between items-center gap-4 text-base font-black">
-                        <span className="text-slate-855">Total Order Value</span>
+                        <span className="text-slate-855">{t("total_order_value")}</span>
                         <span className="text-xl text-[#8E7EFE] font-black">{formatPrice(totalPrice)}</span>
                     </div>
                 </div>
@@ -141,7 +143,7 @@ export default function ConfirmationModal({
                         onClick={executeCheckout}
                         className="w-full py-4 bg-[#8E7EFE] hover:bg-[#7d6dfc] text-white font-extrabold text-base rounded-2xl transition-all duration-300 cursor-pointer shadow-lg shadow-violet-100 hover:scale-[1.01] active:scale-95 text-center flex items-center justify-center gap-2"
                     >
-                        Proceed to Pay
+                        {t("proceed_to_pay")}
                     </button>
                 </div>
             </div>

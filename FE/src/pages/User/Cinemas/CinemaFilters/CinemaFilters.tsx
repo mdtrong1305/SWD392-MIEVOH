@@ -4,6 +4,7 @@ import { THEATER_CHAINS } from "../../../../mockAPI/cinemaMock.tsx";
 import type { TheaterChain } from "../../../../mockAPI/cinemaMock.tsx";
 import CityFilter from "../../../../components/CityFilter/CityFilter.tsx";
 import SearchInput from "../../../../components/SearchInput/SearchInput";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 
 interface CinemaFiltersProps {
     selectedCity: string;
@@ -26,6 +27,7 @@ export default function CinemaFilters({
     filteredChains,
     totalMatchingBranches,
 }: CinemaFiltersProps) {
+    const { t } = useLanguage();
     const [isChainOpen, setIsChainOpen] = useState(false);
 
     const activeChain = THEATER_CHAINS.find(c => c.id === selectedChainId);
@@ -52,13 +54,13 @@ export default function CinemaFilters({
                 <CityFilter
                     selectedCity={selectedCity}
                     onSelectCity={onSelectCity}
-                    label="Select Location:"
+                    label={t("filter_select_location")}
                 />
 
                 {/* Chain Selector Dropdown */}
                 <div className="flex flex-col gap-2 relative">
                     <span className="text-xs font-bold text-gray-400 uppercase tracking-wider filter-header-gradient">
-                        Cinema Chain:
+                        {t("filter_cinema_chain")}
                     </span>
                     <button
                         onClick={() => {
@@ -77,7 +79,7 @@ export default function CinemaFilters({
                                 <Film className={`h-6 w-6 shrink-0 transition-colors duration-300 ${isChainOpen ? "text-violet-600" : "text-violet-500"}`} />
                             )}
                             <span className="truncate">
-                                {activeChain ? activeChain.name : `All Chains (${totalMatchingBranches})`}
+                                {activeChain ? activeChain.name : t("filter_all_chains", { count: totalMatchingBranches })}
                             </span>
                         </div>
                         <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-300 ${isChainOpen ? "rotate-180 text-violet-500" : ""}`} />
@@ -91,12 +93,12 @@ export default function CinemaFilters({
                                 className={`w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-left transition-colors duration-150 cursor-pointer ${
                                     selectedChainId === "all" 
                                         ? "bg-violet-55 text-violet-755 dark:bg-zinc-700/50 dark:!text-violet-400" 
-                                        : "text-gray-700 hover:bg-violet-50/60 hover:text-violet-755 dark:!text-zinc-200 dark:hover:bg-zinc-700 dark:hover:!text-violet-400"
+                                        : "text-gray-700 hover:bg-violet-50/60 hover:text-violet-755 dark:!text-zinc-200 dark:hover:bg-zinc-700 dark:hover:!text-violet-405"
                                 }`}
                             >
                                 <div className="flex items-center gap-2.5">
                                     <Film className="h-6 w-6 text-gray-450 shrink-0" />
-                                    <span>All Chains ({totalMatchingBranches} cinemas)</span>
+                                    <span>{t("filter_all_chains_with_count", { count: totalMatchingBranches })}</span>
                                 </div>
                                 {selectedChainId === "all" && <Check className="h-4 w-4 text-violet-600" />}
                             </button>
@@ -113,7 +115,7 @@ export default function CinemaFilters({
                                                 ? "opacity-40 cursor-not-allowed text-gray-400 dark:text-zinc-550" 
                                                 : isSelected 
                                                     ? "bg-violet-50 text-violet-755 cursor-pointer dark:bg-zinc-700/50 dark:!text-violet-400" 
-                                                    : "text-gray-700 hover:bg-violet-50/60 hover:text-violet-755 cursor-pointer dark:!text-zinc-200 dark:hover:bg-zinc-700 dark:hover:!text-violet-400"
+                                                    : "text-gray-700 hover:bg-violet-50/60 hover:text-violet-755 cursor-pointer dark:!text-zinc-200 dark:hover:bg-zinc-700 dark:hover:!text-violet-404"
                                         }`}
                                     >
                                         <div className="flex items-center gap-2.5 min-w-0">
@@ -131,11 +133,11 @@ export default function CinemaFilters({
                 {/* Search Input */}
                 <div className="flex flex-col gap-2">
                     <span className="text-xs font-bold text-gray-400 uppercase tracking-wider filter-header-gradient">
-                        Quick Search:
+                        {t("filter_quick_search")}
                     </span>
                     <SearchInput
                         size="lg"
-                        placeholder="Enter cinema name, street..."
+                        placeholder={t("filter_search_placeholder")}
                         value={searchQuery}
                         onChange={(e) => onSearchChange(e.target.value)}
                         className="w-full bg-[#F5F3F7]/70 border-violet-100 hover:border-violet-300 rounded-2xl text-sm font-bold text-gray-755 focus:ring-2 focus:ring-violet-100 dark:bg-zinc-800/40 dark:border-zinc-800 dark:hover:border-zinc-700"

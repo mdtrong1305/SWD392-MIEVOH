@@ -1,6 +1,8 @@
+import DateSelector from "../CinemaDetail/DateSelector/DateSelector.tsx";
+import { useLanguage } from "../../../contextAPI/LanguageContext.tsx";
 import { useState, useMemo, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Calendar, Clock, Star, ChevronDown } from "lucide-react";
+import { ArrowLeft, Clock, Star, ChevronDown } from "lucide-react";
 import { MOVIES_DETAILS } from "../../../mockAPI/movieMock.tsx";
 import { THEATER_CHAINS } from "../../../mockAPI/cinemaMock.tsx";
 import CityFilter from "../../../components/CityFilter/CityFilter.tsx";
@@ -82,6 +84,7 @@ const DEFAULT_THEME: ChainTheme = {
 };
 
 export default function BookTicket() {
+    const { t, language } = useLanguage();
     const { id } = useParams<{ id: string }>();
     const movieId = Number(id);
     const navigate = useNavigate();
@@ -95,27 +98,7 @@ export default function BookTicket() {
         window.scrollTo(0, 0);
     }, []);
 
-    // Generate dates checklist starting from today
-    const dates = useMemo(() => {
-        const daysList: DateOption[] = [];
-        const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        for (let i = 0; i < 7; i++) {
-            const d = new Date();
-            d.setDate(d.getDate() + i);
-            const dayOfWeek = weekdays[d.getDay()];
-            const label = `${d.getDate()}/${d.getMonth() + 1}`;
-            
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const dateVal = String(d.getDate()).padStart(2, '0');
-            const dateString = `${year}-${month}-${dateVal}`;
-
-            daysList.push({ label, dayOfWeek, dateString });
-        }
-        return daysList;
-    }, []);
-
-    const [selectedDate, setSelectedDate] = useState<DateOption | null>(dates[0] || null);
+    const [selectedDate, setSelectedDate] = useState<DateOption | null>(null);
     const [selectedCity, setSelectedCity] = useState<string>("All");
 
     const [expandedChains, setExpandedChains] = useState<Record<string, boolean>>({});
@@ -269,15 +252,15 @@ export default function BookTicket() {
                             {/* Additional Meta Information Grid */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-350 border-t border-white/10 pt-3 max-w-2xl font-medium text-left">
                                 <div>
-                                    <span className="text-slate-450 font-bold block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">Release Date</span>
+                                    <span className="text-slate-450 font-bold block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">{t("release_date")}</span>
                                     <span className="text-slate-100 font-extrabold">{movie.releaseDate || "Now showing"}</span>
                                 </div>
                                 <div>
-                                    <span className="text-slate-450 font-bold block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">Director</span>
+                                    <span className="text-slate-450 font-bold block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">{t("director")}</span>
                                     <span className="text-slate-100 font-extrabold">{movie.director}</span>
                                 </div>
                                 <div className="sm:col-span-1">
-                                    <span className="text-slate-450 font-bold block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">Cast</span>
+                                    <span className="text-slate-450 font-bold block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">{t("cast")}</span>
                                     <span className="text-slate-100 font-semibold block truncate" title={movie.cast.join(", ")}>{movie.cast.join(", ")}</span>
                                 </div>
                             </div>
@@ -289,42 +272,16 @@ export default function BookTicket() {
             {/* Main Content Area */}
             <div className="max-w-5xl mx-auto px-4 mt-8 flex flex-col gap-6">
                 
-                {/* 1. Date Selector Block */}
-                <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-3xl p-5 shadow-sm animate__animated animate__fadeIn">
-                    <div className="flex items-center gap-2 mb-4 text-slate-800 dark:text-zinc-300">
-                        <Calendar className="h-5 w-5 text-[#8E7EFE]" />
-                        <span className="text-sm font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">Select Date</span>
-                    </div>
+                {/* 1. Date Selector Block */
+                <DateSelector
+                    selectedDate={selectedDate}
+                    onSelectDate={setSelectedDate}
+                />
 
-                    <div className="flex items-center md:justify-center gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent">
-                        {dates.map((dateOpt) => {
-                            const isSelected = selectedDate?.dateString === dateOpt.dateString;
-                            return (
-                                <button
-                                    key={dateOpt.dateString}
-                                    onClick={() => setSelectedDate(dateOpt)}
-                                    className={`flex flex-col items-center justify-center min-w-[80px] py-3 px-4 rounded-2xl border transition-all duration-350 cursor-pointer ${
-                                        isSelected
-                                            ? "bg-[#8E7EFE] border-[#8E7EFE] text-white shadow-md shadow-[#8E7EFE]/20 scale-[1.02]"
-                                            : "bg-slate-50/50 border-slate-100 text-slate-600 hover:bg-slate-100 hover:text-slate-900 hover:border-slate-200 dark:bg-zinc-800/40 dark:border-zinc-850 dark:text-zinc-400 dark:hover:bg-zinc-700/60 dark:hover:text-white dark:hover:border-zinc-700"
-                                    }`}
-                                >
-                                    <span className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${isSelected ? "text-indigo-100" : "text-slate-400 dark:text-zinc-500"}`}>
-                                        {dateOpt.label}
-                                    </span>
-                                    <span className="text-sm font-extrabold">
-                                        {dateOpt.dayOfWeek}
-                                    </span>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                {/* 2. City Filter Panel */}
+                /* 2. City Filter Panel */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/70 dark:bg-zinc-900/50 border border-white/60 dark:border-zinc-800/80 backdrop-blur-md rounded-2xl px-5 py-4 shadow-sm relative z-30">
                     <div className="flex items-center gap-2 text-slate-700 dark:text-zinc-300">
-                        <span className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-white">Cinema Locations</span>
+                        <span className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-white">{t("cinema_locations_label")}</span>
                     </div>
                     
                     <CityFilter
@@ -340,8 +297,8 @@ export default function BookTicket() {
                     {groupedChains.length === 0 ? (
                         <div className="bg-white dark:bg-zinc-900/50 rounded-3xl p-12 text-center border border-slate-100 dark:border-zinc-800/80 shadow-sm flex flex-col items-center">
                             <span className="text-4xl mb-3">📍</span>
-                            <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-1">No cinemas available</h3>
-                            <p className="text-slate-500 dark:text-zinc-450 font-medium text-xs">Please change your location filter or select another showtime date.</p>
+                            <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-1">{t("no_cinemas_available")}</h3>
+                            <p className="text-slate-500 dark:text-zinc-450 font-medium text-xs">{t("no_cinemas_available_desc")}</p>
                         </div>
                     ) : (
                         groupedChains.map(chain => {
@@ -409,13 +366,13 @@ export default function BookTicket() {
                                                                 {/* Showtimes Formats */}
                                                                 {isBranchExpanded && (
                                                                     <div className="space-y-5 mt-5 pt-5 border-t border-slate-100 dark:border-zinc-800/80 animate__animated animate__fadeIn">
-                                                                        {/* 2D Dubbed - conditionally rendered */}
+                                                                        {/* {t("format_2d_dubbed")} - conditionally rendered */}
                                                                         {hasDubbing && (
                                                                             <div>
                                                                                 <div className="flex items-center gap-2 mb-3">
                                                                                     <span className="h-3 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: theme.glowColor }} />
                                                                                     <h4 className="text-xs font-black text-slate-700 dark:text-white uppercase tracking-wider">
-                                                                                        2D Dubbed
+                                                                                        {t("format_2d_dubbed")}
                                                                                     </h4>
                                                                                 </div>
                                                                                 <div className="flex flex-wrap gap-2.5">
@@ -425,7 +382,7 @@ export default function BookTicket() {
                                                                                             <button
                                                                                                 key={time}
                                                                                                 disabled={expired}
-                                                                                                onClick={() => handleSelectShowtime(branch.name, "2D Dubbed", time)}
+                                                                                                onClick={() => handleSelectShowtime(branch.name, language === "vi" ? "2D Lồng Tiếng" : "2D Dubbed", time)}
                                                                                                 className={`px-5.5 py-2.5 text-xs font-black rounded-xl border transition-all duration-200 ${
                                                                                                     expired
                                                                                                         ? "bg-slate-50 border-slate-100 text-slate-300 dark:bg-zinc-800/20 dark:border-zinc-805 dark:text-zinc-600 dark:line-through cursor-not-allowed line-through text-[11px] font-bold"
@@ -440,12 +397,12 @@ export default function BookTicket() {
                                                                             </div>
                                                                         )}
 
-                                                                        {/* 2D Subbed */}
+                                                                        {/* {t("format_2d_subbed")} */}
                                                                         <div>
                                                                             <div className="flex items-center gap-2 mb-3">
                                                                                 <span className="h-3 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: theme.glowColor }} />
                                                                                 <h4 className="text-xs font-black text-slate-700 dark:text-white uppercase tracking-wider">
-                                                                                    2D Subbed
+                                                                                    {t("format_2d_subbed")}
                                                                                 </h4>
                                                                             </div>
                                                                             <div className="flex flex-wrap gap-2.5">
@@ -455,7 +412,7 @@ export default function BookTicket() {
                                                                                         <button
                                                                                             key={time}
                                                                                             disabled={expired}
-                                                                                            onClick={() => handleSelectShowtime(branch.name, "2D Subbed", time)}
+                                                                                            onClick={() => handleSelectShowtime(branch.name, language === "vi" ? "2D Phụ Đề" : "2D Subtitles", time)}
                                                                                             className={`px-5.5 py-2.5 text-xs font-black rounded-xl border transition-all duration-200 ${
                                                                                                 expired
                                                                                                     ? "bg-slate-50 border-slate-100 text-slate-305 dark:bg-zinc-800/20 dark:border-zinc-805 dark:text-zinc-600 dark:line-through cursor-not-allowed line-through text-[11px] font-bold"

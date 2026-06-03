@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Loader2, Copy } from "lucide-react";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
+import { Copy } from "lucide-react";
 import { toast } from "../../../../components/Toast/Toast.tsx";
 import Loading from "../../../../components/Loading/Loading.tsx";
 
@@ -26,6 +27,7 @@ export default function QRTransferPage({
     setIsVerifying,
     setActiveStep
 }: QRTransferPageProps) {
+    const { t } = useLanguage();
     const [qrLoaded, setQrLoaded] = useState(false);
 
     return (
@@ -33,8 +35,8 @@ export default function QRTransferPage({
             {isVerifying && (
                 <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 text-white">
                     <Loading size="lg" className="mb-4" />
-                    <p className="text-lg font-bold">Verifying bank transfer transaction...</p>
-                    <p className="text-sm text-slate-350 mt-2">Please wait a moment</p>
+                    <p className="text-lg font-bold">{t("verifying_bank_transfer")}</p>
+                    <p className="text-sm text-slate-350 mt-2">{t("please_wait_moment")}</p>
                 </div>
             )}
             <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-[2.5rem] shadow-xl overflow-hidden p-8 md:p-10">
@@ -42,71 +44,67 @@ export default function QRTransferPage({
                     {/* Left Column: Bank account details */}
                     <div className="md:col-span-3 space-y-6">
                         <div className="border-b border-slate-100 dark:border-zinc-800/80 pb-5 text-left">
-                            <h2 className="text-xl font-black text-slate-850 dark:text-white">Transfer money to the following account</h2>
+                            <h2 className="text-xl font-black text-slate-850 dark:text-white">{t("transfer_money_to_account")}</h2>
                             <p className="text-sm font-semibold text-slate-500 dark:text-zinc-400 mt-2 leading-relaxed">
-                                You need to transfer within{" "}
-                                <span className="text-[#E13D53] font-black text-base tracking-wider bg-rose-50 dark:bg-rose-950/40 px-2.5 py-1 rounded-xl">
-                                    {formatTimeLeft(paymentTimeLeft)}
-                                </span>{" "}
-                                otherwise your seats will be released.
+                                {t("transfer_time_limit_desc", { time: formatTimeLeft(paymentTimeLeft) })}
                             </p>
                         </div>
                         
                         <div className="space-y-1">
                             <div className="py-3.5 border-b border-slate-100/80 dark:border-zinc-800/60 flex flex-col items-start gap-1">
-                                <span className="text-[10px] font-black uppercase text-slate-455 dark:!text-white/80 tracking-wider">Bank</span>
+                                <span className="text-[10px] font-black uppercase text-slate-455 dark:!text-white/80 tracking-wider">{t("bank_label")}</span>
                                 <span className="text-slate-800 dark:!text-white font-extrabold text-base text-left">Military Commercial Joint Stock Bank (MB Bank)</span>
                             </div>
                             
                             <div className="py-3.5 border-b border-slate-100/80 dark:border-zinc-800/60 flex flex-col items-start gap-1">
-                                <span className="text-[10px] font-black uppercase text-slate-455 dark:!text-white/80 tracking-wider">Account Number</span>
+                                <span className="text-[10px] font-black uppercase text-slate-455 dark:!text-white/80 tracking-wider">{t("account_number_label")}</span>
                                 <div className="flex items-center justify-between w-full">
                                     <span className="text-slate-800 dark:!text-white font-extrabold text-base tracking-wider">86870029</span>
                                     <button 
                                         onClick={() => {
                                             navigator.clipboard.writeText("86870029");
-                                            toast.success("Account number copied!");
+                                            toast.success(t("toast_account_number_copied"));
                                         }}
                                         className="px-3 py-1.5 rounded-xl bg-violet-50 dark:bg-zinc-800 hover:bg-violet-100 dark:hover:bg-zinc-700 text-[#8E7EFE] transition-colors cursor-pointer flex items-center justify-center gap-1.5 text-xs font-bold"
                                     >
                                         <Copy className="h-3.5 w-3.5" />
-                                        <span>Copy</span>
+                                        <span>{t("copy_btn")}</span>
                                     </button>
                                 </div>
                             </div>
                             
                             <div className="py-3.5 border-b border-slate-100/80 dark:border-zinc-800/60 flex flex-col items-start gap-1">
-                                <span className="text-[10px] font-black uppercase text-slate-455 dark:!text-white/80 tracking-wider">Account Holder</span>
+                                <span className="text-[10px] font-black uppercase text-slate-455 dark:!text-white/80 tracking-wider">{t("account_holder_label")}</span>
                                 <span className="text-slate-800 dark:!text-white font-extrabold text-base">CONG TY TNHH MONET</span>
                             </div>
                             
                             <div className="py-3.5 border-b border-slate-100/80 dark:border-zinc-800/60 flex flex-col items-start gap-1">
-                                <span className="text-[10px] font-black uppercase text-slate-455 dark:!text-white/80 tracking-wider">Transfer Content</span>
+                                <span className="text-[10px] font-black uppercase text-slate-455 dark:!text-white/80 tracking-wider">{t("transfer_content_label")}</span>
                                 <div className="flex items-center justify-between w-full">
                                     <span className="text-slate-805 dark:!text-white font-extrabold text-base tracking-widest bg-violet-50/50 dark:bg-zinc-800/60 px-2 py-0.5 rounded text-[#8E7EFE]">{bookingCode}</span>
                                     <button 
                                         onClick={() => {
                                             navigator.clipboard.writeText(bookingCode);
-                                            toast.success("Transfer content copied!");
+                                            toast.success(t("toast_transfer_content_copied"));
                                         }}
                                         className="px-3 py-1.5 rounded-xl bg-violet-50 dark:bg-zinc-800 hover:bg-violet-100 dark:hover:bg-zinc-700 text-[#8E7EFE] transition-colors cursor-pointer flex items-center justify-center gap-1.5 text-xs font-bold"
                                     >
                                         <Copy className="h-3.5 w-3.5" />
-                                        <span>Copy</span>
+                                        <span>{t("copy_btn")}</span>
                                     </button>
                                 </div>
-                                <span className="text-xs text-rose-500 font-bold mt-1 text-left">Enter exact content to receive the ticket code.</span>
+                                <span className="text-xs text-rose-500 font-bold mt-1 text-left">{t("enter_exact_content_desc")}</span>
                             </div>
                             
                             <div className="py-3.5 border-b border-slate-100/80 dark:border-zinc-800/60 flex flex-col items-start gap-1">
-                                <span className="text-[10px] font-black uppercase text-slate-455 dark:!text-white/80 tracking-wider">Amount</span>
+                                <span className="text-[10px] font-black uppercase text-slate-455 dark:!text-white/80 tracking-wider">{t("amount_label")}</span>
                                 <span className="text-slate-850 dark:!text-white font-black text-xl text-[#8E7EFE]">{formatPrice(totalPrice)}</span>
                             </div>
                         </div>
                         
                         <div className="text-left space-y-1.5 text-xs font-bold text-slate-500 dark:text-zinc-400 pt-2 leading-relaxed">
-                            <p className="text-[#E13D53]">The system automatically issues the ticket code within 30s after your successful transfer.</p>
-                            <p>Please contact hotline <span className="text-[#8E7EFE] dark:!text-[#8E7EFE] font-black">024 7308 8890</span> if you do not receive the ticket code.</p>
+                            
+                            {t("hotline_reminder_desc")}
                         </div>
                         
                         <div className="pt-4 flex gap-4">
@@ -114,7 +112,7 @@ export default function QRTransferPage({
                                 onClick={() => setShowQRTransfer(false)}
                                 className="px-6 py-3.5 border border-slate-200 dark:border-zinc-700 hover:border-slate-355 dark:hover:border-zinc-600 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-650 dark:text-zinc-300 hover:text-slate-800 dark:hover:text-white font-extrabold text-sm rounded-2xl transition-all cursor-pointer"
                             >
-                                Cancel Transaction
+                                {t("cancel_transaction")}
                             </button>
                             <button 
                                 onClick={() => {
@@ -123,12 +121,12 @@ export default function QRTransferPage({
                                         setIsVerifying(false);
                                         setShowQRTransfer(false);
                                         setActiveStep(4);
-                                        toast.success("Payment successful! Your ticket has been issued.");
+                                        toast.success(t("toast_payment_success"));
                                     }, 2200);
                                 }}
                                 className="flex-1 py-3.5 bg-[#8E7EFE] hover:bg-[#7d6dfc] text-white font-extrabold text-sm rounded-2xl transition-all cursor-pointer shadow-lg shadow-violet-100 dark:shadow-none text-center"
                             >
-                                I have successfully transferred
+                                {t("confirm_successful_transfer")}
                             </button>
                         </div>
                     </div>
@@ -165,10 +163,10 @@ export default function QRTransferPage({
                         </div>
                         
                         <button 
-                            onClick={() => toast.success("Screenshot captured! Please open your banking app to scan.")}
+                            onClick={() => toast.success(t("toast_screenshot_captured"))}
                             className="text-xs text-rose-500 font-bold underline mt-5 hover:text-rose-600 cursor-pointer"
                         >
-                            Take a screenshot to scan the QR code
+                            {t("screenshot_qr_desc")}
                         </button>
                     </div>
                 </div>
