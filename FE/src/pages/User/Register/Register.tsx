@@ -15,6 +15,7 @@ import {
 import Button from '../../../components/Button/Button.tsx';
 import useLogin from '../../../hooks/useLogin.ts';
 import useRegister from '../../../hooks/useRegister.ts';
+import { redirectToGoogleApi } from '../../../axios/auth.tsx';
 import '../../../CSS/Register.css';
 
 export default function Register() {
@@ -63,6 +64,7 @@ export default function Register() {
         setShowRegConfirmPwd,
         handleRegisterChange,
         handleRegisterSubmit,
+        isUsernameValid,
         isHoTenValid,
         isEmailValid,
         isSoDTValid,
@@ -100,137 +102,172 @@ export default function Register() {
                         <h2 className="text-4xl font-extrabold text-violet-950 text-center mb-1.5">Sign Up</h2>
                         <p className="text-base text-violet-600/70 text-center mb-6">Join the Mievoh cinema community</p>
 
-                        <div className="space-y-4 overflow-y-auto pr-1 max-h-[380px]">
+                        <div className="space-y-2.5 pr-1">
+                            {/* Username */}
+                            <div>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-violet-500">
+                                        <User className="h-4 w-4" />
+                                    </span>
+                                    <input
+                                        name="username"
+                                        type="text"
+                                        required
+                                        value={registerForm.username}
+                                        onChange={handleRegisterChange}
+                                        className={`w-full pl-11 pr-4 py-2.5 rounded-xl border bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${registerForm.username && errors.username ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
+                                            }`}
+                                        placeholder="Username"
+                                    />
+                                </div>
+                                {errors.username && (
+                                    <p className="mt-1 ml-1 text-2xs text-violet-950 flex items-center gap-1 font-semibold">
+                                        <span>⚠️</span> {errors.username}
+                                    </p>
+                                )}
+                            </div>
+
                             {/* Họ Tên */}
-                            <div className="relative">
-                                <span className="absolute left-4 top-[18px] text-violet-500">
-                                    <User className="h-4.5 w-4.5" />
-                                </span>
-                                <input
-                                    name="hoTen"
-                                    type="text"
-                                    required
-                                    value={registerForm.hoTen}
-                                    onChange={handleRegisterChange}
-                                    className={`w-full pl-11 pr-4 py-3.5 rounded-xl border bg-violet-50/20 text-violet-950 text-lg placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${registerForm.hoTen && errors.hoTen ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
-                                        }`}
-                                    placeholder="Full Name"
-                                />
-                                {registerForm.hoTen && errors.hoTen && (
-                                    <p className="mt-1.5 ml-1 text-2xs text-violet-950 flex items-center gap-1 font-semibold">
+                            <div>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-violet-500">
+                                        <User className="h-4 w-4" />
+                                    </span>
+                                    <input
+                                        name="hoTen"
+                                        type="text"
+                                        required
+                                        disabled={!isUsernameValid}
+                                        value={registerForm.hoTen}
+                                        onChange={handleRegisterChange}
+                                        className={`w-full pl-11 pr-4 py-2.5 rounded-xl border bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.hoTen && errors.hoTen ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
+                                            }`}
+                                        placeholder="Full Name"
+                                    />
+                                </div>
+                                {errors.hoTen && (
+                                    <p className="mt-1 ml-1 text-2xs text-violet-950 flex items-center gap-1 font-semibold">
                                         <span>⚠️</span> {errors.hoTen}
                                     </p>
                                 )}
                             </div>
 
                             {/* Email */}
-                            <div className="relative">
-                                <span className="absolute left-4 top-[18px] text-violet-500">
-                                    <Mail className="h-4.5 w-4.5" />
-                                </span>
-                                <input
-                                    name="email"
-                                    type="email"
-                                    required
-                                    disabled={!isHoTenValid}
-                                    value={registerForm.email}
-                                    onChange={handleRegisterChange}
-                                    className={`w-full pl-11 pr-4 py-3.5 rounded-xl border bg-violet-50/20 text-violet-950 text-lg placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.email && (errors.email || emailTaken) ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
-                                        }`}
-                                    placeholder="Email Address"
-                                />
-                                {registerForm.email && errors.email && (
-                                    <p className="mt-1.5 ml-1 text-2xs text-violet-950 flex items-center gap-1 font-semibold">
+                            <div>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-violet-500">
+                                        <Mail className="h-4 w-4" />
+                                    </span>
+                                    <input
+                                        name="email"
+                                        type="email"
+                                        required
+                                        disabled={!isHoTenValid}
+                                        value={registerForm.email}
+                                        onChange={handleRegisterChange}
+                                        className={`w-full pl-11 pr-4 py-2.5 rounded-xl border bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.email && (errors.email || emailTaken) ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
+                                            }`}
+                                        placeholder="Email Address"
+                                    />
+                                </div>
+                                {errors.email && (
+                                    <p className="mt-1 ml-1 text-2xs text-violet-950 flex items-center gap-1 font-semibold">
                                         <span>⚠️</span> {errors.email}
                                     </p>
                                 )}
-                                {registerForm.email && !errors.email && emailTaken && (
-                                    <p className="mt-1.5 ml-1 text-2xs text-violet-950 flex items-center gap-1 font-semibold">
+                                {!errors.email && emailTaken && (
+                                    <p className="mt-1 ml-1 text-2xs text-violet-950 flex items-center gap-1 font-semibold">
                                         <span>⚠️</span> This email is already registered
                                     </p>
                                 )}
                             </div>
 
                             {/* Số điện thoại */}
-                            <div className="relative">
-                                <span className="absolute left-4 top-[18px] text-violet-500">
-                                    <Phone className="h-4.5 w-4.5" />
-                                </span>
-                                <input
-                                    name="soDT"
-                                    type="tel"
-                                    required
-                                    disabled={!isEmailValid}
-                                    value={registerForm.soDT}
-                                    onChange={handleRegisterChange}
-                                    className={`w-full pl-11 pr-4 py-3.5 rounded-xl border bg-violet-50/20 text-violet-950 text-lg placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.soDT && errors.soDT ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
-                                        }`}
-                                    placeholder="Phone Number"
-                                />
-                                {registerForm.soDT && errors.soDT && (
-                                    <p className="mt-1.5 ml-1 text-2xs text-violet-950 flex items-center gap-1 font-semibold">
+                            <div>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-violet-500">
+                                        <Phone className="h-4 w-4" />
+                                    </span>
+                                    <input
+                                        name="soDT"
+                                        type="tel"
+                                        required
+                                        disabled={!isEmailValid}
+                                        value={registerForm.soDT}
+                                        onChange={handleRegisterChange}
+                                        className={`w-full pl-11 pr-4 py-2.5 rounded-xl border bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.soDT && errors.soDT ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
+                                            }`}
+                                        placeholder="Phone Number"
+                                    />
+                                </div>
+                                {errors.soDT && (
+                                    <p className="mt-1 ml-1 text-2xs text-violet-950 flex items-center gap-1 font-semibold">
                                         <span>⚠️</span> {errors.soDT}
                                     </p>
                                 )}
                             </div>
 
                             {/* Mật khẩu */}
-                            <div className="relative">
-                                <span className="absolute left-4 top-[18px] text-violet-500">
-                                    <Lock className="h-4.5 w-4.5" />
-                                </span>
-                                <input
-                                    name="matKhau"
-                                    type={showRegPwd ? "text" : "password"}
-                                    required
-                                    disabled={!isSoDTValid}
-                                    value={registerForm.matKhau}
-                                    onChange={handleRegisterChange}
-                                    className={`w-full pl-11 pr-11 py-3.5 rounded-xl border bg-violet-50/20 text-violet-950 text-lg placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.matKhau && errors.matKhau ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
-                                        }`}
-                                    placeholder="Password"
-                                />
-                                <button
-                                    type="button"
-                                    disabled={!isSoDTValid}
-                                    onClick={() => setShowRegPwd(!showRegPwd)}
-                                    className="absolute right-4 top-[18px] text-violet-400 hover:text-violet-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                                >
-                                    {showRegPwd ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
-                                </button>
-                                {registerForm.matKhau && errors.matKhau && (
-                                    <p className="mt-1.5 ml-1 text-2xs text-violet-950 flex items-center gap-1 font-semibold">
+                            <div>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-violet-500">
+                                        <Lock className="h-4 w-4" />
+                                    </span>
+                                    <input
+                                        name="matKhau"
+                                        type={showRegPwd ? "text" : "password"}
+                                        required
+                                        disabled={!isSoDTValid}
+                                        value={registerForm.matKhau}
+                                        onChange={handleRegisterChange}
+                                        className={`w-full pl-11 pr-11 py-2.5 rounded-xl border bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.matKhau && errors.matKhau ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
+                                            }`}
+                                        placeholder="Password"
+                                    />
+                                    <button
+                                        type="button"
+                                        disabled={!isSoDTValid}
+                                        onClick={() => setShowRegPwd(!showRegPwd)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-violet-400 hover:text-violet-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                    >
+                                        {showRegPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </button>
+                                </div>
+                                {errors.matKhau && (
+                                    <p className="mt-1 ml-1 text-2xs text-violet-950 flex items-center gap-1 font-semibold">
                                         <span>⚠️</span> {errors.matKhau}
                                     </p>
                                 )}
                             </div>
 
                             {/* Xác nhận mật khẩu */}
-                            <div className="relative">
-                                <span className="absolute left-4 top-[18px] text-violet-500">
-                                    <Lock className="h-4.5 w-4.5" />
-                                </span>
-                                <input
-                                    name="xacNhanMatKhau"
-                                    type={showRegConfirmPwd ? "text" : "password"}
-                                    required
-                                    disabled={!isMatKhauValid}
-                                    value={registerForm.xacNhanMatKhau}
-                                    onChange={handleRegisterChange}
-                                    className={`w-full pl-11 pr-11 py-3.5 rounded-xl border bg-violet-50/20 text-violet-950 text-lg placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.xacNhanMatKhau && errors.xacNhanMatKhau ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
-                                        }`}
-                                    placeholder="Confirm Password"
-                                />
-                                <button
-                                    type="button"
-                                    disabled={!isMatKhauValid}
-                                    onClick={() => setShowRegConfirmPwd(!showRegConfirmPwd)}
-                                    className="absolute right-4 top-[18px] text-violet-400 hover:text-violet-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                                >
-                                    {showRegConfirmPwd ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
-                                </button>
-                                {registerForm.xacNhanMatKhau && errors.xacNhanMatKhau && (
-                                    <p className="mt-1.5 ml-1 text-2xs text-violet-950 flex items-center gap-1 font-semibold">
+                            <div>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-violet-500">
+                                        <Lock className="h-4 w-4" />
+                                    </span>
+                                    <input
+                                        name="xacNhanMatKhau"
+                                        type={showRegConfirmPwd ? "text" : "password"}
+                                        required
+                                        disabled={!isMatKhauValid}
+                                        value={registerForm.xacNhanMatKhau}
+                                        onChange={handleRegisterChange}
+                                        className={`w-full pl-11 pr-11 py-2.5 rounded-xl border bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.xacNhanMatKhau && errors.xacNhanMatKhau ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
+                                            }`}
+                                        placeholder="Confirm Password"
+                                    />
+                                    <button
+                                        type="button"
+                                        disabled={!isMatKhauValid}
+                                        onClick={() => setShowRegConfirmPwd(!showRegConfirmPwd)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-violet-400 hover:text-violet-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                    >
+                                        {showRegConfirmPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </button>
+                                </div>
+                                {errors.xacNhanMatKhau && (
+                                    <p className="mt-1 ml-1 text-2xs text-violet-950 flex items-center gap-1 font-semibold">
                                         <span>⚠️</span> {errors.xacNhanMatKhau}
                                     </p>
                                 )}
@@ -281,22 +318,24 @@ export default function Register() {
                                 <p className="text-base text-violet-600/70 text-center mb-7">Enter your email address to recover your account</p>
 
                                 <div className="space-y-5">
-                                    <div className="relative">
-                                        <span className="absolute left-4 top-[18px] text-violet-500">
-                                            <Mail className="h-4.5 w-4.5" />
-                                        </span>
-                                        <input
-                                            name="forgotEmail"
-                                            type="email"
-                                            required
-                                            value={forgotEmail}
-                                            onChange={(e) => {
-                                                setForgotEmail(e.target.value);
-                                                setForgotErrors({});
-                                            }}
-                                            className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-violet-100 bg-violet-50/20 text-violet-950 text-lg placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
-                                            placeholder="Enter your email address"
-                                        />
+                                    <div>
+                                        <div className="relative">
+                                            <span className="absolute left-4 top-[18px] text-violet-500">
+                                                <Mail className="h-4.5 w-4.5" />
+                                            </span>
+                                            <input
+                                                name="forgotEmail"
+                                                type="email"
+                                                required
+                                                value={forgotEmail}
+                                                onChange={(e) => {
+                                                    setForgotEmail(e.target.value);
+                                                    setForgotErrors({});
+                                                }}
+                                                className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-violet-100 bg-violet-50/20 text-violet-950 text-lg placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
+                                                placeholder="Enter your email address"
+                                            />
+                                        </div>
                                         {forgotErrors.email && (
                                             <p className="mt-1.5 ml-1 text-2xs text-violet-950 flex items-center gap-1 font-semibold">
                                                 <span>⚠️</span> {forgotErrors.email}
@@ -329,29 +368,31 @@ export default function Register() {
                                 <p className="text-base text-violet-600/70 text-center mb-7">Enter your new secure password</p>
 
                                 <div className="space-y-5">
-                                    <div className="relative">
-                                        <span className="absolute left-4 top-[18px] text-violet-500">
-                                            <Lock className="h-4.5 w-4.5" />
-                                        </span>
-                                        <input
-                                            name="forgotNewPassword"
-                                            type={showForgotPwd ? "text" : "password"}
-                                            required
-                                            value={forgotNewPassword}
-                                            onChange={(e) => {
-                                                setForgotNewPassword(e.target.value);
-                                                setForgotErrors({});
-                                            }}
-                                            className="w-full pl-11 pr-11 py-3.5 rounded-xl border border-violet-100 bg-violet-50/20 text-violet-950 text-lg placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
-                                            placeholder="Enter new password"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowForgotPwd(!showForgotPwd)}
-                                            className="absolute right-4 top-[18px] text-violet-400 hover:text-violet-600 transition-colors"
-                                        >
-                                            {showForgotPwd ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5 text-violet-600" />}
-                                        </button>
+                                    <div>
+                                        <div className="relative">
+                                            <span className="absolute left-4 top-[18px] text-violet-500">
+                                                <Lock className="h-4.5 w-4.5" />
+                                            </span>
+                                            <input
+                                                name="forgotNewPassword"
+                                                type={showForgotPwd ? "text" : "password"}
+                                                required
+                                                value={forgotNewPassword}
+                                                onChange={(e) => {
+                                                    setForgotNewPassword(e.target.value);
+                                                    setForgotErrors({});
+                                                }}
+                                                className="w-full pl-11 pr-11 py-3.5 rounded-xl border border-violet-100 bg-violet-50/20 text-violet-950 text-lg placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
+                                                placeholder="Enter new password"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowForgotPwd(!showForgotPwd)}
+                                                className="absolute right-4 top-[18px] text-violet-400 hover:text-violet-600 transition-colors"
+                                            >
+                                                {showForgotPwd ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5 text-violet-600" />}
+                                            </button>
+                                        </div>
                                         {forgotErrors.password && (
                                             <p className="mt-1.5 ml-1 text-2xs text-violet-950 flex items-center gap-1 font-semibold">
                                                 <span>⚠️</span> {forgotErrors.password}
@@ -359,29 +400,31 @@ export default function Register() {
                                         )}
                                     </div>
 
-                                    <div className="relative">
-                                        <span className="absolute left-4 top-[18px] text-violet-500">
-                                            <Lock className="h-4.5 w-4.5" />
-                                        </span>
-                                        <input
-                                            name="forgotConfirmPassword"
-                                            type={showForgotConfirmPwd ? "text" : "password"}
-                                            required
-                                            value={forgotConfirmPassword}
-                                            onChange={(e) => {
-                                                setForgotConfirmPassword(e.target.value);
-                                                setForgotErrors({});
-                                            }}
-                                            className="w-full pl-11 pr-11 py-3.5 rounded-xl border border-violet-100 bg-violet-50/20 text-violet-950 text-lg placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
-                                            placeholder="Confirm new password"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowForgotConfirmPwd(!showForgotConfirmPwd)}
-                                            className="absolute right-4 top-[18px] text-violet-400 hover:text-violet-600 transition-colors"
-                                        >
-                                            {showForgotConfirmPwd ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5 text-violet-600" />}
-                                        </button>
+                                    <div>
+                                        <div className="relative">
+                                            <span className="absolute left-4 top-[18px] text-violet-500">
+                                                <Lock className="h-4.5 w-4.5" />
+                                            </span>
+                                            <input
+                                                name="forgotConfirmPassword"
+                                                type={showForgotConfirmPwd ? "text" : "password"}
+                                                required
+                                                value={forgotConfirmPassword}
+                                                onChange={(e) => {
+                                                    setForgotConfirmPassword(e.target.value);
+                                                    setForgotErrors({});
+                                                }}
+                                                className="w-full pl-11 pr-11 py-3.5 rounded-xl border border-violet-100 bg-violet-50/20 text-violet-950 text-lg placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
+                                                placeholder="Confirm new password"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowForgotConfirmPwd(!showForgotConfirmPwd)}
+                                                className="absolute right-4 top-[18px] text-violet-400 hover:text-violet-600 transition-colors"
+                                            >
+                                                {showForgotConfirmPwd ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5 text-violet-600" />}
+                                            </button>
+                                        </div>
                                         {forgotErrors.confirmPassword && (
                                             <p className="mt-1.5 ml-1 text-2xs text-violet-950 flex items-center gap-1 font-semibold">
                                                 <span>⚠️</span> {forgotErrors.confirmPassword}
@@ -414,19 +457,19 @@ export default function Register() {
                                 <p className="text-base text-violet-600/70 text-center mb-7">Welcome back to Mievoh Cinema</p>
 
                                 <div className="space-y-5">
-                                    {/* Email */}
+                                    {/* Username */}
                                     <div className="relative">
                                         <span className="absolute left-4 top-[18px] text-violet-500">
-                                            <Mail className="h-4.5 w-4.5" />
+                                            <User className="h-4.5 w-4.5" />
                                         </span>
                                         <input
-                                            name="email"
-                                            type="email"
+                                            name="username"
+                                            type="text"
                                             required
-                                            value={loginForm.email}
+                                            value={loginForm.username}
                                             onChange={handleLoginChange}
                                             className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-violet-100 bg-violet-50/20 text-violet-950 text-lg placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
-                                            placeholder="Enter your email address"
+                                            placeholder="Enter your username"
                                         />
                                     </div>
 
@@ -494,7 +537,7 @@ export default function Register() {
 
                                 <button
                                     type="button"
-                                    onClick={() => alert("Google Sign-In will be integrated with the backend shortly.")}
+                                    onClick={() => redirectToGoogleApi()}
                                     className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-violet-200 hover:border-violet-300 hover:bg-violet-50/10 text-violet-700 font-bold transition-all text-base cursor-pointer"
                                 >
                                     <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -735,16 +778,16 @@ export default function Register() {
                                     <div className="space-y-4">
                                         <div className="relative">
                                             <span className="absolute left-3 top-3.5 text-violet-500">
-                                                <Mail className="h-4 w-4" />
+                                                <User className="h-4 w-4" />
                                             </span>
                                             <input
-                                                name="email"
-                                                type="email"
+                                                name="username"
+                                                type="text"
                                                 required
-                                                value={loginForm.email}
+                                                value={loginForm.username}
                                                 onChange={handleLoginChange}
                                                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-violet-100 bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
-                                                placeholder="Email Address"
+                                                placeholder="Username"
                                             />
                                         </div>
 
@@ -811,7 +854,7 @@ export default function Register() {
 
                                     <button
                                         type="button"
-                                        onClick={() => alert("Google Sign-In will be integrated with the backend shortly.")}
+                                        onClick={() => redirectToGoogleApi()}
                                         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-violet-200 hover:border-violet-300 hover:bg-violet-50/10 text-violet-700 font-bold transition-all text-sm cursor-pointer"
                                     >
                                         <svg className="h-4.5 w-4.5" viewBox="0 0 24 24">
@@ -862,131 +905,166 @@ export default function Register() {
 
                             <h2 className="text-2xl font-bold text-violet-950 mb-4 text-center">Sign Up</h2>
 
-                            <div className="space-y-3.5 max-h-[320px] overflow-y-auto pr-1">
-                                <div className="relative">
-                                    <span className="absolute left-3 top-3.5 text-violet-500">
-                                        <User className="h-4 w-4" />
-                                    </span>
-                                    <input
-                                        name="hoTen"
-                                        type="text"
-                                        required
-                                        value={registerForm.hoTen}
-                                        onChange={handleRegisterChange}
-                                        className={`w-full pl-10 pr-4 py-3 rounded-xl border bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${registerForm.hoTen && errors.hoTen ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
-                                            }`}
-                                        placeholder="Full Name"
-                                    />
-                                    {registerForm.hoTen && errors.hoTen && (
+                            <div className="space-y-2 overflow-y-auto pr-1 max-h-[390px]">
+                                {/* Username */}
+                                <div>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-violet-500">
+                                            <User className="h-4 w-4" />
+                                        </span>
+                                        <input
+                                            name="username"
+                                            type="text"
+                                            required
+                                            value={registerForm.username}
+                                            onChange={handleRegisterChange}
+                                            className={`w-full pl-10 pr-4 py-2 rounded-xl border bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${registerForm.username && errors.username ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
+                                                }`}
+                                            placeholder="Username"
+                                        />
+                                    </div>
+                                    {errors.username && (
+                                        <p className="mt-1 ml-1 text-[10px] text-violet-950 flex items-center gap-1 font-semibold">
+                                            <span>⚠️</span> {errors.username}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-violet-500">
+                                            <User className="h-4 w-4" />
+                                        </span>
+                                        <input
+                                            name="hoTen"
+                                            type="text"
+                                            required
+                                            disabled={!isUsernameValid}
+                                            value={registerForm.hoTen}
+                                            onChange={handleRegisterChange}
+                                            className={`w-full pl-10 pr-4 py-2 rounded-xl border bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.hoTen && errors.hoTen ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
+                                                }`}
+                                            placeholder="Full Name"
+                                        />
+                                    </div>
+                                    {errors.hoTen && (
                                         <p className="mt-1 ml-1 text-[10px] text-violet-950 flex items-center gap-1 font-semibold">
                                             <span>⚠️</span> {errors.hoTen}
                                         </p>
                                     )}
                                 </div>
 
-                                <div className="relative">
-                                    <span className="absolute left-3 top-3.5 text-violet-500">
-                                        <Mail className="h-4 w-4" />
-                                    </span>
-                                    <input
-                                        name="email"
-                                        type="email"
-                                        required
-                                        disabled={!isHoTenValid}
-                                        value={registerForm.email}
-                                        onChange={handleRegisterChange}
-                                        className={`w-full pl-10 pr-4 py-3 rounded-xl border bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.email && (errors.email || emailTaken) ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
-                                            }`}
-                                        placeholder="Email Address"
-                                    />
-                                    {registerForm.email && errors.email && (
+                                <div>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-violet-500">
+                                            <Mail className="h-4 w-4" />
+                                        </span>
+                                        <input
+                                            name="email"
+                                            type="email"
+                                            required
+                                            disabled={!isHoTenValid}
+                                            value={registerForm.email}
+                                            onChange={handleRegisterChange}
+                                            className={`w-full pl-10 pr-4 py-2 rounded-xl border bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.email && (errors.email || emailTaken) ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
+                                                }`}
+                                            placeholder="Email Address"
+                                        />
+                                    </div>
+                                    {errors.email && (
                                         <p className="mt-1 ml-1 text-[10px] text-violet-950 flex items-center gap-1 font-semibold">
                                             <span>⚠️</span> {errors.email}
                                         </p>
                                     )}
-                                    {registerForm.email && !errors.email && emailTaken && (
+                                    {!errors.email && emailTaken && (
                                         <p className="mt-1 ml-1 text-[10px] text-violet-950 flex items-center gap-1 font-semibold">
                                             <span>⚠️</span> This email is already registered
                                         </p>
                                     )}
                                 </div>
 
-                                <div className="relative">
-                                    <span className="absolute left-3 top-3.5 text-violet-500">
-                                        <Phone className="h-4 w-4" />
-                                    </span>
-                                    <input
-                                        name="soDT"
-                                        type="tel"
-                                        required
-                                        disabled={!isEmailValid}
-                                        value={registerForm.soDT}
-                                        onChange={handleRegisterChange}
-                                        className={`w-full pl-10 pr-4 py-3 rounded-xl border bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.soDT && errors.soDT ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
-                                            }`}
-                                        placeholder="Phone Number"
-                                    />
-                                    {registerForm.soDT && errors.soDT && (
+                                <div>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-violet-500">
+                                            <Phone className="h-4 w-4" />
+                                        </span>
+                                        <input
+                                            name="soDT"
+                                            type="tel"
+                                            required
+                                            disabled={!isEmailValid}
+                                            value={registerForm.soDT}
+                                            onChange={handleRegisterChange}
+                                            className={`w-full pl-10 pr-4 py-2 rounded-xl border bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.soDT && errors.soDT ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
+                                                }`}
+                                            placeholder="Phone Number"
+                                        />
+                                    </div>
+                                    {errors.soDT && (
                                         <p className="mt-1 ml-1 text-[10px] text-violet-950 flex items-center gap-1 font-semibold">
                                             <span>⚠️</span> {errors.soDT}
                                         </p>
                                     )}
                                 </div>
 
-                                <div className="relative">
-                                    <span className="absolute left-3 top-3.5 text-violet-500">
-                                        <Lock className="h-4 w-4" />
-                                    </span>
-                                    <input
-                                        name="matKhau"
-                                        type={showRegPwd ? "text" : "password"}
-                                        required
-                                        disabled={!isSoDTValid}
-                                        value={registerForm.matKhau}
-                                        onChange={handleRegisterChange}
-                                        className={`w-full pl-10 pr-10 py-3 rounded-xl border bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.matKhau && errors.matKhau ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
-                                            }`}
-                                        placeholder="Password"
-                                    />
-                                    <button
-                                        type="button"
-                                        disabled={!isSoDTValid}
-                                        onClick={() => setShowRegPwd(!showRegPwd)}
-                                        className="absolute right-3 top-3.5 text-violet-400 hover:text-violet-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                                    >
-                                        {showRegPwd ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
-                                    </button>
-                                    {registerForm.matKhau && errors.matKhau && (
+                                <div>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-violet-500">
+                                            <Lock className="h-4 w-4" />
+                                        </span>
+                                        <input
+                                            name="matKhau"
+                                            type={showRegPwd ? "text" : "password"}
+                                            required
+                                            disabled={!isSoDTValid}
+                                            value={registerForm.matKhau}
+                                            onChange={handleRegisterChange}
+                                            className={`w-full pl-10 pr-10 py-2 rounded-xl border bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.matKhau && errors.matKhau ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
+                                                }`}
+                                            placeholder="Password"
+                                        />
+                                        <button
+                                            type="button"
+                                            disabled={!isSoDTValid}
+                                            onClick={() => setShowRegPwd(!showRegPwd)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-violet-400 hover:text-violet-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                        >
+                                            {showRegPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        </button>
+                                    </div>
+                                    {errors.matKhau && (
                                         <p className="mt-1 ml-1 text-[10px] text-violet-950 flex items-center gap-1 font-semibold">
                                             <span>⚠️</span> {errors.matKhau}
                                         </p>
                                     )}
                                 </div>
 
-                                <div className="relative">
-                                    <span className="absolute left-3 top-3.5 text-violet-500">
-                                        <Lock className="h-4 w-4" />
-                                    </span>
-                                    <input
-                                        name="xacNhanMatKhau"
-                                        type={showRegConfirmPwd ? "text" : "password"}
-                                        required
-                                        disabled={!isMatKhauValid}
-                                        value={registerForm.xacNhanMatKhau}
-                                        onChange={handleRegisterChange}
-                                        className={`w-full pl-10 pr-10 py-3 rounded-xl border bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.xacNhanMatKhau && errors.xacNhanMatKhau ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
-                                            }`}
-                                        placeholder="Confirm Password"
-                                    />
-                                    <button
-                                        type="button"
-                                        disabled={!isMatKhauValid}
-                                        onClick={() => setShowRegConfirmPwd(!showRegConfirmPwd)}
-                                        className="absolute right-3 top-3.5 text-violet-400 hover:text-violet-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                                    >
-                                        {showRegConfirmPwd ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
-                                    </button>
-                                    {registerForm.xacNhanMatKhau && errors.xacNhanMatKhau && (
+                                <div>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-violet-500">
+                                            <Lock className="h-4 w-4" />
+                                        </span>
+                                        <input
+                                            name="xacNhanMatKhau"
+                                            type={showRegConfirmPwd ? "text" : "password"}
+                                            required
+                                            disabled={!isMatKhauValid}
+                                            value={registerForm.xacNhanMatKhau}
+                                            onChange={handleRegisterChange}
+                                            className={`w-full pl-10 pr-10 py-2 rounded-xl border bg-violet-50/20 text-violet-950 text-base placeholder-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-violet-100/10 ${registerForm.xacNhanMatKhau && errors.xacNhanMatKhau ? 'border-violet-300 focus:border-violet-500' : 'border-violet-100 focus:border-violet-400'
+                                                }`}
+                                            placeholder="Confirm Password"
+                                        />
+                                        <button
+                                            type="button"
+                                            disabled={!isMatKhauValid}
+                                            onClick={() => setShowRegConfirmPwd(!showRegConfirmPwd)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-violet-400 hover:text-violet-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                        >
+                                            {showRegConfirmPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        </button>
+                                    </div>
+                                    {errors.xacNhanMatKhau && (
                                         <p className="mt-1 ml-1 text-[10px] text-violet-950 flex items-center gap-1 font-semibold">
                                             <span>⚠️</span> {errors.xacNhanMatKhau}
                                         </p>

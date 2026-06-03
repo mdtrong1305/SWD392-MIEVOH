@@ -5,6 +5,7 @@ import { toast } from '../components/Toast/Toast.tsx';
 import { loginUser, clearError, setAuthenticated } from '../pages/User/Login/slice.ts';
 import type { AppDispatch } from '../store/index.tsx';
 import { validateEmail, validatePassword, validateConfirmPassword } from '../validation/validation';
+import { verifyEmailApi, resetPasswordApi } from '../axios/auth.tsx';
 
 export interface LoginForm {
     username: string;
@@ -121,15 +122,12 @@ export default function useLogin(initialSliding: boolean) {
         setForgotLoading(true);
         setForgotErrors({});
         try {
-            await new Promise((resolve) => setTimeout(resolve, 800));
-            if (forgotEmail.toLowerCase() === 'error@gmail.com') {
-                setForgotErrors({ email: 'This email is not registered' });
-            } else {
-                toast.success('Email verified successfully!');
-                setForgotStep('reset');
-            }
-        } catch (err) {
-            setForgotErrors({ email: 'Failed to verify email' });
+            await verifyEmailApi(forgotEmail);
+            toast.success('Email verified successfully!');
+            setForgotStep('reset');
+        } catch (err: any) {
+            const message = err.response?.data?.message || 'Failed to verify email';
+            setForgotErrors({ email: message });
         } finally {
             setForgotLoading(false);
         }
@@ -157,14 +155,15 @@ export default function useLogin(initialSliding: boolean) {
         setForgotLoading(true);
         setForgotErrors({});
         try {
-            await new Promise((resolve) => setTimeout(resolve, 800));
+            await resetPasswordApi({ email: forgotEmail, newPassword: forgotNewPassword });
             toast.success('Password reset successfully!');
             setForgotStep('none');
             setForgotEmail('');
             setForgotNewPassword('');
             setForgotConfirmPassword('');
-        } catch (err) {
-            setForgotErrors({ password: 'Failed to reset password' });
+        } catch (err: any) {
+            const message = err.response?.data?.message || 'Failed to reset password';
+            setForgotErrors({ password: message });
         } finally {
             setForgotLoading(false);
         }
