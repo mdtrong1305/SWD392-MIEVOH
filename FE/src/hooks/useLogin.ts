@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from '../components/Toast/Toast.tsx';
-import { loginUser, clearError } from '../pages/User/Login/slice.ts';
+import { loginUser, clearError, setAuthenticated } from '../pages/User/Login/slice.ts';
 import type { AppDispatch } from '../store/index.tsx';
 import { validateEmail, validatePassword, validateConfirmPassword } from '../validation/validation';
 
 export interface LoginForm {
-    email: string;
+    username: string;
     password: string;
 }
 
@@ -24,7 +24,7 @@ export default function useLogin(initialSliding: boolean) {
     const [params] = useSearchParams();
 
     const [isSliding, setIsSliding] = useState(initialSliding);
-    const [loginForm, setLoginForm] = useState<LoginForm>({ email: '', password: '' });
+    const [loginForm, setLoginForm] = useState<LoginForm>({ username: '', password: '' });
     const [showLoginPwd, setShowLoginPwd] = useState(false);
 
     // Forgot Password States
@@ -62,6 +62,48 @@ export default function useLogin(initialSliding: boolean) {
             }
         }
     }, [isAuthenticated, navigate, params, dispatch]);
+
+    // Handle Google OAuth redirect credentials
+    useEffect(() => {
+        const token = params.get('token');
+        const username = params.get('username');
+        const fullName = params.get('fullName');
+        const email = params.get('email');
+        const avatar = params.get('avatar');
+
+        if (token && username) {
+            // Prevent duplicate toast/processing in StrictMode (development)
+            if ((window as any).__google_oauth_processed__ === token) {
+                return;
+            }
+            (window as any).__google_oauth_processed__ = token;
+
+            // Write to localStorage
+            localStorage.setItem('accessToken', token);
+            localStorage.setItem('auth_isAuthenticated', 'true');
+            
+            const userObj = {
+                username,
+                name: fullName || username,
+                email: email || username,
+                fullName: fullName || username,
+                hoTen: fullName || username,
+                role: "USER",
+                avatar: avatar || "/images/avatar.jpg",
+                token
+            };
+            localStorage.setItem('auth_user', JSON.stringify(userObj));
+            
+            // Dispatch action to update Redux store
+            dispatch(setAuthenticated(userObj));
+
+            toast.success('Logged in with Google successfully!');
+
+            // Clear query params by navigating to homepage or redirect target
+            const redirect = params.get('redirect') || '/';
+            navigate(redirect, { replace: true });
+        }
+    }, [params, dispatch, navigate]);
 
     const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -130,9 +172,8 @@ export default function useLogin(initialSliding: boolean) {
 
     const handleLoginSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const emailErr = validateEmail(loginForm.email);
-        if (emailErr) {
-            toast.error(emailErr);
+        if (!loginForm.username.trim()) {
+            toast.error("Username is required!");
             return;
         }
         if (!loginForm.password.trim()) {

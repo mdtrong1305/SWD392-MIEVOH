@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginAuthDto, RegisterAuthDto } from './dto/auth.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -52,10 +52,17 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   @ApiOperation({ summary: 'Callback nhận dữ liệu từ Google trả về' })
   @ApiResponse({
-    status: 200,
-    description: 'Xác thực Google thành công, trả về JWT Token.',
+    status: 302,
+    description: 'Xác thực Google thành công, chuyển hướng về Frontend với Token.',
   })
-  googleAuthRedirect(@Req() req: Request) {
-    return this.authService.googleLogin(req);
+  async googleAuthRedirect(@Req() req: Request, @Res() res: any) {
+    const result = await this.authService.googleLogin(req);
+    const token = result.token.accessToken;
+    const user = result.user;
+    
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const redirectUrl = `${frontendUrl}/login?token=${token}&username=${user.username}&fullName=${encodeURIComponent(user.fullName || '')}&email=${user.email || ''}&avatar=${user.avatar || ''}`;
+    
+    return res.redirect(redirectUrl);
   }
 }

@@ -21,7 +21,7 @@ model User {
   password    String?
 
   authProvider String  @default("local") // "local", "google"
-  googleId     String? @unique
+  googleId     String?
   avatar       String? // Lưu link ảnh đại diện từ Google
 
   userType String? @default("user") // "user", "staff", "admin"
@@ -30,7 +30,7 @@ model User {
   dateOfBirth DateTime?
   address     String?
   gender      String? // "Nam", "Nữ", "Khác"
-  cccd        String? @unique // Căn cước công dân
+  cccd        String? // Căn cước công dân
 
 
   isSubscribedToPromo Boolean? @default(true)

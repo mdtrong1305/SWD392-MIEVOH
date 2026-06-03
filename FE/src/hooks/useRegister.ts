@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from '../components/Toast/Toast.tsx';
-import { MOCK_USERS } from '../mockAPI/userMock.tsx';
+import { registerApi } from '../axios/auth.tsx';
 import { 
+    validateUsername,
     validateEmail, 
     validatePhone, 
     validateName, 
@@ -10,6 +11,7 @@ import {
 } from '../validation/validation';
 
 export interface RegisterForm {
+    username: string;
     matKhau: string;
     xacNhanMatKhau: string;
     email: string;
@@ -18,6 +20,7 @@ export interface RegisterForm {
 }
 
 export interface FormErrors {
+    username?: string;
     email?: string;
     matKhau?: string;
     xacNhanMatKhau?: string;
@@ -32,6 +35,7 @@ export default function useRegister(onRegisterSuccess: () => void) {
     const [emailTaken, setEmailTaken] = useState(false);
 
     const [registerForm, setRegisterForm] = useState<RegisterForm>({
+        username: '',
         matKhau: '',
         xacNhanMatKhau: '',
         email: '',
@@ -78,6 +82,12 @@ export default function useRegister(onRegisterSuccess: () => void) {
         const newErrors: FormErrors = { ...errors };
 
         switch (fieldName) {
+            case 'username': {
+                const err = validateUsername(value);
+                if (err) newErrors.username = err;
+                else delete newErrors.username;
+                break;
+            }
             case 'matKhau': {
                 const err = validatePassword(value);
                 if (err) newErrors.matKhau = err;
@@ -124,6 +134,9 @@ export default function useRegister(onRegisterSuccess: () => void) {
     const validateRegisterForm = () => {
         const newErrors: FormErrors = {};
 
+        const usernameErr = validateUsername(registerForm.username);
+        if (usernameErr) newErrors.username = usernameErr;
+
         const nameErr = validateName(registerForm.hoTen);
         if (nameErr) newErrors.hoTen = nameErr;
 
@@ -144,13 +157,8 @@ export default function useRegister(onRegisterSuccess: () => void) {
     };
 
     const checkEmailExists = async (emailStr: string) => {
-        try {
-            await new Promise((resolve) => setTimeout(resolve, 50));
-            const exists = MOCK_USERS.some(u => u.email.toLowerCase() === emailStr.toLowerCase());
-            setEmailTaken(exists);
-        } catch (err) {
-            console.error(err);
-        }
+        // Disabled real-time check since backend validates user existence during submit
+        setEmailTaken(false);
     };
 
     const registerUserAPI = async (payload: any) => {
@@ -158,25 +166,28 @@ export default function useRegister(onRegisterSuccess: () => void) {
         setRegError(null);
         setRegSuccess(false);
         try {
-            await new Promise((resolve) => setTimeout(resolve, 800));
+            await registerApi({
+                username: payload.username,
+                fullName: payload.fullName,
+                email: payload.email,
+                phoneNumber: payload.phoneNumber,
+                password: payload.password
+            });
 
-            if (payload.email.toLowerCase() === 'error@gmail.com') {
-                setRegError("Email is invalid or has been locked");
-                setRegSuccess(false);
-            } else {
-                setRegSuccess(true);
-                toast.success("Account registered successfully!");
-                setRegError(null);
-                setRegisterForm({
-                    matKhau: '',
-                    xacNhanMatKhau: '',
-                    email: '',
-                    hoTen: '',
-                    soDT: ''
-                });
-            }
+            setRegSuccess(true);
+            toast.success("Account registered successfully!");
+            setRegError(null);
+            setRegisterForm({
+                username: '',
+                matKhau: '',
+                xacNhanMatKhau: '',
+                email: '',
+                hoTen: '',
+                soDT: ''
+            });
         } catch (err: any) {
-            setRegError(err.message || "Registration failed");
+            const errorMessage = err?.response?.data?.message || err?.message || "Registration failed";
+            setRegError(errorMessage);
             setRegSuccess(false);
         } finally {
             setRegLoading(false);
@@ -188,17 +199,17 @@ export default function useRegister(onRegisterSuccess: () => void) {
         if (!validateRegisterForm()) return;
 
         const payload = {
-            name: registerForm.hoTen,
+            username: registerForm.username,
+            fullName: registerForm.hoTen,
             email: registerForm.email,
             password: registerForm.matKhau,
-            phone: registerForm.soDT,
-            gender: true,
-            role: 'USER',
+            phoneNumber: registerForm.soDT,
         };
         registerUserAPI(payload);
     };
 
-    const isHoTenValid = registerForm.hoTen.trim() !== '' && !errors.hoTen;
+    const isUsernameValid = registerForm.username.trim() !== '' && !errors.username;
+    const isHoTenValid = isUsernameValid && registerForm.hoTen.trim() !== '' && !errors.hoTen;
     const isEmailValid = isHoTenValid && registerForm.email.trim() !== '' && !errors.email && !emailTaken;
     const isSoDTValid = isEmailValid && registerForm.soDT.trim() !== '' && !errors.soDT;
     const isMatKhauValid = isSoDTValid && registerForm.matKhau.trim() !== '' && !errors.matKhau;
@@ -216,6 +227,7 @@ export default function useRegister(onRegisterSuccess: () => void) {
         setShowRegConfirmPwd,
         handleRegisterChange,
         handleRegisterSubmit,
+        isUsernameValid,
         isHoTenValid,
         isEmailValid,
         isSoDTValid,

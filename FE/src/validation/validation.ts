@@ -1,4 +1,16 @@
-// Common form validation utility functions for Mievoh Application
+export const validateUsername = (username: string): string | null => {
+    if (!username.trim()) {
+        return "Username is required";
+    }
+    if (username.trim().length < 3) {
+        return "Username must be at least 3 characters";
+    }
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!usernameRegex.test(username.trim())) {
+        return "Username can only contain letters, numbers, and underscores";
+    }
+    return null;
+};
 
 export const validateEmail = (email: string): string | null => {
     if (!email.trim()) {
