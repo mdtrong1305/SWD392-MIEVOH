@@ -68,3 +68,41 @@ export const googleCallbackApi = async (): Promise<AuthResponse> => {
   const response = await api.get<AuthResponse>('/auth/google/callback');
   return response.data;
 };
+
+export interface ResetPasswordPayload {
+  email: string;
+  newPassword: string;
+}
+
+export interface ChangePasswordPayload {
+  oldPassword: string;
+  newPassword: string;
+}
+
+/**
+ * API kiểm tra email tồn tại để khôi phục mật khẩu (Forgot Password - Step 1)
+ * Endpoint: POST /api/auth/verify-email
+ */
+export const verifyEmailApi = async (email: string): Promise<{ message: string }> => {
+  const response = await api.post<{ message: string }>('/auth/verify-email', { email });
+  return response.data;
+};
+
+/**
+ * API đặt lại mật khẩu mới cho người dùng (Forgot Password - Step 2)
+ * Endpoint: POST /api/auth/reset-password
+ */
+export const resetPasswordApi = async (payload: ResetPasswordPayload): Promise<{ message: string }> => {
+  const response = await api.post<{ message: string }>('/auth/reset-password', payload);
+  return response.data;
+};
+
+/**
+ * API thay đổi mật khẩu khi đã đăng nhập (Change Password)
+ * Endpoint: POST /api/auth/change-password
+ */
+export const changePasswordApi = async (payload: ChangePasswordPayload): Promise<{ message: string }> => {
+  const response = await api.post<{ message: string }>('/auth/change-password', payload);
+  return response.data;
+};
+

@@ -1,5 +1,5 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { LoginAuthDto, RegisterAuthDto } from './dto/auth.dto';
+import { Injectable, UnauthorizedException, BadRequestException, NotFoundException } from '@nestjs/common';
+import { LoginAuthDto, RegisterAuthDto, VerifyEmailDto, ResetPasswordDto, ChangePasswordDto } from './dto/auth.dto';
 import { PrismaService } from '../../modules-system/prisma/prisma.service';
 import { TokenService } from '../../modules-system/token/token.service';
 import * as bcrypt from 'bcrypt';
@@ -138,5 +138,64 @@ export class AuthService {
       },
       token,
     };
+  }
+
+  async verifyEmail(dto: VerifyEmailDto) {
+    const user = await this.prisma.user.findFirst({
+      where: { email: dto.email, authProvider: 'local' },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Email này chưa được đăng ký tài khoản');
+    }
+
+    return { message: 'Xác thực email thành công' };
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    const user = await this.prisma.user.findFirst({
+      where: { email: dto.email, authProvider: 'local' },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Email này chưa được đăng ký tài khoản');
+    }
+
+    await this.prisma.user.update({
+      where: { username: user.username },
+      data: {
+        password: bcrypt.hashSync(dto.newPassword, 10),
+      },
+    });
+
+    return { message: 'Khôi phục mật khẩu thành công' };
+  }
+
+  async changePassword(username: string, dto: ChangePasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { username },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Người dùng không tồn tại');
+    }
+
+    if (user.authProvider !== 'local') {
+      throw new BadRequestException('Tài khoản được đăng nhập bằng bên thứ ba, không thể đổi mật khẩu');
+    }
+
+    const isPasswordValid = bcrypt.compareSync(dto.oldPassword, user.password || '');
+    if (!isPasswordValid) {
+      throw new BadRequestException('Mật khẩu cũ không chính xác');
+    }
+
+    await this.prisma.user.update({
+      where: { username },
+      data: {
+        password: bcrypt.hashSync(dto.newPassword, 10),
+      },
+    });
+
+    return { message: 'Đổi mật khẩu thành công' };
   }
 }

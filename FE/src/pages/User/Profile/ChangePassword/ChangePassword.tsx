@@ -3,6 +3,7 @@ import { Eye, EyeOff, Save, Check } from "lucide-react";
 import { toast } from "../../../../components/Toast/Toast.tsx";
 import Button from "../../../../components/Button/Button.tsx";
 import { validatePassword, validateConfirmPassword } from "../../../../validation/validation";
+import { changePasswordApi } from "../../../../axios/auth.tsx";
 
 export default function ChangePassword() {
     const [isSaving, setIsSaving] = useState(false);
@@ -66,21 +67,28 @@ export default function ChangePassword() {
         setIsSaving(true);
         setIsSaved(false);
 
-        // Simulate API network latency
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        try {
+            await changePasswordApi({
+                oldPassword: formData.currentPassword,
+                newPassword: formData.newPassword
+            });
+            setIsSaving(false);
+            setIsSaved(true);
+            toast.success("Password changed successfully!");
+            setFormData({
+                currentPassword: "",
+                newPassword: "",
+                confirmPassword: ""
+            });
 
-        setIsSaving(false);
-        setIsSaved(true);
-        toast.success("Password changed successfully!");
-        setFormData({
-            currentPassword: "",
-            newPassword: "",
-            confirmPassword: ""
-        });
-
-        setTimeout(() => {
-            setIsSaved(false);
-        }, 3000);
+            setTimeout(() => {
+                setIsSaved(false);
+            }, 3000);
+        } catch (err: any) {
+            setIsSaving(false);
+            const message = err.response?.data?.message || "Failed to change password";
+            toast.error(message);
+        }
     };
 
     return (

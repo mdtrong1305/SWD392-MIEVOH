@@ -60,3 +60,50 @@ export class RegisterAuthDto {
   @IsString({ message: 'Mật khẩu phải là chuỗi' })
   password!: string;
 }
+
+export class VerifyEmailDto {
+  @ApiProperty({
+    description: 'Địa chỉ email cần khôi phục mật khẩu',
+    example: 'nguyenvana@gmail.com',
+  })
+  @IsEmail({}, { message: 'Email không hợp lệ' })
+  @IsNotEmpty({ message: 'Email không được để trống' })
+  email!: string;
+}
+
+export class ResetPasswordDto {
+  @ApiProperty({
+    description: 'Địa chỉ email cần khôi phục mật khẩu',
+    example: 'nguyenvana@gmail.com',
+  })
+  @IsEmail({}, { message: 'Email không hợp lệ' })
+  @IsNotEmpty({ message: 'Email không được để trống' })
+  email!: string;
+
+  @ApiProperty({
+    description: 'Mật khẩu mới',
+    example: 'newpassword123',
+  })
+  @IsNotEmpty({ message: 'Mật khẩu mới không được để trống' })
+  @IsString({ message: 'Mật khẩu mới phải là chuỗi' })
+  newPassword!: string;
+}
+
+export class ChangePasswordDto {
+  @ApiProperty({
+    description: 'Mật khẩu hiện tại',
+    example: '12345678',
+  })
+  @IsNotEmpty({ message: 'Mật khẩu hiện tại không được để trống' })
+  @IsString({ message: 'Mật khẩu hiện tại phải là chuỗi' })
+  oldPassword!: string;
+
+  @ApiProperty({
+    description: 'Mật khẩu mới',
+    example: 'newpassword123',
+  })
+  @IsNotEmpty({ message: 'Mật khẩu mới không được để trống' })
+  @IsString({ message: 'Mật khẩu mới phải là chuỗi' })
+  newPassword!: string;
+}
+

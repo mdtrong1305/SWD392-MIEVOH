@@ -1,10 +1,10 @@
 import { Controller, Post, Body, Get, UseGuards, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginAuthDto, RegisterAuthDto } from './dto/auth.dto';
+import { LoginAuthDto, RegisterAuthDto, VerifyEmailDto, ResetPasswordDto, ChangePasswordDto } from './dto/auth.dto';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request } from 'express';
 import { Public } from '../../common/decorators/public.decorator';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -64,5 +64,33 @@ export class AuthController {
     const redirectUrl = `${frontendUrl}/login?token=${token}&username=${user.username}&fullName=${encodeURIComponent(user.fullName || '')}&email=${user.email || ''}&avatar=${user.avatar || ''}`;
     
     return res.redirect(redirectUrl);
+  }
+
+  @Public()
+  @Post('verify-email')
+  @ApiOperation({ summary: 'Kiểm tra email tồn tại để khôi phục mật khẩu' })
+  @ApiResponse({ status: 200, description: 'Email tồn tại và hợp lệ.' })
+  @ApiResponse({ status: 404, description: 'Email chưa đăng ký.' })
+  verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
+    return this.authService.verifyEmail(verifyEmailDto);
+  }
+
+  @Public()
+  @Post('reset-password')
+  @ApiOperation({ summary: 'Đặt lại mật khẩu mới cho người dùng' })
+  @ApiResponse({ status: 200, description: 'Đặt lại mật khẩu thành công.' })
+  @ApiResponse({ status: 404, description: 'Email chưa đăng ký.' })
+  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetPasswordDto);
+  }
+
+  @ApiBearerAuth('JWT-auth')
+  @Post('change-password')
+  @ApiOperation({ summary: 'Thay đổi mật khẩu khi đang đăng nhập' })
+  @ApiResponse({ status: 200, description: 'Đổi mật khẩu thành công.' })
+  @ApiResponse({ status: 400, description: 'Mật khẩu cũ không chính xác hoặc tài khoản là OAuth.' })
+  changePassword(@Req() req: Request, @Body() changePasswordDto: ChangePasswordDto) {
+    const username = (req as any).user.username;
+    return this.authService.changePassword(username, changePasswordDto);
   }
 }
