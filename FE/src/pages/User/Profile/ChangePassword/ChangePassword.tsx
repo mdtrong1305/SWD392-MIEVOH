@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { Eye, EyeOff, Save, Check } from "lucide-react";
 import { toast } from "../../../../components/Toast/Toast.tsx";
 import Button from "../../../../components/Button/Button.tsx";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 import { validatePassword, validateConfirmPassword } from "../../../../validation/validation";
 import { changePasswordApi } from "../../../../axios/auth.tsx";
 
 export default function ChangePassword() {
+    const { t } = useLanguage();
     const [isSaving, setIsSaving] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
 
@@ -74,7 +76,7 @@ export default function ChangePassword() {
             });
             setIsSaving(false);
             setIsSaved(true);
-            toast.success("Password changed successfully!");
+            toast.success(t("password_changed_success"));
             setFormData({
                 currentPassword: "",
                 newPassword: "",
@@ -86,7 +88,7 @@ export default function ChangePassword() {
             }, 3000);
         } catch (err: any) {
             setIsSaving(false);
-            const message = err.response?.data?.message || "Failed to change password";
+            const message = err.response?.data?.message || t("password_changed_failed");
             toast.error(message);
         }
     };
@@ -101,14 +103,14 @@ export default function ChangePassword() {
                         ? "border-red-300 bg-red-50/10 focus-within:border-red-500" 
                         : "border-violet-100 bg-white/95 focus-within:border-violet-500 focus-within:shadow-md"
                 }`}>
-                    <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">Current Password *</label>
+                    <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">{t("current_password")} *</label>
                     <div className="relative">
                         <input
                             type={showPasswords.current ? "text" : "password"}
                             name="currentPassword"
                             value={formData.currentPassword}
                             onChange={handleInputChange}
-                            placeholder="Enter your current password"
+                            placeholder={t("current_password_placeholder")}
                             className="w-full bg-transparent py-2 pr-8 text-base text-gray-700 outline-none"
                         />
                         <button
@@ -128,14 +130,14 @@ export default function ChangePassword() {
                         ? "border-red-300 bg-red-50/10 focus-within:border-red-500" 
                         : "border-violet-100 bg-white/95 focus-within:border-violet-500 focus-within:shadow-md"
                 }`}>
-                    <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">New Password *</label>
+                    <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">{t("new_password")} *</label>
                     <div className="relative">
                         <input
                             type={showPasswords.new ? "text" : "password"}
                             name="newPassword"
                             value={formData.newPassword}
                             onChange={handleInputChange}
-                            placeholder="Enter your new password"
+                            placeholder={t("new_password_placeholder")}
                             className="w-full bg-transparent py-2 pr-8 text-base text-gray-700 outline-none"
                         />
                         <button
@@ -155,14 +157,14 @@ export default function ChangePassword() {
                         ? "border-red-300 bg-red-50/10 focus-within:border-red-500" 
                         : "border-violet-100 bg-white/95 focus-within:border-violet-500 focus-within:shadow-md"
                 }`}>
-                    <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">Confirm New Password *</label>
+                    <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">{t("confirm_new_password")} *</label>
                     <div className="relative">
                         <input
                             type={showPasswords.confirm ? "text" : "password"}
                             name="confirmPassword"
                             value={formData.confirmPassword}
                             onChange={handleInputChange}
-                            placeholder="Confirm your new password"
+                            placeholder={t("confirm_new_password_placeholder")}
                             className="w-full bg-transparent py-2 pr-8 text-base text-gray-700 outline-none"
                         />
                         <button
@@ -189,17 +191,17 @@ export default function ChangePassword() {
                     {isSaving ? (
                         <>
                             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                            Updating...
+                            {t("updating_btn")}
                         </>
                     ) : isSaved ? (
                         <>
                             <Check className="h-4 w-4" />
-                            Updated Successfully!
+                            {t("updated_success_btn")}
                         </>
                     ) : (
                         <>
                             <Save className="h-4 w-4" />
-                            Update Password
+                            {t("update_password_btn")}
                         </>
                     )}
                 </Button>

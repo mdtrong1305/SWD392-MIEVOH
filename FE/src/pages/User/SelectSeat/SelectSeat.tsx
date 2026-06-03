@@ -7,8 +7,10 @@ import TicketSuccess from "./TicketSuccess/TicketSuccess.tsx";
 import BookingSidebar from "./BookingSidebar/BookingSidebar.tsx";
 import ConfirmationModal from "./ConfirmationModal/ConfirmationModal.tsx";
 import useSelectSeat from "../../../hooks/useSelectSeat.ts";
+import { useLanguage } from "../../../contextAPI/LanguageContext.tsx";
 
 export default function SelectSeat() {
+    const { t } = useLanguage();
     const {
         activeStep,
         setActiveStep,
@@ -105,7 +107,7 @@ export default function SelectSeat() {
                         <div className={`p-2 rounded-xl flex items-center justify-center ${activeStep === 1 ? "bg-violet-50 dark:bg-[#8E7EFE]/15 text-[#8E7EFE] dark:text-[#a599ff]" : "bg-transparent text-slate-400 dark:text-zinc-300"}`}>
                             <LayoutGrid className="h-5 w-5" />
                         </div>
-                        <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">Select Seat</span>
+                        <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">{t("select_seat_title")}</span>
                     </div>
 
                     <ChevronRight className="h-4 w-4 text-slate-300 dark:text-zinc-500" />
@@ -114,7 +116,7 @@ export default function SelectSeat() {
                         <div className={`p-2 rounded-xl flex items-center justify-center ${activeStep === 2 ? "bg-violet-50 dark:bg-[#8E7EFE]/15 text-[#8E7EFE] dark:text-[#a599ff]" : "bg-transparent text-slate-400 dark:text-zinc-300"}`}>
                             <ShoppingBag className="h-5 w-5" />
                         </div>
-                        <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">Combos</span>
+                        <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">{t("stepper_combos")}</span>
                     </div>
 
                     <ChevronRight className="h-4 w-4 text-slate-300 dark:text-zinc-500" />
@@ -123,7 +125,7 @@ export default function SelectSeat() {
                         <div className={`p-2 rounded-xl flex items-center justify-center ${activeStep === 3 ? "bg-violet-50 dark:bg-[#8E7EFE]/15 text-[#8E7EFE] dark:text-[#a599ff]" : "bg-transparent text-slate-400 dark:text-zinc-300"}`}>
                             <CreditCard className="h-5 w-5" />
                         </div>
-                        <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">Payment</span>
+                        <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">{t("stepper_payment")}</span>
                     </div>
 
                     <ChevronRight className="h-4 w-4 text-slate-300 dark:text-zinc-500" />
@@ -132,7 +134,7 @@ export default function SelectSeat() {
                         <div className={`p-2 rounded-xl flex items-center justify-center ${activeStep >= 4 ? "bg-violet-50 dark:bg-[#8E7EFE]/15 text-[#8E7EFE] dark:text-[#a599ff]" : "bg-transparent text-slate-400 dark:text-zinc-300"}`}>
                             <Ticket className="h-5 w-5" />
                         </div>
-                        <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">Ticket Info</span>
+                        <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">{t("stepper_ticket_info")}</span>
                     </div>
                 </div>
 

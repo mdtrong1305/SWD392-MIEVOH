@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import Button from "../../../../components/Button/Button.tsx";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 
 export default function Newsletter() {
+    const { t } = useLanguage();
     const [email, setEmail] = useState("");
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -10,7 +12,7 @@ export default function Newsletter() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!email || !email.includes("@")) {
-            setError("Invalid email. Please try again.");
+            setError(t("newsletter_invalid_email"));
             return;
         }
 
@@ -31,17 +33,17 @@ export default function Newsletter() {
 
                 <div className="relative mx-auto max-w-2xl">
                     <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight sm:text-3xl">
-                        Get the Latest Updates
+                        {t("newsletter_title")}
                     </h2>
                     
                     <p className="mx-auto mt-3 max-w-lg text-sm text-gray-500 leading-relaxed">
-                        Subscribe to our newsletter to stay updated on exclusive deals, cinema news, and upcoming movies.
+                        {t("newsletter_desc")}
                     </p>
 
                     {isSubscribed ? (
                         <div className="mt-8 rounded-2xl bg-green-50 p-4 border border-green-200 animate-scale-up">
                             <p className="text-sm font-semibold text-green-700">
-                                ✓ Subscribed successfully! Thank you for your interest in mievoh.
+                                {t("newsletter_success")}
                             </p>
                             <button
                                 onClick={() => {
@@ -50,7 +52,7 @@ export default function Newsletter() {
                                 }}
                                 className="mt-2 text-xs font-semibold text-green-600 underline hover:text-green-700"
                             >
-                                Subscribe another email
+                                {t("newsletter_another")}
                             </button>
                         </div>
                     ) : (
@@ -60,7 +62,7 @@ export default function Newsletter() {
                                 <input
                                     id="newsletter-email"
                                     type="email"
-                                    placeholder="Enter your email..."
+                                    placeholder={t("newsletter_placeholder")}
                                     value={email}
                                     onChange={(e) => {
                                         setEmail(e.target.value);
@@ -88,10 +90,10 @@ export default function Newsletter() {
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                         </svg>
-                                        Subscribing
+                                        {t("newsletter_subscribing")}
                                     </span>
                                 ) : (
-                                    "Subscribe"
+                                    t("newsletter_subscribe")
                                 )}
                             </Button>
                         </form>

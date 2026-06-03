@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Star, MessageSquarePlus } from "lucide-react";
 import Button from "../../../../components/Button/Button.tsx";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 import { toast } from "../../../../components/Toast/Toast.tsx";
 
 export interface Review {
@@ -18,6 +19,7 @@ interface DetailReviewsProps {
 }
 
 export default function DetailReviews({ reviews, onAddReview }: DetailReviewsProps) {
+    const { t } = useLanguage();
     const { isAuthenticated, user } = useSelector((state: any) => state.login || { isAuthenticated: false, user: null });
     const [rating, setRating] = useState(5);
     const [hoverRating, setHoverRating] = useState<number | null>(null);
@@ -47,14 +49,14 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
             reviewerName = user.name || user.hoTen || "User";
         } else {
             if (!guestName.trim()) {
-                toast.error("Please enter your name!");
+                toast.error(t("reviews_enter_name_toast"));
                 return;
             }
             reviewerName = guestName.trim();
         }
 
         if (!comment.trim()) {
-            toast.error("Please write a comment!");
+            toast.error(t("reviews_enter_comment_toast"));
             return;
         }
 
@@ -65,7 +67,7 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
         setComment("");
         setGuestName("");
         
-        toast.success("Thank you for submitting your review!");
+        toast.success(t("reviews_success_toast"));
     };
 
     return (
@@ -73,7 +75,7 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
             {/* Header / Title */}
             <div>
                 <h2 className="text-xl font-bold text-gray-900 dark:border-zinc-800/80 border-b border-[#EAE6F0] pb-3">
-                    Audience Reviews ({reviews.length})
+                    {t("reviews_audience", { count: reviews.length })}
                 </h2>
             </div>
 
@@ -93,7 +95,7 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
                         ))}
                     </div>
                     <span className="text-xs text-gray-500 font-bold">
-                        Based on {reviews.length} reviews
+                        {t("reviews_based_on", { count: reviews.length })}
                     </span>
                 </div>
 
@@ -104,7 +106,7 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
                         const percentage = totalVotes > 0 ? (count / totalVotes) * 100 : 0;
                         return (
                             <div key={stars} className="flex items-center gap-3 text-sm">
-                                <span className="w-12 font-bold text-gray-600 text-right shrink-0">{stars} stars</span>
+                                <span className="w-12 font-bold text-gray-600 text-right shrink-0">{t("reviews_star_count", { count: stars })}</span>
                                 <div className="flex-grow h-2.5 bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden">
                                     <div 
                                         className="h-full bg-gradient-to-r from-[#9370DB] to-[#7B68EE] rounded-full transition-all duration-500" 
@@ -122,7 +124,7 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
             <div className="flex flex-col gap-6">
                 {reviews.length === 0 ? (
                     <div className="text-center py-10 border border-dashed border-gray-200 rounded-xl">
-                        <p className="text-gray-500 text-sm font-medium">No reviews yet. Be the first to review!</p>
+                        <p className="text-gray-500 text-sm font-medium">{t("reviews_no_reviews")}</p>
                     </div>
                 ) : (
                     <div className="flex flex-col gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
@@ -165,14 +167,14 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
                 <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
                     <MessageSquarePlus className="h-5 w-5 text-[#6D28D9] dark:text-violet-400 shrink-0" />
                     <span className="review-header-gradient">
-                        Write Your Review
+                        {t("reviews_write_review")}
                     </span>
                 </h3>
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                     {/* Star selection */}
                     <div className="flex items-center gap-3">
-                        <span className="text-sm font-bold text-gray-600">Your rating:</span>
+                        <span className="text-sm font-bold text-gray-600">{t("reviews_your_rating")}</span>
                         <div className="flex gap-1">
                             {[1, 2, 3, 4, 5].map((star) => (
                                 <button
@@ -201,13 +203,13 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
                     {/* Guest Name (only when not logged in) */}
                     {!isAuthenticated && (
                         <div className="flex flex-col gap-1.5 animate__animated animate__fadeIn">
-                            <label htmlFor="reviewerName" className="text-sm font-bold text-gray-600">Your Name *</label>
+                            <label htmlFor="reviewerName" className="text-sm font-bold text-gray-600">{t("reviews_your_name")}</label>
                             <input
                                 type="text"
                                 id="reviewerName"
                                 value={guestName}
                                 onChange={(e) => setGuestName(e.target.value)}
-                                placeholder="Enter your name to display on your review..."
+                                placeholder={t("reviews_name_placeholder")}
                                 className="rounded-xl border border-violet-100 bg-[#F6F3F9]/50 py-2.5 px-4 text-sm text-gray-700 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-violet-500 focus:bg-white focus:ring-2 focus:ring-violet-100 max-w-md dark:border-zinc-800 dark:bg-zinc-850/40 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:bg-zinc-800 dark:focus:ring-zinc-800"
                             />
                         </div>
@@ -215,13 +217,13 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
 
                     {/* Comment text */}
                     <div className="flex flex-col gap-1.5">
-                        <label htmlFor="reviewerComment" className="text-sm font-bold text-gray-600">Comment content:</label>
+                        <label htmlFor="reviewerComment" className="text-sm font-bold text-gray-600">{t("reviews_comment_label")}</label>
                         <textarea
                             id="reviewerComment"
                             rows={4}
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
-                            placeholder="Share your thoughts about this movie..."
+                            placeholder={t("reviews_comment_placeholder")}
                             className="rounded-xl border border-violet-100 bg-[#F6F3F9]/50 py-2.5 px-4 text-sm text-gray-700 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-violet-500 focus:bg-white focus:ring-2 focus:ring-violet-100 resize-none dark:border-zinc-800 dark:bg-zinc-850/40 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:bg-zinc-800 dark:focus:ring-zinc-800"
                         />
                     </div>
@@ -234,7 +236,7 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
                             type="submit"
                             className="w-full sm:w-auto px-10"
                         >
-                            Submit Review
+                            {t("reviews_submit")}
                         </Button>
                     </div>
                 </form>

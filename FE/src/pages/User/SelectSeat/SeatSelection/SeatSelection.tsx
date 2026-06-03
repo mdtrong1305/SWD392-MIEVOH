@@ -7,6 +7,8 @@ interface SeatSelectionProps {
     bookedSeats: Set<string>;
 }
 
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
+
 export default function SeatSelection({
     selectedSeats,
     handleSeatClick,
@@ -15,13 +17,14 @@ export default function SeatSelection({
     vipRows,
     bookedSeats
 }: SeatSelectionProps) {
+    const { t } = useLanguage();
     return (
         <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-3xl p-6 shadow-sm overflow-hidden flex flex-col items-center animate__animated animate__fadeIn">
             {/* Screen Visualizer */}
             <div className="w-[85%] max-w-lg mb-14 text-center relative">
                 <div className="w-full h-1 border-t-4 border-[#8E7EFE] rounded-[50%] filter blur-[1px] shadow-[0_4px_12px_rgba(142,126,254,0.6)]" />
                 <div className="w-full h-16 bg-gradient-to-b from-[#8E7EFE]/10 to-transparent absolute top-0 left-0 rounded-[50%] blur-md pointer-events-none" />
-                <span className="text-[10px] font-black tracking-[0.3em] text-[#8E7EFE]/80 uppercase block mt-3">SCREEN</span>
+                <span className="text-[10px] font-black tracking-[0.3em] text-[#8E7EFE]/80 uppercase block mt-3">{t("screen")}</span>
             </div>
 
             {/* Grid container */}
@@ -93,23 +96,23 @@ export default function SeatSelection({
             <div className="w-full border-t border-slate-100 dark:border-zinc-800/80 mt-6 pt-6 grid grid-cols-2 sm:grid-cols-5 gap-4 text-sm font-bold text-slate-700 dark:text-zinc-300 justify-items-center">
                 <div className="flex items-center gap-2.5">
                     <div className="w-4.5 h-4.5 rounded-lg bg-white border border-slate-350 dark:bg-zinc-800 dark:border-zinc-500" />
-                    <span>Standard</span>
+                    <span>{t("seat_type_regular")}</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                     <div className="w-4.5 h-4.5 rounded-lg bg-indigo-50 border border-indigo-400 dark:bg-indigo-950/40 dark:border-indigo-800" />
-                    <span>VIP Seat</span>
+                    <span>{t("seat_type_vip")}</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                     <div className="w-9 h-4.5 rounded-lg bg-rose-50 border border-rose-400 dark:bg-rose-950/20 dark:border-rose-800" />
-                    <span>Sweetbox (Double)</span>
+                    <span>{t("seat_type_sweetbox")}</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                     <div className="w-4.5 h-4.5 rounded-lg bg-[#8E7EFE] border border-[#8E7EFE]" />
-                    <span>Selected</span>
+                    <span>{t("seat_status_selected")}</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                     <div className="w-4.5 h-4.5 rounded bg-slate-200/60 border border-slate-200 dark:bg-zinc-800/40 dark:border-zinc-800 flex items-center justify-center text-[9px] text-slate-400 dark:text-zinc-500 font-black">✖</div>
-                    <span>Booked</span>
+                    <span>{t("seat_status_booked")}</span>
                 </div>
             </div>
         </div>

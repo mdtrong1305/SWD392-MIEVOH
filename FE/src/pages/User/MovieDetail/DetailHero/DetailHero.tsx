@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 import { useNavigate } from "react-router-dom";
 import { Star, Clock, Calendar, Globe, Play, User, Users, Shield } from "lucide-react";
 import Button from "../../../../components/Button/Button.tsx";
@@ -7,6 +8,12 @@ import TrailerModal from "../TrailerModal/TrailerModal.tsx";
 export interface MovieDetailInfo {
     id: number;
     title: string;
+    title_vi?: string;
+    title_en?: string;
+    description_vi?: string;
+    description_en?: string;
+    language_vi?: string;
+    language_en?: string;
     image: string;
     backdrop: string;
     rating: number;
@@ -46,8 +53,31 @@ const getTrailerUrl = (movieId: number): string => {
     return trailers[movieId] || "https://www.youtube.com/embed/n9xhJrPXop4";
 };
 
+const genreKeys: Record<string, string> = {
+    "Action": "genre_action",
+    "Sci-Fi": "genre_scifi",
+    "Romance": "genre_romance",
+    "Music": "genre_music",
+    "Mystery": "genre_mystery",
+    "Thriller": "genre_thriller",
+    "Comedy": "genre_comedy",
+    "Family": "genre_family",
+    "Adventure": "genre_adventure",
+    "Animation": "genre_animation",
+    "Crime": "genre_crime",
+    "Horror": "genre_horror",
+    "Sports": "genre_sports",
+    "Drama": "genre_drama",
+    "Documentary": "genre_documentary",
+    "Nature": "genre_nature"
+};
+
 export default function DetailHero({ movie }: DetailHeroProps) {
+    const { t, language } = useLanguage();
     const navigate = useNavigate();
+    const displayTitle = language === "vi" ? (movie.title_vi || movie.title) : (movie.title_en || movie.title);
+    const displayDescription = language === "vi" ? (movie.description_vi || movie.description) : (movie.description_en || movie.description);
+    const displayLanguage = language === "vi" ? (movie.language_vi || movie.language) : (movie.language_en || movie.language);
     const [showTrailer, setShowTrailer] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
 
@@ -85,7 +115,7 @@ export default function DetailHero({ movie }: DetailHeroProps) {
                     <div className="w-48 sm:w-60 md:w-80 lg:w-[340px] aspect-[3/4] md:aspect-auto overflow-hidden rounded-2xl border-2 border-white/20 shadow-2xl shrink-0 animate__animated animate__zoomIn">
                         <img 
                             src={movie.image} 
-                            alt={movie.title} 
+                            alt={displayTitle} 
                             className="w-full h-full object-cover"
                         />
                     </div>
@@ -101,13 +131,13 @@ export default function DetailHero({ movie }: DetailHeroProps) {
                             <span className={`text-xs font-bold px-2.5 py-1 rounded-md ${
                                 movie.status === "coming_soon" ? "bg-violet-600 text-white" : "bg-green-600 text-white"
                             }`}>
-                                {movie.status === "coming_soon" ? "Coming Soon" : "Now Showing"}
+                                {movie.status === "coming_soon" ? t("coming_soon") : t("now_showing")}
                             </span>
                         </div>
 
                         {/* Title */}
                         <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight">
-                            {movie.title}
+                            {displayTitle}
                         </h1>
 
                         {/* Rating */}
@@ -123,19 +153,23 @@ export default function DetailHero({ movie }: DetailHeroProps) {
 
                         {/* Genres */}
                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5">
-                            {movie.genres.map((genre, idx) => (
-                                <span 
-                                    key={idx}
-                                    className="bg-[#6D28D9]/30 text-[#D8B4FE] border border-[#6D28D9]/40 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm"
-                                >
-                                    {genre}
-                                </span>
-                            ))}
+                            {movie.genres.map((genre, idx) => {
+                                const key = genreKeys[genre];
+                                const displayGenre = key ? t(key as any) : genre;
+                                return (
+                                    <span 
+                                        key={idx}
+                                        className="bg-[#6D28D9]/30 text-[#D8B4FE] border border-[#6D28D9]/40 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm"
+                                    >
+                                        {displayGenre}
+                                    </span>
+                                );
+                            })}
                         </div>
 
                         {/* Synopsis Description */}
                         <p className="text-gray-300 text-sm max-w-xl md:max-w-2xl leading-relaxed mt-1 font-medium text-center md:text-left opacity-90">
-                            {movie.description}
+                            {displayDescription}
                         </p>
 
                         {/* Detailed Metadata Grid */}
@@ -143,43 +177,43 @@ export default function DetailHero({ movie }: DetailHeroProps) {
                             <div className="flex items-start gap-2.5">
                                 <Calendar className="h-4.5 w-4.5 text-violet-400 shrink-0 mt-0.5" />
                                 <div className="flex flex-col gap-0.5 text-left">
-                                    <span className="text-violet-300 font-bold text-xs uppercase tracking-wider">Release Date</span>
+                                    <span className="text-violet-300 font-bold text-xs uppercase tracking-wider">{t("release_date")}</span>
                                     <span className="text-white font-extrabold">{movie.releaseDate}</span>
                                 </div>
                             </div>
                             <div className="flex items-start gap-2.5">
                                 <User className="h-4.5 w-4.5 text-violet-400 shrink-0 mt-0.5" />
                                 <div className="flex flex-col gap-0.5 text-left">
-                                    <span className="text-violet-300 font-bold text-xs uppercase tracking-wider">Director</span>
+                                    <span className="text-violet-300 font-bold text-xs uppercase tracking-wider">{t("director")}</span>
                                     <span className="text-white font-extrabold">{movie.director}</span>
                                 </div>
                             </div>
                             <div className="flex items-start gap-2.5">
                                 <Users className="h-4.5 w-4.5 text-violet-400 shrink-0 mt-0.5" />
                                 <div className="flex flex-col gap-0.5 text-left">
-                                    <span className="text-violet-300 font-bold text-xs uppercase tracking-wider">Cast</span>
+                                    <span className="text-violet-300 font-bold text-xs uppercase tracking-wider">{t("cast")}</span>
                                     <span className="text-white font-extrabold leading-snug">{movie.cast.join(", ")}</span>
                                 </div>
                             </div>
                             <div className="flex items-start gap-2.5">
                                 <Shield className="h-4.5 w-4.5 text-violet-400 shrink-0 mt-0.5" />
                                 <div className="flex flex-col gap-0.5 text-left">
-                                    <span className="text-violet-300 font-bold text-xs uppercase tracking-wider">Age Rating</span>
+                                    <span className="text-violet-300 font-bold text-xs uppercase tracking-wider">{t("age_rating")}</span>
                                     <span className="text-white font-extrabold">{movie.ageRating}</span>
                                 </div>
                             </div>
                             <div className="flex items-start gap-2.5">
                                 <Clock className="h-4.5 w-4.5 text-violet-400 shrink-0 mt-0.5" />
                                 <div className="flex flex-col gap-0.5 text-left">
-                                    <span className="text-violet-300 font-bold text-xs uppercase tracking-wider">Duration</span>
+                                    <span className="text-violet-300 font-bold text-xs uppercase tracking-wider">{t("duration")}</span>
                                     <span className="text-white font-extrabold">{movie.duration}</span>
                                 </div>
                             </div>
                             <div className="flex items-start gap-2.5">
                                 <Globe className="h-4.5 w-4.5 text-violet-400 shrink-0 mt-0.5" />
                                 <div className="flex flex-col gap-0.5 text-left">
-                                    <span className="text-violet-300 font-bold text-xs uppercase tracking-wider">Language</span>
-                                    <span className="text-white font-extrabold">{movie.language}</span>
+                                    <span className="text-violet-300 font-bold text-xs uppercase tracking-wider">{t("language_label")}</span>
+                                    <span className="text-white font-extrabold">{displayLanguage}</span>
                                 </div>
                             </div>
                         </div>
@@ -192,7 +226,7 @@ export default function DetailHero({ movie }: DetailHeroProps) {
                                 onClick={handleBuyTicket}
                                 className="w-full sm:w-auto shadow-lg shadow-violet-500/20"
                             >
-                                {movie.status === "coming_soon" ? "Get Notified" : "Buy Ticket"}
+                                {movie.status === "coming_soon" ? t("get_notified") : t("buy_ticket")}
                             </Button>
                             <Button 
                                 variant="outline-purple" 
@@ -201,7 +235,7 @@ export default function DetailHero({ movie }: DetailHeroProps) {
                                 className="w-full sm:w-auto text-white hover:text-white border-white/30 hover:border-white"
                             >
                                 <Play className="h-4 w-4 mr-2 fill-white" />
-                                Watch Trailer
+                                {t("watch_trailer")}
                             </Button>
                         </div>
                     </div>
@@ -214,7 +248,7 @@ export default function DetailHero({ movie }: DetailHeroProps) {
                 isClosing={isClosing}
                 onClose={handleCloseTrailer}
                 trailerUrl={getTrailerUrl(movie.id)}
-                movieTitle={movie.title}
+                movieTitle={displayTitle}
             />
         </div>
     );

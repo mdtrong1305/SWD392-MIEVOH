@@ -1,4 +1,7 @@
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
+
 export default function MovieHero() {
+    const { t } = useLanguage();
     return (
         <div 
             className="relative py-16 md:py-20 bg-cover bg-center text-white"
@@ -14,12 +17,12 @@ export default function MovieHero() {
                 <div className="flex flex-col gap-3 items-center">
                     {/* Centered Title */}
                     <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white md:leading-tight animate__animated animate__fadeInDown">
-                        Movie List
+                        {t("movie_list_title")}
                     </h1>
                     
                     {/* Centered Subtitle */}
                     <p className="text-sm md:text-base text-gray-300 max-w-xl leading-relaxed font-medium animate__animated animate__fadeInUp animate__delay-1s">
-                        Explore the ultimate cinematic world with the hottest now showing and upcoming blockbuster movies at Mievoh.
+                        {t("movie_list_subtitle")}
                     </p>
                 </div>
             </div>

@@ -4,10 +4,12 @@ import Slider from "react-slick";
 import { slickHotMoviesSettings } from "../../../../config/slick/slickConfig.tsx";
 import CountUp from "react-countup";
 import { Link } from "react-router-dom";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 import { toast } from "../../../../components/Toast/Toast.tsx";
 import { HOT_MOVIES } from "../../../../mockAPI/movieMock.tsx";
 
 export default function HotMovies() {
+    const { t } = useLanguage();
 
     // Resolve default export for react-slick in Vite environment
     const SlickSlider = (Slider as any).default || Slider;
@@ -18,7 +20,7 @@ export default function HotMovies() {
             {/* Header section with heading */}
             <div className="mb-8">
                 <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                    Trending Movies
+                    {t("trending_movies")}
                 </h2>
             </div>
 
@@ -67,7 +69,7 @@ export default function HotMovies() {
                                     </div>
                                 </div>
 
-                                {/* Quick Book Button */}
+                                {/* {t("quick_book")} Button */}
                                 <div className="mt-auto">
                                     <Button 
                                         variant="outline" 
@@ -76,10 +78,10 @@ export default function HotMovies() {
                                         onClick={(e) => {
                                             e.preventDefault();
                                             e.stopPropagation();
-                                            toast.success(`Opening ticket booking for: ${movie.title}`);
+                                            toast.success(t("opening_booking_for", { title: movie.title }) || `Opening ticket booking for: ${movie.title}`);
                                         }}
                                     >
-                                        Quick Book
+                                        {t("quick_book")}
                                     </Button>
                                 </div>
                             </Link>

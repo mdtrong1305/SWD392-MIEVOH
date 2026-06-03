@@ -12,6 +12,7 @@ import {
     startBooking,
     bookingFinished
 } from "../pages/User/SelectSeat/slice.ts";
+import { useLanguage } from "../contextAPI/LanguageContext.tsx";
 
 interface LocationState {
     branchName?: string;
@@ -26,10 +27,11 @@ const seatRows = ["A", "B", "C", "D", "E", "F", "G", "H", "J"];
 const standardRows = ["A", "B", "C", "D"];
 const vipRows = ["E", "F", "G", "H"];
 const bookedSeats = BOOKED_SEATS_MOCK;
-const combos = BOOKING_COMBOS;
+
 
 export default function useSelectSeat() {
     const { id } = useParams<{ id: string }>();
+    const { t, language } = useLanguage();
     const movieId = Number(id);
     const location = useLocation();
     const navigate = useNavigate();
@@ -78,7 +80,7 @@ export default function useSelectSeat() {
             setPaymentTimeLeft((prev) => {
                 if (prev <= 1) {
                     clearInterval(timer);
-                    toast.error("Seat hold time expired. Please select seats again!");
+                    toast.error(t("toast_seat_hold_expired"));
                     setShowQRTransfer(false);
                     setActiveStep(1);
                     return 0;
@@ -108,10 +110,25 @@ export default function useSelectSeat() {
     const dateLabel = booking.dateLabel || routeDateLabel;
     const dayOfWeek = booking.dayOfWeek || routeDayOfWeek;
 
+    // Localized combos list
+    const combos = useMemo(() => {
+        return BOOKING_COMBOS.map(combo => ({
+            ...combo,
+            name: language === "vi" ? (combo.name_vi || combo.name) : (combo.name_en || combo.name),
+            description: language === "vi" ? (combo.description_vi || combo.description) : (combo.description_en || combo.description),
+        }));
+    }, [language]);
+
     // Load movie details
     const movie = useMemo(() => {
-        return MOVIES_DETAILS[movieId] || MOVIES_DETAILS[1]; // default to 1 if not found
-    }, [movieId]);
+        const rawMovie = MOVIES_DETAILS[movieId] || MOVIES_DETAILS[1];
+        return {
+            ...rawMovie,
+            title: language === "vi" ? (rawMovie.title_vi || rawMovie.title) : (rawMovie.title_en || rawMovie.title),
+            description: language === "vi" ? (rawMovie.description_vi || rawMovie.description) : (rawMovie.description_en || rawMovie.description),
+            language: language === "vi" ? (rawMovie.language_vi || rawMovie.language) : (rawMovie.language_en || rawMovie.language),
+        };
+    }, [movieId, language]);
 
     // Room name
     const roomName = useMemo(() => {
@@ -134,7 +151,7 @@ export default function useSelectSeat() {
             dispatch(toggleSeat(seatCode));
         } else {
             if (selectedSeats.length >= 8) {
-                toast.error("You can only select up to 8 seats");
+                toast.error(t("toast_max_seats_limit"));
                 return;
             }
             dispatch(toggleSeat(seatCode));
@@ -206,7 +223,7 @@ export default function useSelectSeat() {
 
     const handleCheckout = () => {
         if (selectedSeats.length === 0) {
-            toast.error("Please select at least one seat before paying");
+            toast.error(t("toast_select_seat_required"));
             return;
         }
 
@@ -229,7 +246,7 @@ export default function useSelectSeat() {
             setGuestErrors(errs);
 
             if (Object.keys(errs).length > 0) {
-                toast.error("Please fix personal info errors");
+                toast.error(t("toast_fix_info_errors"));
                 return;
             }
         }
@@ -255,7 +272,7 @@ export default function useSelectSeat() {
         
         setShowQRTransfer(true);
         setPaymentTimeLeft(600);
-        toast.success("Payment transaction initiated!");
+        toast.success(t("toast_payment_initiated"));
     };
 
     const userPhone = authUser?.soDT || authUser?.phone || "Not updated";

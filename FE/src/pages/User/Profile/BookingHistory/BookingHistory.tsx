@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Ticket, Calendar, Clock, MapPin, Receipt, CheckCircle, Info, X } from "lucide-react";
+import { Ticket, Calendar, Clock, MapPin, Receipt, CheckCircle, Info } from "lucide-react";
 import type { RootState } from "../../../../store/index.tsx";
 import { resetBooking } from "../../SelectSeat/slice.ts";
 import { MOVIES_DETAILS } from "../../../../mockAPI/movieMock.tsx";
 import { toast } from "../../../../components/Toast/Toast.tsx";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 
 import type { BookingRecord } from "../../../../mockAPI/historyMock.tsx";
 import { DEFAULT_BOOKING_HISTORY } from "../../../../mockAPI/historyMock.tsx";
 
 export default function BookingHistory() {
+    const { t, language } = useLanguage();
     const dispatch = useDispatch();
     const [history, setHistory] = useState<BookingRecord[]>([]);
     const [selectedRecordForModal, setSelectedRecordForModal] = useState<BookingRecord | null>(null);
@@ -79,7 +81,7 @@ export default function BookingHistory() {
                 
                 // Clear current booking state so it doesn't duplicate
                 dispatch(resetBooking());
-                toast.success(`Successfully saved booking ${booking.bookingCode} to your history!`);
+                toast.success(t("booking_saved_history_success", { code: booking.bookingCode }));
             } else {
                 // If already recorded, clean up Redux state
                 dispatch(resetBooking());
@@ -90,7 +92,7 @@ export default function BookingHistory() {
     }, [booking, dispatch]);
 
     const formatPrice = (value: number) => {
-        return value.toLocaleString("en-US") + " VND";
+        return value.toLocaleString("vi-VN") + " VND";
     };
 
     return (
@@ -142,7 +144,7 @@ export default function BookingHistory() {
             {history.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 border border-dashed border-gray-200 rounded-2xl bg-gray-50/30">
                     <Ticket className="h-12 w-12 text-gray-300 mb-3" />
-                    <p className="text-sm font-medium text-gray-550">No tickets booked yet.</p>
+                    <p className="text-sm font-medium text-gray-550">{t("no_tickets_booked")}</p>
                 </div>
             ) : (
                 <div className="flex flex-col gap-4 max-h-[560px] overflow-y-auto pr-2 custom-booking-scrollbar">
@@ -164,10 +166,16 @@ export default function BookingHistory() {
                             <div className="flex-grow p-5 flex flex-col justify-between gap-4">
                                 <div className="flex flex-col gap-2">
                                     <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-                                        <h4 className="text-base font-black text-gray-900">{record.movieTitle}</h4>
+                                        <h4 className="text-base font-black text-gray-900">
+                                            {(() => {
+                                                const mInfo = MOVIES_DETAILS[record.movieId];
+                                                if (!mInfo) return record.movieTitle;
+                                                return language === "vi" ? (mInfo.title_vi || mInfo.title) : (mInfo.title_en || mInfo.title);
+                                            })()}
+                                        </h4>
                                         <span className="inline-flex self-start items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
                                             <CheckCircle className="h-3.5 w-3.5" />
-                                            {record.status === "Paid" ? "Paid (Đã thanh toán)" : record.status}
+                                            {record.status === "Paid" ? t("paid_status") : record.status}
                                         </span>
                                     </div>
                                     
@@ -183,11 +191,11 @@ export default function BookingHistory() {
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <Clock className="h-4 w-4 text-violet-500 dark:text-[#a599ff] shrink-0" />
-                                            <span className="text-xs sm:text-sm">Showtime: {record.time}</span>
+                                            <span className="text-xs sm:text-sm">{t("booking_showtime")}: {record.time}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <Ticket className="h-4 w-4 text-violet-500 dark:text-[#a599ff] shrink-0" />
-                                            <span className="text-xs sm:text-sm">Seats: <strong className="text-gray-900 dark:text-white">{record.seats.join(", ")}</strong></span>
+                                            <span className="text-xs sm:text-sm">{t("booking_seats")}: <strong className="text-gray-900 dark:text-white">{record.seats.join(", ")}</strong></span>
                                         </div>
                                     </div>
                                 </div>
@@ -198,7 +206,7 @@ export default function BookingHistory() {
                                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                                     <div className="text-xs text-gray-500 font-semibold flex items-center gap-1.5">
                                         <Info className="h-3.5 w-3.5 text-gray-400" />
-                                        <span>Combo: {record.combos} | Booked on: {record.dateBooked}</span>
+                                        <span>{t("booking_combo")}: {record.combos} | {t("booked_on")}: {record.dateBooked}</span>
                                     </div>
                                     <div className="flex items-center gap-1.5 shrink-0">
                                         <Receipt className="h-4 w-4 text-violet-650 dark:text-[#a599ff]" />
@@ -218,9 +226,9 @@ export default function BookingHistory() {
                                     onClick={() => setSelectedRecordForModal(record)}
                                     className="px-4 py-2 text-xs font-black text-violet-800 dark:text-violet-950 bg-violet-100 hover:bg-violet-600 hover:text-white dark:hover:bg-violet-500 dark:hover:text-white rounded-xl transition-all duration-300 shadow-sm cursor-pointer hover:scale-105 active:scale-95"
                                 >
-                                    Xem mã vé
+                                    {t("view_ticket_code")}
                                 </button>
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Click to scan</span>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">{t("click_to_scan")}</span>
                             </div>
                         </div>
                     ))}
@@ -238,7 +246,7 @@ export default function BookingHistory() {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="w-full flex flex-col items-center gap-5">
-                            <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Mã Nhận Vé</span>
+                            <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">{t("ticket_receipt_code")}</span>
                             
                             {/* Barcode Frame */}
                             <div className="bg-white mievoh-barcode-frame p-5 rounded-2xl border border-gray-150 shadow-sm flex flex-col items-center w-full">
@@ -289,7 +297,7 @@ export default function BookingHistory() {
                             </div>
 
                             <span className="text-[10px] font-bold text-gray-400 text-center uppercase tracking-wider">
-                                Quét tại quầy soát vé để vào rạp
+                                {t("scan_at_counter_desc")}
                             </span>
                         </div>
                     </div>

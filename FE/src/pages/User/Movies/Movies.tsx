@@ -3,26 +3,35 @@ import MovieHero from "./MovieHero/MovieHero.tsx";
 import MovieFilters from "./MovieFilters/MovieFilters.tsx";
 import MovieGrid from "./MovieGrid/MovieGrid.tsx";
 import { INITIAL_MOVIES } from "../../../mockAPI/movieMock.tsx";
+import { useLanguage } from "../../../contextAPI/LanguageContext.tsx";
 
 
 export default function Movies() {
+    const { language } = useLanguage();
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedStatus, setSelectedStatus] = useState<"all" | "now_showing" | "coming_soon">("all");
     const [selectedGenre, setSelectedGenre] = useState("");
     const [sortBy, setSortBy] = useState("rating-desc");
 
+    const localizedMovies = useMemo(() => {
+        return INITIAL_MOVIES.map(movie => ({
+            ...movie,
+            title: language === "vi" ? (movie.title_vi || movie.title) : (movie.title_en || movie.title),
+        }));
+    }, [language]);
+
     // Extract all unique genres from initial list
     const genres = useMemo(() => {
         const set = new Set<string>();
-        INITIAL_MOVIES.forEach((movie) => {
+        localizedMovies.forEach((movie) => {
             movie.genres.forEach((genre) => set.add(genre));
         });
         return Array.from(set);
-    }, []);
+    }, [localizedMovies]);
 
     // Filter and Sort Movies
     const filteredMovies = useMemo(() => {
-        return INITIAL_MOVIES.filter((movie) => {
+        return localizedMovies.filter((movie) => {
             const matchesSearch = movie.title.toLowerCase().includes(searchQuery.toLowerCase());
             const matchesStatus = selectedStatus === "all" || movie.status === selectedStatus;
             const matchesGenre = selectedGenre === "" || movie.genres.includes(selectedGenre);
@@ -39,7 +48,7 @@ export default function Movies() {
             }
             return 0;
         });
-    }, [searchQuery, selectedStatus, selectedGenre, sortBy]);
+    }, [searchQuery, selectedStatus, selectedGenre, sortBy, localizedMovies]);
 
     return (
         <div className="w-full bg-[#EFEBF4] pb-16">

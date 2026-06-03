@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Users, Ticket, GraduationCap } from "lucide-react";
 import Button from "../../../../components/Button/Button.tsx";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 import Slider from "react-slick";
 import { slickPromotionsSettings } from "../../../../config/slick/slickConfig.tsx";
 
@@ -12,45 +13,49 @@ interface Promotion {
     image: string;
 }
 
-const promotions: Promotion[] = [
-    {
-        id: 1,
-        title: "Family Sunday",
-        description: "Get 20% off family combo when watching movies on Sundays.",
-        type: "family",
-        image: "https://images.unsplash.com/photo-1585647347483-22b66260dfff?auto=format&fit=crop&w=600&q=80",
-    },
-    {
-        id: 2,
-        title: "20% Member Discount",
-        description: "Special offer: 20% discount on ticket prices for VIP members of mievoh.",
-        type: "vip",
-        image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80",
-    },
-    {
-        id: 3,
-        title: "Student Special",
-        description: "Flat rate of 45K for students on weekdays from Monday to Thursday.",
-        type: "student",
-        image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80",
-    },
-    {
-        id: 4,
-        title: "Late Night Ticket",
-        description: "Flat rate of 50K for showtimes after 22:00 daily for night owls.",
-        type: "vip",
-        image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80",
-    },
-    {
-        id: 5,
-        title: "Sweet Couple Combo",
-        description: "Save 10% when purchasing a Couple Combo (2 drinks + 1 large popcorn) at the concession stand.",
-        type: "family",
-        image: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=600&q=80",
-    },
-];
+
 
 export default function Promotions() {
+    const { t } = useLanguage();
+    
+
+    const promotions: Promotion[] = [
+        {
+            id: 1,
+            title: t("promo_family_title"),
+            description: t("promo_family_desc"),
+            type: "family",
+            image: "https://images.unsplash.com/photo-1585647347483-22b66260dfff?auto=format&fit=crop&w=600&q=80",
+        },
+        {
+            id: 2,
+            title: t("promo_vip_title"),
+            description: t("promo_vip_desc"),
+            type: "vip",
+            image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80",
+        },
+        {
+            id: 3,
+            title: t("promo_student_title"),
+            description: t("promo_student_desc"),
+            type: "student",
+            image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80",
+        },
+        {
+            id: 4,
+            title: t("promo_night_title"),
+            description: t("promo_night_desc"),
+            type: "vip",
+            image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80",
+        },
+        {
+            id: 5,
+            title: t("promo_couple_title"),
+            description: t("promo_couple_desc"),
+            type: "family",
+            image: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=600&q=80",
+        },
+    ];
     const [claimedPromos, setClaimedPromos] = useState<number[]>([]);
 
     const handleClaimPromo = (id: number) => {
@@ -80,7 +85,7 @@ export default function Promotions() {
             {/* Header */}
             <div className="mb-8">
                 <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                    Special Promotions
+                    {t("special_promotions")}
                 </h2>
             </div>
 
@@ -130,7 +135,7 @@ export default function Promotions() {
                                                     : "border-gray-200 hover:border-[#6D28D9]"
                                             }`}
                                         >
-                                            {isClaimed ? "Claimed ✓" : "Claim Code"}
+                                            {isClaimed ? t("claimed") : t("claim_code")}
                                         </Button>
                                     </div>
                                 </div>

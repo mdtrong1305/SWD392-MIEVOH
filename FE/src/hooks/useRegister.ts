@@ -1,3 +1,4 @@
+import { useLanguage } from "../contextAPI/LanguageContext.tsx";
 import React, { useState, useEffect } from 'react';
 import { toast } from '../components/Toast/Toast.tsx';
 import { registerApi } from '../axios/auth.tsx';
@@ -29,6 +30,7 @@ export interface FormErrors {
 }
 
 export default function useRegister(onRegisterSuccess: () => void) {
+    const { t } = useLanguage();
     const [regLoading, setRegLoading] = useState(false);
     const [regError, setRegError] = useState<string | null>(null);
     const [regSuccess, setRegSuccess] = useState(false);
@@ -156,7 +158,7 @@ export default function useRegister(onRegisterSuccess: () => void) {
         return Object.keys(newErrors).length === 0;
     };
 
-    const checkEmailExists = async (emailStr: string) => {
+    const checkEmailExists = async (_emailStr: string) => {
         // Disabled real-time check since backend validates user existence during submit
         setEmailTaken(false);
     };
@@ -175,7 +177,7 @@ export default function useRegister(onRegisterSuccess: () => void) {
             });
 
             setRegSuccess(true);
-            toast.success("Account registered successfully!");
+            toast.success(t("toast_register_success"));
             setRegError(null);
             setRegisterForm({
                 username: '',

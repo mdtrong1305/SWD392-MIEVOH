@@ -1,4 +1,5 @@
 import { ChevronLeft } from "lucide-react";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 import { type ComboItem } from "../../../../mockAPI/bookingMock.tsx";
 
 interface PopcornSelectionProps {
@@ -16,13 +17,14 @@ export default function PopcornSelection({
     setActiveStep,
     formatPrice
 }: PopcornSelectionProps) {
+    const { t } = useLanguage();
     return (
         <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-3xl p-6 shadow-sm animate__animated animate__fadeIn flex flex-col gap-6">
             <div className="flex items-center justify-between">
                 <h3 className="text-base font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
-                    🍿 Popcorn, Drinks & Combos
+                    🍿 {t("popcorn_drinks_combos")}
                 </h3>
-                <span className="text-xs font-bold text-[#8E7EFE] bg-[#8E7EFE]/10 dark:bg-[#8E7EFE]/15 px-3 py-1 rounded-full">Save up to 20% when purchased together</span>
+                <span className="text-xs font-bold text-[#8E7EFE] bg-[#8E7EFE]/10 dark:bg-[#8E7EFE]/15 px-3 py-1 rounded-full">{t("popcorn_combo_discount_desc")}</span>
             </div>
 
             <div className="flex flex-col gap-4">
@@ -69,7 +71,7 @@ export default function PopcornSelection({
                     className="px-5 py-2.5 border border-slate-200 dark:border-zinc-700 hover:border-slate-300 dark:hover:border-zinc-600 text-slate-600 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 font-extrabold text-xs rounded-2xl transition-all cursor-pointer flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-zinc-800"
                 >
                     <ChevronLeft className="h-4 w-4" />
-                    Back to seat selection
+                    {t("back_to_seats")}
                 </button>
             </div>
         </div>

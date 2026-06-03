@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 import { Check } from "lucide-react";
 import { type ComboItem } from "../../../../mockAPI/bookingMock.tsx";
 import type { MovieDetailInfo } from "../../MovieDetail/DetailHero/DetailHero.tsx";
@@ -36,6 +37,7 @@ export default function TicketSuccess({
     formatPrice,
     bookingCode
 }: TicketSuccessProps) {
+    const { t } = useLanguage();
     return (
         <div className="max-w-4xl mx-auto py-8 animate__animated animate__zoomIn">
             <div className="bg-white dark:bg-zinc-900/50 border border-slate-150 dark:border-zinc-800/80 rounded-[2.5rem] shadow-xl overflow-hidden relative flex flex-col md:flex-row">
@@ -55,8 +57,8 @@ export default function TicketSuccess({
                                 <Check className="h-6 w-6 stroke-[3]" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-black text-slate-850 dark:text-white">Booking Successful!</h2>
-                                <p className="text-sm text-slate-500 dark:text-zinc-400 font-bold mt-0.5">Thank you for choosing Mievoh. Your showtime awaits you.</p>
+                                <h2 className="text-2xl font-black text-slate-850 dark:text-white">{t("booking_success_title")}</h2>
+                                <p className="text-sm text-slate-500 dark:text-zinc-400 font-bold mt-0.5">{t("booking_success_desc")}</p>
                             </div>
                         </div>
  
@@ -77,25 +79,25 @@ export default function TicketSuccess({
                         {/* Grid of ticket details with larger sizes */}
                         <div className="grid grid-cols-2 gap-y-5 gap-x-8 py-6 text-sm font-bold text-slate-655 dark:text-zinc-300">
                             <div>
-                                <span className="text-slate-400 dark:!text-white/70 block mb-1 font-black uppercase tracking-wider text-[10px]">Cinema</span>
+                                <span className="text-slate-400 dark:!text-white/70 block mb-1 font-black uppercase tracking-wider text-[10px]">{t("booking_cinema")}</span>
                                 <span className="text-slate-855 dark:text-white font-black text-base">{branchName}</span>
                             </div>
                             <div>
-                                <span className="text-slate-400 dark:!text-white/70 block mb-1 font-black uppercase tracking-wider text-[10px]">Hall & Seats</span>
+                                <span className="text-slate-400 dark:!text-white/70 block mb-1 font-black uppercase tracking-wider text-[10px]">{t("booking_hall_seats")}</span>
                                 <span className="text-slate-855 dark:text-white font-black text-base">{roomName} • <span className="text-[#8E7EFE] dark:text-[#8E7EFE] bg-violet-50 dark:bg-[#8E7EFE]/15 px-2.5 py-1 rounded-lg">{selectedSeats.join(", ")}</span></span>
                             </div>
                             <div>
-                                <span className="text-slate-400 dark:!text-white/70 block mb-1 font-black uppercase tracking-wider text-[10px]">Showtime</span>
+                                <span className="text-slate-400 dark:!text-white/70 block mb-1 font-black uppercase tracking-wider text-[10px]">{t("booking_showtime")}</span>
                                 <span className="text-slate-855 dark:text-white font-black text-base">{time} • {dayOfWeek}, {dateLabel}</span>
                             </div>
                             <div>
-                                <span className="text-slate-400 dark:!text-white/70 block mb-1 font-black uppercase tracking-wider text-[10px]">Format</span>
+                                <span className="text-slate-400 dark:!text-white/70 block mb-1 font-black uppercase tracking-wider text-[10px]">{t("booking_format")}</span>
                                 <span className="text-slate-855 dark:text-white font-black text-base">{format}</span>
                             </div>
  
                             {comboPrice > 0 && (
                                 <div className="col-span-2 border-t border-slate-100/80 dark:border-zinc-800/50 pt-4">
-                                    <span className="text-slate-400 dark:!text-white/70 block mb-1.5 font-black uppercase tracking-wider text-[10px]">Attached Combos</span>
+                                    <span className="text-slate-400 dark:!text-white/70 block mb-1.5 font-black uppercase tracking-wider text-[10px]">{t("attached_combos")}</span>
                                     <span className="text-slate-855 dark:text-white font-black text-base bg-slate-50 dark:bg-zinc-800/60 px-3 py-1.5 rounded-xl inline-block">
                                         {combos.filter(c => comboQuantities[c.id] > 0).map(c => `${c.name} (x${comboQuantities[c.id]})`).join(", ")}
                                     </span>
@@ -105,7 +107,7 @@ export default function TicketSuccess({
                     </div>
  
                     <div className="border-t border-slate-100 dark:border-zinc-800/80 pt-5 flex justify-between items-center text-base font-black text-slate-855 dark:text-white">
-                        <span>Total Amount Paid:</span>
+                        <span>{t("total_amount_paid")}</span>
                         <span className="text-2xl text-[#8E7EFE] font-black">{formatPrice(totalPrice)}</span>
                     </div>
                 </div>
@@ -163,7 +165,7 @@ export default function TicketSuccess({
                             </svg>
                             <span className="text-2xl font-mono tracking-[0.3em] !text-black font-black mt-4">{bookingCode}</span>
                         </div>
-                        <span className="text-[10px] font-black text-slate-455 dark:!text-white/70 uppercase tracking-widest leading-normal">Scan barcode at the cinema<br />to print ticket entry pass</span>
+                        <span className="text-[10px] font-black text-slate-455 dark:!text-white/70 uppercase tracking-widest leading-normal">{t("scan_barcode_desc")}</span>
                     </div>
  
                     <div className="flex flex-col gap-2.5 w-full mt-8 md:mt-10">
@@ -171,13 +173,13 @@ export default function TicketSuccess({
                             to="/" 
                             className="py-3.5 px-4 bg-white dark:bg-transparent border border-slate-200 dark:border-[#8E7EFE]/40 hover:border-slate-300 dark:hover:border-[#8E7EFE]/60 text-slate-700 dark:!text-[#8E7EFE] hover:text-slate-900 dark:hover:!text-white font-extrabold text-xs rounded-2xl transition-all cursor-pointer shadow-sm dark:shadow-none text-center dark:hover:bg-[#8E7EFE]/10"
                         >
-                            Back to Homepage
+                            {t("back_to_homepage")}
                         </Link>
                         <Link 
                             to={`/movies/${movie.id}`} 
                             className="py-3.5 px-4 bg-[#8E7EFE] hover:bg-[#7d6dfc] text-white font-extrabold text-xs rounded-2xl transition-all cursor-pointer shadow-lg shadow-violet-100 dark:shadow-none hover:scale-[1.01] active:scale-95 text-center"
                         >
-                            Movie Details
+                            {t("movie_details")}
                         </Link>
                     </div>
                 </div>

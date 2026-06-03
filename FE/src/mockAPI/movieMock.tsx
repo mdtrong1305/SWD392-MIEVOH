@@ -7,6 +7,8 @@ export const HOT_MOVIES: Movie[] = [
     {
         id: 1,
         title: "Kẻ Đánh Cắp Giấc Mơ",
+        title_vi: "Kẻ Đánh Cắp Giấc Mơ",
+        title_en: "Inception",
         image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80",
         rating: 4.8,
         genres: ["Action", "Sci-Fi"],
@@ -15,6 +17,8 @@ export const HOT_MOVIES: Movie[] = [
     {
         id: 2,
         title: "Giai Điệu Tình Yêu",
+        title_vi: "Giai Điệu Tình Yêu",
+        title_en: "La La Land",
         image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80",
         rating: 4.5,
         genres: ["Romance", "Music"],
@@ -23,6 +27,8 @@ export const HOT_MOVIES: Movie[] = [
     {
         id: 3,
         title: "Bí Ẩn Căn Phòng",
+        title_vi: "Bí Ẩn Căn Phòng",
+        title_en: "Parasite",
         image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=600&q=80",
         rating: 4.3,
         genres: ["Mystery", "Thriller"],
@@ -31,6 +37,8 @@ export const HOT_MOVIES: Movie[] = [
     {
         id: 4,
         title: "Nụ Cười Ngày Mới",
+        title_vi: "Nụ Cười Ngày Mới",
+        title_en: "A New Day's Smile",
         image: "https://images.unsplash.com/photo-1578849278619-e73505e9610f?auto=format&fit=crop&w=600&q=80",
         rating: 4.2,
         genres: ["Comedy", "Family"],
@@ -39,6 +47,8 @@ export const HOT_MOVIES: Movie[] = [
     {
         id: 5,
         title: "Chiến Binh Vũ Trụ",
+        title_vi: "Chiến Binh Vũ Trụ",
+        title_en: "Dune",
         image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80",
         rating: 4.9,
         genres: ["Action", "Sci-Fi"],
@@ -51,6 +61,8 @@ export const INITIAL_MOVIES: Movie[] = [
     {
         id: 1,
         title: "Kẻ Đánh Cắp Giấc Mơ",
+        title_vi: "Kẻ Đánh Cắp Giấc Mơ",
+        title_en: "Inception",
         image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80",
         rating: 4.8,
         genres: ["Action", "Sci-Fi"],
@@ -59,6 +71,8 @@ export const INITIAL_MOVIES: Movie[] = [
     {
         id: 2,
         title: "Giai Điệu Tình Yêu",
+        title_vi: "Giai Điệu Tình Yêu",
+        title_en: "La La Land",
         image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80",
         rating: 4.5,
         genres: ["Romance", "Music"],
@@ -67,6 +81,8 @@ export const INITIAL_MOVIES: Movie[] = [
     {
         id: 3,
         title: "Bí Ẩn Căn Phòng",
+        title_vi: "Bí Ẩn Căn Phòng",
+        title_en: "Parasite",
         image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=600&q=80",
         rating: 4.3,
         genres: ["Mystery", "Thriller"],
@@ -75,6 +91,8 @@ export const INITIAL_MOVIES: Movie[] = [
     {
         id: 4,
         title: "Nụ Cười Ngày Mới",
+        title_vi: "Nụ Cười Ngày Mới",
+        title_en: "A New Day's Smile",
         image: "https://images.unsplash.com/photo-1578849278619-e73505e9610f?auto=format&fit=crop&w=600&q=80",
         rating: 4.2,
         genres: ["Comedy", "Family"],
@@ -83,6 +101,8 @@ export const INITIAL_MOVIES: Movie[] = [
     {
         id: 5,
         title: "Chiến Binh Vũ Trụ",
+        title_vi: "Chiến Binh Vũ Trụ",
+        title_en: "Dune",
         image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80",
         rating: 4.9,
         genres: ["Action", "Sci-Fi"],
@@ -91,6 +111,8 @@ export const INITIAL_MOVIES: Movie[] = [
     {
         id: 6,
         title: "Thung Lũng Gió",
+        title_vi: "Thung Lũng Gió",
+        title_en: "Nausicaä of the Valley of the Wind",
         image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=600&q=80",
         rating: 4.7,
         genres: ["Adventure", "Animation"],
@@ -99,6 +121,8 @@ export const INITIAL_MOVIES: Movie[] = [
     {
         id: 7,
         title: "Thám Tử Tư",
+        title_vi: "Thám Tử Tư",
+        title_en: "Knives Out",
         image: "https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=600&q=80",
         rating: 4.4,
         genres: ["Mystery", "Crime"],
@@ -107,6 +131,8 @@ export const INITIAL_MOVIES: Movie[] = [
     {
         id: 8,
         title: "Quái Vật Đáy Biển",
+        title_vi: "Quái Vật Đáy Biển",
+        title_en: "Underwater",
         image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
         rating: 4.1,
         genres: ["Horror", "Thriller"],
@@ -115,6 +141,8 @@ export const INITIAL_MOVIES: Movie[] = [
     {
         id: 9,
         title: "Huyền Thoại Sân Cỏ",
+        title_vi: "Huyền Thoại Sân Cỏ",
+        title_en: "Creed",
         image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=600&q=80",
         rating: 4.6,
         genres: ["Sports", "Drama"],
@@ -123,6 +151,8 @@ export const INITIAL_MOVIES: Movie[] = [
     {
         id: 10,
         title: "Hành Tinh Xanh",
+        title_vi: "Hành Tinh Xanh",
+        title_en: "Earth",
         image: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=600&q=80",
         rating: 4.8,
         genres: ["Documentary", "Nature"],
@@ -132,6 +162,8 @@ export const INITIAL_MOVIES: Movie[] = [
     {
         id: 11,
         title: "Chiến Binh Báo Đen",
+        title_vi: "Chiến Binh Báo Đen",
+        title_en: "Black Panther",
         image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=600&q=80",
         rating: 4.7,
         genres: ["Action", "Adventure"],
@@ -141,6 +173,8 @@ export const INITIAL_MOVIES: Movie[] = [
     {
         id: 12,
         title: "Vùng Đất Câm Lặng: Ngày Một",
+        title_vi: "Vùng Đất Câm Lặng: Ngày Một",
+        title_en: "A Quiet Place: Day One",
         image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80",
         rating: 4.4,
         genres: ["Horror", "Thriller"],
@@ -150,6 +184,8 @@ export const INITIAL_MOVIES: Movie[] = [
     {
         id: 13,
         title: "Thế Giới Khủng Long: Sinh Tồn",
+        title_vi: "Thế Giới Khủng Long: Sinh Tồn",
+        title_en: "Jurassic World: Dominion",
         image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=600&q=80",
         rating: 4.6,
         genres: ["Action", "Sci-Fi"],
@@ -159,6 +195,8 @@ export const INITIAL_MOVIES: Movie[] = [
     {
         id: 14,
         title: "Phép Thuật Kỳ Lạ",
+        title_vi: "Phép Thuật Kỳ Lạ",
+        title_en: "Strange Magic",
         image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80",
         rating: 4.5,
         genres: ["Animation", "Family"],
@@ -172,6 +210,8 @@ export const MOVIES_DETAILS: Record<number, MovieDetailInfo> = {
     1: {
         id: 1,
         title: "Kẻ Đánh Cắp Giấc Mơ",
+        title_vi: "Kẻ Đánh Cắp Giấc Mơ",
+        title_en: "Inception",
         image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80",
         backdrop: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1200&q=80",
         rating: 4.8,
@@ -181,13 +221,19 @@ export const MOVIES_DETAILS: Record<number, MovieDetailInfo> = {
         duration: "148 mins",
         ageRating: "R-16",
         language: "English - Vietnamese Subtitles",
+        language_vi: "Tiếng Anh - Phụ đề Tiếng Việt",
+        language_en: "English - Vietnamese Subtitles",
         director: "Christopher Nolan",
         cast: ["Leonardo DiCaprio", "Joseph Gordon-Levitt", "Elliot Page"],
-        description: "A professional thief who has the ability to enter the subconscious of others to steal secrets while they are dreaming. This time, he is given the reverse task: planting an idea into the target's mind to execute the perfect plan."
+        description: "A professional thief who has the ability to enter the subconscious of others to steal secrets while they are dreaming. This time, he is given the reverse task: planting an idea into the target's mind to execute the perfect plan.",
+        description_vi: "Một kẻ trộm chuyên nghiệp có khả năng xâm nhập vào tiềm thức của người khác để đánh cắp bí mật khi họ đang mơ. Lần này, anh ta được giao một nhiệm vụ ngược lại: gieo rắc một ý tưởng vào tâm trí của mục tiêu để thực hiện một kế hoạch hoàn hảo.",
+        description_en: "A professional thief who has the ability to enter the subconscious of others to steal secrets while they are dreaming. This time, he is given the reverse task: planting an idea into the target's mind to execute the perfect plan."
     },
     2: {
         id: 2,
         title: "Giai Điệu Tình Yêu",
+        title_vi: "Giai Điệu Tình Yêu",
+        title_en: "La La Land",
         image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80",
         backdrop: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80",
         rating: 4.5,
@@ -199,11 +245,15 @@ export const MOVIES_DETAILS: Record<number, MovieDetailInfo> = {
         language: "English - Vietnamese Subtitles",
         director: "Damien Chazelle",
         cast: ["Ryan Gosling", "Emma Stone", "John Legend"],
-        description: "A romantic and bittersweet love story between a passionate jazz musician and an aspiring young actress struggling to find her break in glamorous Hollywood."
+        description: "A romantic and bittersweet love story between a passionate jazz musician and an aspiring young actress struggling to find her break in glamorous Hollywood.",
+        description_vi: "Một câu chuyện tình yêu lãng mạn và ngọt ngào nhưng cũng đầy cay đắng giữa một nhạc sĩ nhạc jazz đầy đam mê và một nữ diễn viên trẻ đầy tham vọng đang chật vật tìm kiếm cơ hội tỏa sáng tại Hollywood hoa lệ.",
+        description_en: "A romantic and bittersweet love story between a passionate jazz musician and an aspiring young actress struggling to find her break in glamorous Hollywood."
     },
     3: {
         id: 3,
         title: "Bí Ẩn Căn Phòng",
+        title_vi: "Bí Ẩn Căn Phòng",
+        title_en: "Parasite",
         image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=600&q=80",
         backdrop: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&q=80",
         rating: 4.3,
@@ -213,13 +263,19 @@ export const MOVIES_DETAILS: Record<number, MovieDetailInfo> = {
         duration: "115 mins",
         ageRating: "R-18",
         language: "Korean - Vietnamese Subtitles",
+        language_vi: "Tiếng Hàn - Phụ đề Tiếng Việt",
+        language_en: "Korean - Vietnamese Subtitles",
         director: "Bong Joon-ho",
         cast: ["Song Kang-ho", "Lee Sun-kyun", "Cho Yeo-jeong"],
-        description: "A mysterious murder occurs in a locked room at a wealthy family's villa. The police inspector must peel back every layer of deception from the residents to find the real killer."
+        description: "A mysterious murder occurs in a locked room at a wealthy family's villa. The police inspector must peel back every layer of deception from the residents to find the real killer.",
+        description_vi: "Một vụ án mạng bí ẩn xảy ra trong một căn phòng khóa kín tại biệt thự của một gia đình giàu có. Thanh tra cảnh sát phải lật mở từng lớp lừa dối từ những người cư trú để tìm ra kẻ sát nhân thực sự.",
+        description_en: "A mysterious murder occurs in a locked room at a wealthy family's villa. The police inspector must peel back every layer of deception from the residents to find the real killer."
     },
     4: {
         id: 4,
         title: "Nụ Cười Ngày Mới",
+        title_vi: "Nụ Cười Ngày Mới",
+        title_en: "A New Day's Smile",
         image: "https://images.unsplash.com/photo-1578849278619-e73505e9610f?auto=format&fit=crop&w=600&q=80",
         backdrop: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80",
         rating: 4.2,
@@ -229,13 +285,19 @@ export const MOVIES_DETAILS: Record<number, MovieDetailInfo> = {
         duration: "105 mins",
         ageRating: "G",
         language: "Vietnamese",
+        language_vi: "Tiếng Việt",
+        language_en: "Vietnamese",
         director: "Tran Thanh",
         cast: ["Tuan Tran", "Uyen An", "Kha Nhu"],
-        description: "A heartwarming family comedy-drama bringing gentle laughter and deep life lessons about parental love, filial piety, and daily generational conflicts."
+        description: "A heartwarming family comedy-drama bringing gentle laughter and deep life lessons about parental love, filial piety, and daily generational conflicts.",
+        description_vi: "Một bộ phim hài - chính kịch gia đình ấm áp mang lại những tiếng cười nhẹ nhàng và những bài học sâu sắc về tình mẫu tử, lòng hiếu thảo và những mâu thuẫn thế hệ hàng ngày.",
+        description_en: "A heartwarming family comedy-drama bringing gentle laughter and deep life lessons about parental love, filial piety, and daily generational conflicts."
     },
     5: {
         id: 5,
         title: "Chiến Binh Vũ Trụ",
+        title_vi: "Chiến Binh Vũ Trụ",
+        title_en: "Dune",
         image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80",
         backdrop: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
         rating: 4.9,
@@ -247,11 +309,15 @@ export const MOVIES_DETAILS: Record<number, MovieDetailInfo> = {
         language: "English - Vietnamese Subtitles",
         director: "Denis Villeneuve",
         cast: ["Timothée Chalamet", "Zendaya", "Rebecca Ferguson"],
-        description: "The grand journey of a destined young hero tasked with protecting the universe's most valuable resource on a harsh desert planet."
+        description: "The grand journey of a destined young hero tasked with protecting the universe's most valuable resource on a harsh desert planet.",
+        description_vi: "Hành trình vĩ đại của một người hùng trẻ tuổi được định sẵn có nhiệm vụ bảo vệ tài nguyên quý giá nhất của vũ trụ trên một hành tinh sa mạc khắc nghiệt.",
+        description_en: "The grand journey of a destined young hero tasked with protecting the universe's most valuable resource on a harsh desert planet."
     },
     6: {
         id: 6,
         title: "Thung Lũng Gió",
+        title_vi: "Thung Lũng Gió",
+        title_en: "Nausicaä of the Valley of the Wind",
         image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=600&q=80",
         backdrop: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80",
         rating: 4.7,
@@ -261,13 +327,19 @@ export const MOVIES_DETAILS: Record<number, MovieDetailInfo> = {
         duration: "116 mins",
         ageRating: "G",
         language: "Vietnamese Dubbed",
+        language_vi: "Tiếng Việt Lồng tiếng",
+        language_en: "Vietnamese Dubbed",
         director: "Hayao Miyazaki",
         cast: ["Sumi Shimamoto", "Mahito Tsujimura"],
-        description: "In a distant future, a young princess fights to prevent two warring kingdoms from destroying each other and the fragile ecological environment of their valley."
+        description: "In a distant future, a young princess fights to prevent two warring kingdoms from destroying each other and the fragile ecological environment of their valley.",
+        description_vi: "Trong một tương lai xa xôi, một công chúa trẻ chiến đấu để ngăn chặn hai vương quốc đang chiến tranh tiêu diệt lẫn nhau và môi trường sinh thái mong manh của thung lũng của họ.",
+        description_en: "In a distant future, a young princess fights to prevent two warring kingdoms from destroying each other and the fragile ecological environment of their valley."
     },
     7: {
         id: 7,
         title: "Thám Tử Tư",
+        title_vi: "Thám Tử Tư",
+        title_en: "Knives Out",
         image: "https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=600&q=80",
         backdrop: "https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=1200&q=80",
         rating: 4.4,
@@ -279,11 +351,15 @@ export const MOVIES_DETAILS: Record<number, MovieDetailInfo> = {
         language: "English - Vietnamese Subtitles",
         director: "Rian Johnson",
         cast: ["Daniel Craig", "Chris Evans", "Ana de Armas"],
-        description: "When a famous detective novelist dies mysteriously at his estate, an eccentric private investigator is hired to investigate and discovers everyone in the family has a motive."
+        description: "When a famous detective novelist dies mysteriously at his estate, an eccentric private investigator is hired to investigate and discovers everyone in the family has a motive.",
+        description_vi: "Khi một tiểu thuyết gia trinh thám nổi tiếng qua đời một cách bí ẩn tại biệt thự của mình, một thám tử tư lập dị được thuê để điều tra và phát hiện ra mọi người trong gia đình đều có động cơ.",
+        description_en: "When a famous detective novelist dies mysteriously at his estate, an eccentric private investigator is hired to investigate and discovers everyone in the family has a motive."
     },
     8: {
         id: 8,
         title: "Quái Vật Đáy Biển",
+        title_vi: "Quái Vật Đáy Biển",
+        title_en: "Underwater",
         image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
         backdrop: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
         rating: 4.1,
@@ -295,11 +371,15 @@ export const MOVIES_DETAILS: Record<number, MovieDetailInfo> = {
         language: "English - Vietnamese Subtitles",
         director: "William Eubank",
         cast: ["Kristen Stewart", "Vincent Cassel", "Mamoudou Athie"],
-        description: "A crew of oceanic researchers working at a deep-sea drilling station face mysterious bloodthirsty creatures after an earthquake destroys their facility."
+        description: "A crew of oceanic researchers working at a deep-sea drilling station face mysterious bloodthirsty creatures after an earthquake destroys their facility.",
+        description_vi: "Một nhóm nghiên cứu đại dương làm việc tại một trạm khoan biển sâu phải đối mặt với những sinh vật khát máu bí ẩn sau khi một trận động đất phá hủy cơ sở của họ.",
+        description_en: "A crew of oceanic researchers working at a deep-sea drilling station face mysterious bloodthirsty creatures after an earthquake destroys their facility."
     },
     9: {
         id: 9,
         title: "Huyền Thoại Sân Cỏ",
+        title_vi: "Huyền Thoại Sân Cỏ",
+        title_en: "Creed",
         image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=600&q=80",
         backdrop: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=1200&q=80",
         rating: 4.6,
@@ -311,11 +391,15 @@ export const MOVIES_DETAILS: Record<number, MovieDetailInfo> = {
         language: "English - Vietnamese Subtitles",
         director: "Ryan Coogler",
         cast: ["Michael B. Jordan", "Sylvester Stallone"],
-        description: "An inspiring film about the arduous journey and extraordinary determination of a young athlete overcoming injury and social prejudice to prove himself on the professional field."
+        description: "An inspiring film about the arduous journey and extraordinary determination of a young athlete overcoming injury and social prejudice to prove himself on the professional field.",
+        description_vi: "Một bộ phim truyền cảm hứng về hành trình gian khổ và sự quyết tâm phi thường của một vận động viên trẻ vượt qua chấn thương và định kiến xã hội để khẳng định mình trên sân cỏ chuyên nghiệp.",
+        description_en: "An inspiring film about the arduous journey and extraordinary determination of a young athlete overcoming injury and social prejudice to prove himself on the professional field."
     },
     10: {
         id: 10,
         title: "Hành Tinh Xanh",
+        title_vi: "Hành Tinh Xanh",
+        title_en: "Earth",
         image: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=600&q=80",
         backdrop: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=1200&q=80",
         rating: 4.8,
@@ -325,13 +409,19 @@ export const MOVIES_DETAILS: Record<number, MovieDetailInfo> = {
         duration: "90 mins",
         ageRating: "G",
         language: "English - Vietnamese Voiceover",
+        language_vi: "Tiếng Anh - Thuyết minh Tiếng Việt",
+        language_en: "English - Vietnamese Voiceover",
         director: "Alastair Fothergill",
         cast: ["David Attenborough"],
-        description: "An amazing and vivid look at the incredibly rich biodiversity and survival challenges faced by wild flora and fauna on Earth."
+        description: "An amazing and vivid look at the incredibly rich biodiversity and survival challenges faced by wild flora and fauna on Earth.",
+        description_vi: "Cái nhìn tuyệt vời và sinh động về sự đa dạng sinh học vô cùng phong phú và những thử thách sinh tồn mà hệ động thực vật hoang dã trên Trái đất phải đối mặt.",
+        description_en: "An amazing and vivid look at the incredibly rich biodiversity and survival challenges faced by wild flora and fauna on Earth."
     },
     11: {
         id: 11,
         title: "Chiến Binh Báo Đen",
+        title_vi: "Chiến Binh Báo Đen",
+        title_en: "Black Panther",
         image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=600&q=80",
         backdrop: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1200&q=80",
         rating: 4.7,
@@ -343,11 +433,15 @@ export const MOVIES_DETAILS: Record<number, MovieDetailInfo> = {
         language: "English - Vietnamese Subtitles",
         director: "Ryan Coogler",
         cast: ["Chadwick Boseman", "Michael B. Jordan", "Lupita Nyong'o"],
-        description: "Following his father's death, Prince T'Challa returns to the advanced nation of Wakanda to succeed to the throne and protect his country from hostile threats."
+        description: "Following his father's death, Prince T'Challa returns to the advanced nation of Wakanda to succeed to the throne and protect his country from hostile threats.",
+        description_vi: "Sau cái chết của cha mình, Hoàng tử T'Challa trở lại quốc gia Wakanda tiên tiến để kế vị ngai vàng và bảo vệ đất nước khỏi những mối đe dọa thù địch.",
+        description_en: "Following his father's death, Prince T'Challa returns to the advanced nation of Wakanda to succeed to the throne and protect his country from hostile threats."
     },
     12: {
         id: 12,
         title: "Vùng Đất Câm Lặng: Ngày Một",
+        title_vi: "Vùng Đất Câm Lặng: Ngày Một",
+        title_en: "A Quiet Place: Day One",
         image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80",
         backdrop: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&q=80",
         rating: 4.4,
@@ -359,11 +453,15 @@ export const MOVIES_DETAILS: Record<number, MovieDetailInfo> = {
         language: "English - Vietnamese Subtitles",
         director: "Michael Sarnoski",
         cast: ["Lupita Nyong'o", "Joseph Quinn"],
-        description: "Experience the day the world went quiet in New York City, one of the loudest cities in the world, as sound-sensitive alien creatures first land."
+        description: "Experience the day the world went quiet in New York City, one of the loudest cities in the world, as sound-sensitive alien creatures first land.",
+        description_vi: "Trải nghiệm ngày thế giới im lặng tại Thành phố New York, một trong những thành phố ồn ào nhất thế giới, khi các sinh vật ngoài hành tinh nhạy cảm với âm thanh lần đầu tiên hạ cánh.",
+        description_en: "Experience the day the world went quiet in New York City, one of the loudest cities in the world, as sound-sensitive alien creatures first land."
     },
     13: {
         id: 13,
         title: "Thế Giới Khủng Long: Sinh Tồn",
+        title_vi: "Thế Giới Khủng Long: Sinh Tồn",
+        title_en: "Jurassic World: Dominion",
         image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=600&q=80",
         backdrop: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1200&q=80",
         rating: 4.6,
@@ -375,11 +473,15 @@ export const MOVIES_DETAILS: Record<number, MovieDetailInfo> = {
         language: "English - Vietnamese Subtitles",
         director: "Colin Trevorrow",
         cast: ["Chris Pratt", "Bryce Dallas Howard"],
-        description: "A struggle for survival as humanity lives alongside history's most fearsome creatures in a newly shared world."
+        description: "A struggle for survival as humanity lives alongside history's most fearsome creatures in a newly shared world.",
+        description_vi: "Cuộc đấu tranh sinh tồn khi nhân loại sống chung với những sinh vật đáng sợ nhất lịch sử trong một thế giới mới chia sẻ.",
+        description_en: "A struggle for survival as humanity lives alongside history's most fearsome creatures in a newly shared world."
     },
     14: {
         id: 14,
         title: "Phép Thuật Kỳ Lạ",
+        title_vi: "Phép Thuật Kỳ Lạ",
+        title_en: "Strange Magic",
         image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80",
         backdrop: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80",
         rating: 4.5,
@@ -391,7 +493,9 @@ export const MOVIES_DETAILS: Record<number, MovieDetailInfo> = {
         language: "Vietnamese Dubbed",
         director: "Gary Rydstrom",
         cast: ["Alan Cumming", "Evan Rachel Wood"],
-        description: "A musical animated fantasy adventure, inspired by A Midsummer Night's Dream, exploring a colorful and magical fairy tale world."
+        description: "A musical animated fantasy adventure, inspired by A Midsummer Night's Dream, exploring a colorful and magical fairy tale world.",
+        description_vi: "Một cuộc phiêu lưu giả tưởng hoạt hình ca nhạc, lấy cảm hứng từ Giấc mộng đêm hè, khám phá một thế giới cổ tích đầy màu sắc và ma thuật.",
+        description_en: "A musical animated fantasy adventure, inspired by A Midsummer Night's Dream, exploring a colorful and magical fairy tale world."
     }
 };
 

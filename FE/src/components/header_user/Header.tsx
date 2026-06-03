@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { User, Menu, X, Ticket, LogOut, Lock, Sun, Moon } from "lucide-react";
+import { User, Menu, X, Ticket, LogOut, Lock, Sun, Moon, Globe } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "../../store/index.tsx";
 import { logout } from "../../pages/User/Login/slice.ts";
 import { useLocation, Link } from "react-router-dom";
 import Button from "../Button/Button";
 import { useTheme } from "../../contextAPI/ThemeContext.tsx";
+import { useLanguage } from "../../contextAPI/LanguageContext.tsx";
 import SearchInput from "../SearchInput/SearchInput";
 
 type NavItem = {
@@ -30,6 +31,7 @@ export default function Header({
     const { isAuthenticated, user } = useSelector((state: any) => state.login || { isAuthenticated: false, user: null });
     const location = useLocation();
     const { theme, toggleTheme } = useTheme();
+    const { language, setLanguage, t } = useLanguage();
 
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -106,6 +108,15 @@ export default function Header({
                             location.pathname === item.href ||
                             (location.pathname.startsWith(item.href) && item.href !== "/");
 
+                        const translatedLabel =
+                            item.label === "Movies"
+                                ? t("nav_movies")
+                                : item.label === "Cinemas"
+                                ? t("nav_cinemas")
+                                : item.label === "News"
+                                ? t("nav_news")
+                                : item.label;
+
                         return (
                             <Link
                                 key={item.label}
@@ -115,7 +126,7 @@ export default function Header({
                                         : "text-gray-600 dark:text-violet-400 font-semibold hover:text-[#5B21B6] dark:hover:text-violet-200"
                                     }`}
                             >
-                                {item.label}
+                                {translatedLabel}
                                 {isActive && (
                                     <span className={`nav-active-underline absolute bottom-0 left-0 right-0 h-0.5 rounded-full ${isAnimatedPath ? "animate-slide-in" : ""}`} />
                                 )}
@@ -134,6 +145,16 @@ export default function Header({
 
                     {/* Auth Actions (desktop only) */}
                     <div className="hidden items-center gap-4 md:flex">
+                        {/* Language Toggle Button */}
+                        <button
+                            onClick={() => setLanguage(language === "vi" ? "en" : "vi")}
+                            className="flex items-center justify-center gap-1.5 h-9 px-3 rounded-full bg-[#F1F3F5] dark:bg-zinc-800 hover:bg-[#E9ECEF] dark:hover:bg-zinc-700 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer outline-none border-none text-xs font-extrabold text-violet-800 dark:text-violet-400 shrink-0 select-none"
+                            aria-label="Toggle language"
+                        >
+                            <Globe className="h-4 w-4" />
+                            <span>{language.toUpperCase()}</span>
+                        </button>
+
                         {/* Light/Dark Toggle Icon Button */}
                         <button
                             onClick={toggleTheme}
@@ -158,7 +179,7 @@ export default function Header({
                                         alt={user?.name || "avatar"}
                                         className="h-6.5 w-6.5 rounded-full object-cover border border-violet-100 dark:border-zinc-700"
                                     />
-                                    <span className="font-extrabold text-violet-850 dark:!text-violet-400">{user?.name || "Account"}</span>
+                                    <span className="font-extrabold text-violet-850 dark:!text-violet-400">{user?.name || t("profile")}</span>
                                 </button>
                                 {userMenuOpen && (
                                     <div className="absolute right-0 mt-3 w-64 rounded-2xl border border-violet-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-2 shadow-2xl z-50 animate__animated animate__fadeIn animate__faster">
@@ -183,7 +204,7 @@ export default function Header({
                                                 className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-600 dark:text-zinc-300 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-400 transition-all duration-200"
                                             >
                                                 <User className="h-4.5 w-4.5 text-violet-500" />
-                                                <span>Profile</span>
+                                                <span>{t("profile")}</span>
                                             </Link>
                                             
                                             <Link 
@@ -192,16 +213,16 @@ export default function Header({
                                                 className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-600 dark:text-zinc-300 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-400 transition-all duration-200"
                                             >
                                                 <Ticket className="h-4.5 w-4.5 text-violet-500" />
-                                                <span>Booked Tickets</span>
+                                                <span>{t("booked_tickets")}</span>
                                             </Link>
-
+ 
                                             <Link 
                                                 to="/profile?tab=password" 
                                                 onClick={() => setUserMenuOpen(false)}
                                                 className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-600 dark:text-zinc-300 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-400 transition-all duration-200"
                                             >
                                                 <Lock className="h-4.5 w-4.5 text-violet-500" />
-                                                <span>Change Password</span>
+                                                <span>{t("change_password")}</span>
                                             </Link>
                                         </div>
                                         
@@ -211,7 +232,7 @@ export default function Header({
                                                 className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-850 dark:hover:text-violet-200 transition-all duration-200 cursor-pointer"
                                             >
                                                 <LogOut className="h-4.5 w-4.5 text-violet-500" />
-                                                <span>Logout</span>
+                                                <span>{t("logout")}</span>
                                             </button>
                                         </div>
                                     </div>
@@ -224,18 +245,28 @@ export default function Header({
                                     href={`/login${redirectQuery}`}
                                     size="sm"
                                 >
-                                    Login
+                                    {t("login")}
                                 </Button>
                                 <Button
                                     variant="primary"
                                     href={`/register${redirectQuery}`}
                                     size="md"
                                 >
-                                    Sign Up
+                                    {t("register")}
                                 </Button>
                             </>
                         )}
                     </div>
+
+                    {/* Mobile Language Toggle Button */}
+                    <button
+                        onClick={() => setLanguage(language === "vi" ? "en" : "vi")}
+                        className="flex items-center justify-center gap-1 h-9 px-2.5 rounded-full bg-[#F1F3F5] dark:bg-zinc-800 hover:bg-[#E9ECEF] dark:hover:bg-zinc-700 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer outline-none border-none text-xs font-extrabold text-violet-800 dark:text-violet-400 shrink-0 md:hidden select-none"
+                        aria-label="Toggle language"
+                    >
+                        <Globe className="h-3.5 w-3.5" />
+                        <span>{language.toUpperCase()}</span>
+                    </button>
 
                     {/* Mobile Theme Toggle Button */}
                     <button
@@ -281,6 +312,15 @@ export default function Header({
                                 location.pathname === item.href ||
                                 (location.pathname.startsWith(item.href) && item.href !== "/");
 
+                            const translatedLabel =
+                                item.label === "Movies"
+                                    ? t("nav_movies")
+                                    : item.label === "Cinemas"
+                                    ? t("nav_cinemas")
+                                    : item.label === "News"
+                                    ? t("nav_news")
+                                    : item.label;
+
                             return (
                                 <Link
                                     key={item.label}
@@ -291,7 +331,7 @@ export default function Header({
                                         }`}
                                     onClick={() => setIsOpen(false)}
                                 >
-                                    {item.label}
+                                    {translatedLabel}
                                 </Link>
                             );
                         })}
@@ -316,7 +356,7 @@ export default function Header({
                                           onClick={() => setIsOpen(false)}
                                       >
                                           <User className="h-4 w-4 text-violet-500" />
-                                          <span>Profile</span>
+                                          <span>{t("profile")}</span>
                                       </Link>
                                       <Link
                                           to="/profile?tab=tickets"
@@ -324,7 +364,7 @@ export default function Header({
                                           onClick={() => setIsOpen(false)}
                                       >
                                           <Ticket className="h-4 w-4 text-violet-500" />
-                                          <span>Booked Tickets</span>
+                                          <span>{t("booked_tickets")}</span>
                                       </Link>
                                       <Link
                                           to="/profile?tab=password"
@@ -332,7 +372,7 @@ export default function Header({
                                           onClick={() => setIsOpen(false)}
                                       >
                                           <Lock className="h-4 w-4 text-violet-500" />
-                                          <span>Change Password</span>
+                                          <span>{t("change_password")}</span>
                                       </Link>
                                       <div className="border-t border-violet-50 dark:border-zinc-800 mt-2 pt-2">
                                           <button
@@ -340,7 +380,7 @@ export default function Header({
                                               className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-850 dark:hover:text-violet-200 transition-colors cursor-pointer"
                                           >
                                               <LogOut className="h-4 w-4 text-violet-500" />
-                                              <span>Logout</span>
+                                              <span>{t("logout")}</span>
                                           </button>
                                       </div>
                                   </>
@@ -352,7 +392,7 @@ export default function Header({
                                          className="w-full text-center py-2 text-sm"
                                          onClick={() => setIsOpen(false)}
                                      >
-                                         Login
+                                         {t("login")}
                                      </Button>
                                      <Button
                                          variant="primary"
@@ -360,7 +400,7 @@ export default function Header({
                                          className="w-full text-center py-2 text-sm"
                                          onClick={() => setIsOpen(false)}
                                      >
-                                         Sign Up
+                                         {t("register")}
                                      </Button>
                                  </div>
                              )}

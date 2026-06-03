@@ -1,6 +1,8 @@
 import { Smartphone } from "lucide-react";
+import { useLanguage } from "../../contextAPI/LanguageContext.tsx";
 
 export default function Footer() {
+    const { t } = useLanguage();
     const isAnimatedPath = true;
 
     return (
@@ -21,30 +23,30 @@ export default function Footer() {
                             />
                         </a>
                         <p className="mt-2 text-sm text-gray-500 leading-relaxed max-w-xs">
-                            Ultimate cinematic experience. Book tickets easily, enjoy fully.
+                            {t("footer_desc")}
                         </p>
                         <p className="mt-6 text-xs text-gray-400">
-                            © 2024 mievoh. All rights reserved.
+                            {t("footer_rights")}
                         </p>
                     </div>
 
                     {/* Column 2: Explore */}
                     <div>
-                        <h3 className="text-base font-bold review-header-gradient mb-4">Explore</h3>
+                        <h3 className="text-base font-bold review-header-gradient mb-4">{t("footer_explore")}</h3>
                         <ul className="space-y-3">
                             <li>
                                 <a href="#" className={`text-sm text-gray-500 ${isAnimatedPath ? "hover:text-[#7B68EE] hover:underline transition-colors" : ""}`}>
-                                    About Us
+                                    {t("footer_about")}
                                 </a>
                             </li>
                             <li>
                                 <a href="#" className={`text-sm text-gray-500 ${isAnimatedPath ? "hover:text-[#7B68EE] hover:underline transition-colors" : ""}`}>
-                                    Terms of Service
+                                    {t("footer_terms")}
                                 </a>
                             </li>
                             <li>
                                 <a href="#" className={`text-sm text-gray-500 ${isAnimatedPath ? "hover:text-[#7B68EE] hover:underline transition-colors" : ""}`}>
-                                    Privacy Policy
+                                    {t("footer_privacy")}
                                 </a>
                             </li>
                         </ul>
@@ -52,21 +54,21 @@ export default function Footer() {
 
                     {/* Column 3: Support */}
                     <div>
-                        <h3 className="text-base font-bold review-header-gradient mb-4">Support</h3>
+                        <h3 className="text-base font-bold review-header-gradient mb-4">{t("footer_support")}</h3>
                         <ul className="space-y-3">
                             <li>
                                 <a href="#" className={`text-sm text-gray-500 ${isAnimatedPath ? "hover:text-[#7B68EE] hover:underline transition-colors" : ""}`}>
-                                    Help Center
+                                    {t("footer_help")}
                                 </a>
                             </li>
                             <li>
                                 <a href="#" className={`text-sm text-gray-500 ${isAnimatedPath ? "hover:text-[#7B68EE] hover:underline transition-colors" : ""}`}>
-                                    Contact Us
+                                    {t("footer_contact")}
                                 </a>
                             </li>
                             <li>
                                 <a href="#" className={`text-sm text-gray-500 ${isAnimatedPath ? "hover:text-[#7B68EE] hover:underline transition-colors" : ""}`}>
-                                    FAQ
+                                    {t("footer_faq")}
                                 </a>
                             </li>
                         </ul>
@@ -74,7 +76,7 @@ export default function Footer() {
 
                     {/* Column 4: Download App */}
                     <div>
-                        <h3 className="text-base font-bold review-header-gradient mb-4">Download App</h3>
+                        <h3 className="text-base font-bold review-header-gradient mb-4">{t("footer_download")}</h3>
                         <ul className="space-y-3">
                             <li>
                                 <a href="#" className={`flex items-center gap-2 text-sm text-gray-500 ${isAnimatedPath ? "hover:text-[#7B68EE] transition-colors" : ""}`}>

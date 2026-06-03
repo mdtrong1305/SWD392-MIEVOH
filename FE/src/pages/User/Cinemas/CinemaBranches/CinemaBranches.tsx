@@ -1,6 +1,7 @@
 import { MapPin, Star, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { CinemaBranch } from "../../../../mockAPI/cinemaMock.tsx";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 
 export interface DisplayBranch extends CinemaBranch {
     chainName: string;
@@ -14,6 +15,7 @@ interface CinemaBranchesProps {
 
 export default function CinemaBranches({ branches, onResetFilters }: CinemaBranchesProps) {
     const navigate = useNavigate();
+    const { t } = useLanguage();
 
     if (branches.length === 0) {
         return (
@@ -21,15 +23,15 @@ export default function CinemaBranches({ branches, onResetFilters }: CinemaBranc
                 <div className="h-16 w-16 bg-violet-50 rounded-full flex items-center justify-center mx-auto mb-4 text-violet-500">
                     <Search className="h-8 w-8" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">No cinemas found</h3>
+                <h3 className="text-lg font-bold text-gray-900">{t("no_cinemas_found")}</h3>
                 <p className="text-sm text-gray-500 mt-2 max-w-md mx-auto">
-                    Sorry, no cinemas match your current filters. Please try again with other options.
+                    {t("no_cinemas_found_desc")}
                 </p>
                 <button
                     onClick={onResetFilters}
                     className="mt-5 text-sm font-bold text-violet-600 hover:text-violet-800 bg-violet-50 hover:bg-violet-100 px-5 py-2.5 rounded-2xl transition-all duration-200 cursor-pointer"
                 >
-                    Clear Filters
+                    {t("clear_filters")}
                 </button>
             </div>
         );
