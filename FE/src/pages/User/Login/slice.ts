@@ -1,12 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-
-
-import { MOCK_USERS } from "../../../mockAPI/userMock.tsx";
+import { loginApi } from "../../../axios/auth.tsx";
 
 // Types
 export type LoginCredentials = {
-    email: string;
+    username: string;
     password: string;
 };
 
@@ -51,63 +49,48 @@ export const loginUser = createAsyncThunk<
     "login/loginUser",
     async (credentials, { rejectWithValue }) => {
         try {
-            // Simulated network delay
-            await new Promise((resolve) => setTimeout(resolve, 800));
-
             // Verify basic fields are provided
-            if (!credentials.email || !credentials.password) {
-                return rejectWithValue("Email and password cannot be empty");
+            if (!credentials.username || !credentials.password) {
+                return rejectWithValue("Username and password cannot be empty");
             }
 
-            // Check if credentials match any predefined mock user
-            const foundUser = MOCK_USERS.find(
-                u => u.email.toLowerCase() === credentials.email.toLowerCase()
-            );
+            const response = await loginApi({
+                username: credentials.username,
+                password: credentials.password,
+            });
 
-            if (foundUser) {
-                // If it is a predefined mock user, validate password
-                if (foundUser.matKhau !== credentials.password) {
-                    return rejectWithValue("Incorrect password");
-                }
-                return {
-                    content: {
-                        user: {
-                            id: foundUser.id,
-                            email: foundUser.email,
-                            name: foundUser.hoTen,
-                            hoTen: foundUser.hoTen,
-                            soDT: foundUser.soDT,
-                            phone: foundUser.soDT,
-                            role: foundUser.role,
-                            avatar: foundUser.avatar || "/images/avatar.jpg"
-                        },
-                        token: "mock-jwt-token-xyz789"
-                    }
-                };
+            // NestJS wraps its response payload in a { message, statusCode, data } object
+            const responseData = (response as any).data || response;
+            const user = responseData.user;
+            const token = responseData.token?.accessToken || responseData.accessToken;
+
+            if (!user) {
+                return rejectWithValue("Invalid API response format: user object not found");
             }
 
-            const username = credentials.email.split('@')[0];
-            const capitalizedName = username.charAt(0).toUpperCase() + username.slice(1);
-
-            // Return mock response matching Redux store expectation for other emails
+            // Return response format matching slice.ts fulfilled expectations
             return {
                 content: {
                     user: {
-                        id: "mock-user-123",
-                        email: credentials.email,
-                        name: capitalizedName,
-                        hoTen: capitalizedName,
-                        role: "USER",
-                        avatar: "/images/avatar.jpg"
+                        username: user.username,
+                        name: user.fullName || user.username,
+                        email: user.email || user.username,
+                        fullName: user.fullName || user.username,
+                        hoTen: user.fullName || user.username,
+                        role: user.userType || "USER",
+                        avatar: user.avatar || "/images/avatar.jpg"
                     },
-                    token: "mock-jwt-token-xyz789"
+                    token: token
                 }
             };
         } catch (err: any) {
-            return rejectWithValue(err.message || "Login failed");
+            // Extract meaningful error message from backend response if available
+            const errorMessage = err?.response?.data?.message || err?.message || "Login failed";
+            return rejectWithValue(errorMessage);
         }
     }
 );
+
 
 const loginSlice = createSlice({
     name: "login",

@@ -8,6 +8,12 @@ import { ResponseSuccessInterceptor } from './common/interceptors/responese-succ
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  
+  app.enableCors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  });
+
   // đặt api global prefix cho toàn bộ route trong ứng dụng
   app.setGlobalPrefix('api');
   // bật global pipe để tự động validate dữ liệu đầu vào cho toàn bộ ứng dụng
