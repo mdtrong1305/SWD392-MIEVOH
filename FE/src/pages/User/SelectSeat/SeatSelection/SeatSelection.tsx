@@ -19,7 +19,7 @@ export default function SeatSelection({
 }: SeatSelectionProps) {
     const { t } = useLanguage();
     return (
-        <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-3xl p-6 shadow-sm overflow-hidden flex flex-col items-center animate__animated animate__fadeIn">
+        <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-3xl p-4 sm:p-6 shadow-sm overflow-hidden flex flex-col items-center animate__animated animate__fadeIn w-full min-w-0">
             {/* Screen Visualizer */}
             <div className="w-[85%] max-w-lg mb-14 text-center relative">
                 <div className="w-full h-1 border-t-4 border-[#8E7EFE] rounded-[50%] filter blur-[1px] shadow-[0_4px_12px_rgba(142,126,254,0.6)]" />
@@ -28,7 +28,7 @@ export default function SeatSelection({
             </div>
 
             {/* Grid container */}
-            <div className="w-full overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent">
+            <div className="w-full overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent min-w-0">
                 <div className="min-w-[580px] flex flex-col gap-2.5 items-center px-4">
                     {seatRows.map(row => {
                         const isCoupleRow = row === "J";
@@ -93,24 +93,24 @@ export default function SeatSelection({
             </div>
 
             {/* Seat Legend */}
-            <div className="w-full border-t border-slate-100 dark:border-zinc-800/80 mt-6 pt-6 grid grid-cols-2 sm:grid-cols-5 gap-4 text-sm font-bold text-slate-700 dark:text-zinc-300 justify-items-center">
-                <div className="flex items-center gap-2.5">
-                    <div className="w-4.5 h-4.5 rounded-lg bg-white border border-slate-350 dark:bg-zinc-800 dark:border-zinc-500" />
+            <div className="w-full border-t border-slate-100 dark:border-zinc-800/80 mt-6 pt-6 grid grid-cols-2 sm:grid-cols-5 gap-y-4 gap-x-6 text-xs sm:text-sm font-bold text-slate-700 dark:text-zinc-300 max-w-2xl mx-auto px-4 sm:px-0">
+                <div className="flex items-center gap-2.5 w-full justify-start">
+                    <div className="w-4.5 h-4.5 rounded bg-white border border-slate-350 dark:bg-zinc-800 dark:border-zinc-550" />
                     <span>{t("seat_type_regular")}</span>
                 </div>
-                <div className="flex items-center gap-2.5">
-                    <div className="w-4.5 h-4.5 rounded-lg bg-indigo-50 border border-indigo-400 dark:bg-indigo-950/40 dark:border-indigo-800" />
+                <div className="flex items-center gap-2.5 w-full justify-start">
+                    <div className="w-4.5 h-4.5 rounded bg-indigo-50 border border-indigo-400 dark:bg-indigo-950/40 dark:border-indigo-800" />
                     <span>{t("seat_type_vip")}</span>
                 </div>
-                <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-4.5 rounded-lg bg-rose-50 border border-rose-400 dark:bg-rose-950/20 dark:border-rose-800" />
+                <div className="flex items-center gap-2.5 w-full justify-start">
+                    <div className="w-9 h-4.5 rounded bg-rose-50 border border-rose-400 dark:bg-rose-950/20 dark:border-rose-800" />
                     <span>{t("seat_type_sweetbox")}</span>
                 </div>
-                <div className="flex items-center gap-2.5">
-                    <div className="w-4.5 h-4.5 rounded-lg bg-[#8E7EFE] border border-[#8E7EFE]" />
+                <div className="flex items-center gap-2.5 w-full justify-start">
+                    <div className="w-4.5 h-4.5 rounded bg-[#8E7EFE] border border-[#8E7EFE]" />
                     <span>{t("seat_status_selected")}</span>
                 </div>
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 w-full justify-start">
                     <div className="w-4.5 h-4.5 rounded bg-slate-200/60 border border-slate-200 dark:bg-zinc-800/40 dark:border-zinc-800 flex items-center justify-center text-[9px] text-slate-400 dark:text-zinc-500 font-black">✖</div>
                     <span>{t("seat_status_booked")}</span>
                 </div>

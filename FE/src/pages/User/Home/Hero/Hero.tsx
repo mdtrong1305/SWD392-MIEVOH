@@ -11,7 +11,7 @@ export default function Hero() {
     return (
         <div className="relative mx-auto max-w-[85%] px-4 pt-16 sm:pt-24">
             {/* Main Banner Card */}
-            <div className="relative h-[75vh] min-h-[550px] w-full overflow-hidden rounded-3xl bg-black shadow-2xl">
+            <div className="relative h-[55vh] min-h-[450px] sm:h-[75vh] sm:min-h-[550px] w-full overflow-hidden rounded-3xl bg-black shadow-2xl">
                 {/* Background Image with twilight skyscrapers */}
                 <img
                     src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1600&q=80"
@@ -24,24 +24,24 @@ export default function Hero() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
                 {/* Left/bottom aligned Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-8 sm:p-12 lg:p-16 max-w-2xl flex flex-col items-start text-white">
+                <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-12 lg:p-16 max-w-2xl flex flex-col items-start text-white">
                     {/* Badge */}
-                    <span className="inline-block rounded-full bg-white/20 backdrop-blur-md px-4 py-1 text-xs font-semibold uppercase tracking-wider text-purple-200 mb-4 border border-white/10 animate__animated animate__fadeInDown">
+                    <span className="inline-block rounded-full bg-white/20 backdrop-blur-md px-4 py-1 text-xs font-semibold uppercase tracking-wider text-purple-200 mb-3 sm:mb-4 border border-white/10 animate__animated animate__fadeInDown">
                         {t("explore_now")}
                     </span>
 
                     {/* Movie Title */}
-                    <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-white drop-shadow-md animate__animated animate__fadeInLeft">
+                    <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-white drop-shadow-md animate__animated animate__fadeInLeft">
                         {t("infinite_journey")}
                     </h1>
 
                     {/* Description */}
-                    <p className="mt-4 text-base sm:text-lg text-gray-300 leading-relaxed drop-shadow-sm font-medium animate__animated animate__fadeInLeft animate__delay-1s">
+                    <p className="mt-2.5 sm:mt-4 text-xs sm:text-lg text-gray-300 leading-relaxed drop-shadow-sm font-medium animate__animated animate__fadeInLeft animate__delay-1s">
                         {t("hero_desc")}
                     </p>
 
                     {/* Action Buttons */}
-                    <div className="mt-8 flex flex-wrap gap-4 animate__animated animate__fadeInUp animate__delay-1s">
+                    <div className="mt-5 sm:mt-8 flex flex-wrap gap-3 sm:gap-4 animate__animated animate__fadeInUp animate__delay-1s">
                         <Button 
                             variant="primary" 
                             size="md"

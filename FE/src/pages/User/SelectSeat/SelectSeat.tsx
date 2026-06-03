@@ -102,39 +102,39 @@ export default function SelectSeat() {
             {/* Main Area */}
             <div className="max-w-7xl mx-auto px-4 mt-6">
                 {/* Stepper Header */}
-                <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-3xl py-4 shadow-sm mb-6 flex items-center justify-center gap-2 sm:gap-6 md:gap-12 animate__animated animate__fadeIn">
-                    <div className={`flex items-center gap-2 transition-all duration-300 ${activeStep === 1 ? "text-[#8E7EFE] dark:text-[#a599ff]" : "text-slate-500 dark:text-white font-extrabold"}`}>
-                        <div className={`p-2 rounded-xl flex items-center justify-center ${activeStep === 1 ? "bg-violet-50 dark:bg-[#8E7EFE]/15 text-[#8E7EFE] dark:text-[#a599ff]" : "bg-transparent text-slate-400 dark:text-zinc-300"}`}>
-                            <LayoutGrid className="h-5 w-5" />
+                <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-3xl py-4 shadow-sm mb-6 flex items-center justify-center gap-1 sm:gap-6 md:gap-12 animate__animated animate__fadeIn px-2 sm:px-4">
+                    <div className={`flex items-center gap-1 sm:gap-2 transition-all duration-300 ${activeStep === 1 ? "text-[#8E7EFE] dark:text-[#a599ff]" : "text-slate-500 dark:text-white font-extrabold"}`}>
+                        <div className={`p-1 sm:p-2 rounded-xl flex items-center justify-center ${activeStep === 1 ? "bg-violet-50 dark:bg-[#8E7EFE]/15 text-[#8E7EFE] dark:text-[#a599ff]" : "bg-transparent text-slate-400 dark:text-zinc-300"}`}>
+                            <LayoutGrid className="h-4 w-4 sm:h-5 sm:w-5" />
                         </div>
-                        <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">{t("select_seat_title")}</span>
+                        <span className="text-[9px] xs:text-[10px] sm:text-xs md:text-sm font-extrabold uppercase tracking-wider">{t("select_seat_title")}</span>
                     </div>
 
-                    <ChevronRight className="h-4 w-4 text-slate-300 dark:text-zinc-500" />
+                    <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 text-slate-300 dark:text-zinc-500" />
 
-                    <div className={`flex items-center gap-2 transition-all duration-300 ${activeStep === 2 ? "text-[#8E7EFE] dark:text-[#a599ff]" : "text-slate-500 dark:text-white font-extrabold"}`}>
-                        <div className={`p-2 rounded-xl flex items-center justify-center ${activeStep === 2 ? "bg-violet-50 dark:bg-[#8E7EFE]/15 text-[#8E7EFE] dark:text-[#a599ff]" : "bg-transparent text-slate-400 dark:text-zinc-300"}`}>
-                            <ShoppingBag className="h-5 w-5" />
+                    <div className={`flex items-center gap-1 sm:gap-2 transition-all duration-300 ${activeStep === 2 ? "text-[#8E7EFE] dark:text-[#a599ff]" : "text-slate-500 dark:text-white font-extrabold"}`}>
+                        <div className={`p-1 sm:p-2 rounded-xl flex items-center justify-center ${activeStep === 2 ? "bg-violet-50 dark:bg-[#8E7EFE]/15 text-[#8E7EFE] dark:text-[#a599ff]" : "bg-transparent text-slate-400 dark:text-zinc-300"}`}>
+                            <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5" />
                         </div>
-                        <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">{t("stepper_combos")}</span>
+                        <span className="text-[9px] xs:text-[10px] sm:text-xs md:text-sm font-extrabold uppercase tracking-wider">{t("stepper_combos")}</span>
                     </div>
 
-                    <ChevronRight className="h-4 w-4 text-slate-300 dark:text-zinc-500" />
+                    <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 text-slate-300 dark:text-zinc-500" />
 
-                    <div className={`flex items-center gap-2 transition-all duration-300 ${activeStep === 3 ? "text-[#8E7EFE] dark:text-[#a599ff]" : "text-slate-500 dark:text-white font-extrabold"}`}>
-                        <div className={`p-2 rounded-xl flex items-center justify-center ${activeStep === 3 ? "bg-violet-50 dark:bg-[#8E7EFE]/15 text-[#8E7EFE] dark:text-[#a599ff]" : "bg-transparent text-slate-400 dark:text-zinc-300"}`}>
-                            <CreditCard className="h-5 w-5" />
+                    <div className={`flex items-center gap-1 sm:gap-2 transition-all duration-300 ${activeStep === 3 ? "text-[#8E7EFE] dark:text-[#a599ff]" : "text-slate-500 dark:text-white font-extrabold"}`}>
+                        <div className={`p-1 sm:p-2 rounded-xl flex items-center justify-center ${activeStep === 3 ? "bg-violet-50 dark:bg-[#8E7EFE]/15 text-[#8E7EFE] dark:text-[#a599ff]" : "bg-transparent text-slate-400 dark:text-zinc-300"}`}>
+                            <CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
                         </div>
-                        <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">{t("stepper_payment")}</span>
+                        <span className="text-[9px] xs:text-[10px] sm:text-xs md:text-sm font-extrabold uppercase tracking-wider">{t("stepper_payment")}</span>
                     </div>
 
-                    <ChevronRight className="h-4 w-4 text-slate-300 dark:text-zinc-500" />
+                    <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 text-slate-300 dark:text-zinc-500" />
 
-                    <div className={`flex items-center gap-2 transition-all duration-300 ${activeStep >= 4 ? "text-[#8E7EFE] dark:text-[#a599ff]" : "text-slate-500 dark:text-white font-extrabold"}`}>
-                        <div className={`p-2 rounded-xl flex items-center justify-center ${activeStep >= 4 ? "bg-violet-50 dark:bg-[#8E7EFE]/15 text-[#8E7EFE] dark:text-[#a599ff]" : "bg-transparent text-slate-400 dark:text-zinc-300"}`}>
-                            <Ticket className="h-5 w-5" />
+                    <div className={`flex items-center gap-1 sm:gap-2 transition-all duration-300 ${activeStep >= 4 ? "text-[#8E7EFE] dark:text-[#a599ff]" : "text-slate-500 dark:text-white font-extrabold"}`}>
+                        <div className={`p-1 sm:p-2 rounded-xl flex items-center justify-center ${activeStep >= 4 ? "bg-violet-50 dark:bg-[#8E7EFE]/15 text-[#8E7EFE] dark:text-[#a599ff]" : "bg-transparent text-slate-400 dark:text-zinc-300"}`}>
+                            <Ticket className="h-4 w-4 sm:h-5 sm:w-5" />
                         </div>
-                        <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">{t("stepper_ticket_info")}</span>
+                        <span className="text-[9px] xs:text-[10px] sm:text-xs md:text-sm font-extrabold uppercase tracking-wider">{t("stepper_ticket_info")}</span>
                     </div>
                 </div>
 
@@ -152,8 +152,8 @@ export default function SelectSeat() {
                             setActiveStep={setActiveStep}
                         />
                     ) : (
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                            <div className="lg:col-span-2 flex flex-col gap-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start w-full min-w-0">
+                            <div className="lg:col-span-2 flex flex-col gap-6 w-full min-w-0">
                                 {activeStep === 1 && (
                                     <SeatSelection
                                         selectedSeats={selectedSeats}

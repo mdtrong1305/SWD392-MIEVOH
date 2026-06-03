@@ -62,8 +62,7 @@ export const slickPromotionsSettings: Settings = {
             settings: {
                 slidesToShow: 1,
                 slidesToScroll: 1,
-                centerMode: true,
-                centerPadding: "80px",
+                centerMode: false,
             }
         },
         {
@@ -71,8 +70,7 @@ export const slickPromotionsSettings: Settings = {
             settings: {
                 slidesToShow: 1,
                 slidesToScroll: 1,
-                centerMode: true,
-                centerPadding: "40px",
+                centerMode: false,
             }
         }
     ]
