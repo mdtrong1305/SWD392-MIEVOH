@@ -8,6 +8,7 @@ import {
   UseGuards,
   Put,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { CinemasService } from './cinemas.service';
 import { Roles } from '../../common/decorators/role.decorator';
@@ -44,16 +45,19 @@ export class CinemasController {
   }
 
   @Get()
-  @Public()
-  @ApiOperation({ summary: 'Lấy danh sách rạp chiếu (có thể lọc theo cụm rạp)' })
-  @ApiQuery({ name: 'cinemaComplexId', required: false, description: 'Mã cụm rạp để lọc' })
+  @UseGuards(RoleGuard)
+  @Roles('admin', 'staff')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Lấy danh sách rạp chiếu thuộc một cụm rạp (ADMIN, STAFF)' })
+  @ApiQuery({ name: 'cinemaComplexId', required: true, description: 'Mã cụm rạp' })
   @ApiResponse({ status: 200, description: 'Lấy danh sách thành công' })
+  @ApiResponse({ status: 400, description: 'Thiếu mã cụm rạp' })
   @ApiResponse({ status: 404, description: 'Không tìm thấy cụm rạp' })
-  getCinemas(@Query('cinemaComplexId') cinemaComplexId?: string) {
-    if (cinemaComplexId) {
-      return this.cinemasService.getCinemasByComplexId(cinemaComplexId);
+  getCinemas(@Query('cinemaComplexId') cinemaComplexId: string) {
+    if (!cinemaComplexId) {
+      throw new BadRequestException('Vui lòng cung cấp mã cụm rạp (cinemaComplexId)');
     }
-    return this.cinemasService.findAll();
+    return this.cinemasService.getCinemasByComplexId(cinemaComplexId);
   }
 
   @Get('/:cinemaId')
