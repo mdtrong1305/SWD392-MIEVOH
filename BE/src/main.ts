@@ -1,5 +1,7 @@
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { join } from 'path';
 import { AppModule } from './app.module';
 import { PORT } from './common/constant/app.constant';
 import { ValidationPipe } from '@nestjs/common';
@@ -7,7 +9,10 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { ResponseSuccessInterceptor } from './common/interceptors/responese-success.interceptor';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // serve thư mục public/images để có thể truy cập ảnh qua link
+  app.useStaticAssets(join(process.cwd(), 'public/images'));
 
   app.enableCors({
     origin: 'http://localhost:5173',

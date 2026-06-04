@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../modules-system/prisma/prisma.service';
 import { deleteFile } from '../../common/helper/delete-file.helper';
+import { DOMAIN_SERVER } from '../../common/constant/app.constant';
 import {
   CreateCinemaSystemDto,
   UpdateCinemaSystemDto,
@@ -16,7 +17,7 @@ export class CinemaSystemsService {
     const cinemaSystem = await this.prisma.cinemaSystem.create({
       data: {
         name: body.name,
-        logo: imagePath,
+        logo: `${DOMAIN_SERVER}/${imagePath}`,
       },
     });
 
@@ -80,7 +81,7 @@ export class CinemaSystemsService {
       dataToUpdate.name = body.name;
     }
     if (logoFilename) {
-      dataToUpdate.logo = `cinema-systems/${logoFilename}`;
+      dataToUpdate.logo = `${DOMAIN_SERVER}/cinema-systems/${logoFilename}`;
     }
 
     const updated = await this.prisma.cinemaSystem.update({
