@@ -33,6 +33,7 @@ async function bootstrap() {
     .setDescription('Tài liệu API cho hệ thống đặt vé xem phim')
     .setVersion('1.0')
     .addTag('Authentication', 'Xác thực và đăng ký')
+    .addTag('Cinema Systems', 'Quản lý hệ thống rạp')
     .addTag('Banners', 'Quản lý ảnh banner')
     .addBearerAuth(
       {
