@@ -11,7 +11,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { CinemaComplexesService } from './cinema-complexes.service';
-import { Role } from '../../common/decorators/role.decorator';
+import { Roles } from '../../common/decorators/role.decorator';
 import {
   ApiBearerAuth,
   ApiExtraModels,
@@ -37,9 +37,9 @@ export class CinemaComplexesController {
 
   @Post()
   @UseGuards(RoleGuard)
-  @Role('ADMIN')
+  @Roles('admin')
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Tạo cụm rạp mới (Chỉ ADMIN)' })
+  @ApiOperation({ summary: 'Tạo cụm rạp mới (ADMIN)' })
   @ApiResponse({ status: 201, description: 'Tạo cụm rạp thành công' })
   @ApiResponse({ status: 400, description: 'Dữ liệu không hợp lệ' })
   @ApiResponse({ status: 401, description: 'Chưa đăng nhập' })
@@ -51,13 +51,17 @@ export class CinemaComplexesController {
 
   @Get()
   @Public()
-  @ApiOperation({ summary: 'Lấy danh sách cụm rạp (có thể lọc theo hệ thống rạp)' })
-  @ApiQuery({ name: 'cinemaSystemId', required: false, description: 'Mã hệ thống rạp để lọc' })
+  @ApiOperation({
+    summary: 'Lấy danh sách cụm rạp (có thể lọc theo hệ thống rạp)',
+  })
+  @ApiQuery({
+    name: 'cinemaSystemId',
+    required: false,
+    description: 'Mã hệ thống rạp để lọc',
+  })
   @ApiResponse({ status: 200, description: 'Lấy danh sách thành công' })
   @ApiResponse({ status: 404, description: 'Không tìm thấy hệ thống rạp' })
-  getCinemaComplexes(
-    @Query('cinemaSystemId') cinemaSystemId?: string,
-  ) {
+  getCinemaComplexes(@Query('cinemaSystemId') cinemaSystemId?: string) {
     if (cinemaSystemId) {
       return this.cinemaComplexesService.getCinemaComplexesBySystemId(
         cinemaSystemId,
@@ -66,11 +70,20 @@ export class CinemaComplexesController {
     return this.cinemaComplexesService.findAll();
   }
 
+  @Get('/:cinemaComplexId')
+  @Public()
+  @ApiOperation({ summary: 'Lấy chi tiết cụm rạp' })
+  @ApiResponse({ status: 200, description: 'Lấy chi tiết thành công' })
+  @ApiResponse({ status: 404, description: 'Không tìm thấy cụm rạp' })
+  findById(@Param('cinemaComplexId') cinemaComplexId: string) {
+    return this.cinemaComplexesService.findById(cinemaComplexId);
+  }
+
   @Put()
   @UseGuards(RoleGuard)
-  @Role('ADMIN')
+  @Roles('admin')
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Cập nhật cụm rạp (Chỉ ADMIN)' })
+  @ApiOperation({ summary: 'Cập nhật cụm rạp (ADMIN)' })
   @ApiResponse({ status: 200, description: 'Cập nhật cụm rạp thành công' })
   @ApiResponse({ status: 400, description: 'Dữ liệu không hợp lệ' })
   @ApiResponse({ status: 401, description: 'Chưa đăng nhập' })
@@ -85,9 +98,9 @@ export class CinemaComplexesController {
 
   @Delete('/:cinemaComplexId')
   @UseGuards(RoleGuard)
-  @Role('ADMIN')
+  @Roles('admin')
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Xóa cụm rạp (Chỉ ADMIN)' })
+  @ApiOperation({ summary: 'Xóa cụm rạp (ADMIN)' })
   @ApiResponse({ status: 200, description: 'Xóa cụm rạp thành công' })
   @ApiResponse({ status: 401, description: 'Chưa đăng nhập' })
   @ApiResponse({ status: 403, description: 'Không có quyền' })

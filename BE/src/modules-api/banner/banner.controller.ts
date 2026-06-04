@@ -21,7 +21,7 @@ import {
   ApiExtraModels,
 } from '@nestjs/swagger';
 import { Public } from '../../common/decorators/public.decorator';
-import { Role } from '../../common/decorators/role.decorator';
+import { Roles } from '../../common/decorators/role.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerBannersConfig } from '../../common/configs/multer.config';
 import { UploadBannerImageDto } from './dto/banner.dto';
@@ -46,11 +46,11 @@ export class BannerController {
 
   @Post('')
   @UseGuards(RoleGuard)
-  @Role('ADMIN')
+  @Roles('admin', 'staff')
   @ApiBearerAuth('JWT-auth')
   @UseInterceptors(FileInterceptor('image', multerBannersConfig))
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Upload ảnh banner (Chỉ ADMIN)' })
+  @ApiOperation({ summary: 'Upload ảnh banner (ADMIN, STAFF)' })
   @ApiBody({
     schema: {
       type: 'object',
@@ -83,9 +83,9 @@ export class BannerController {
 
   @Delete('/:bannerId')
   @UseGuards(RoleGuard)
-  @Role('ADMIN')
+  @Roles('admin', 'staff')
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Xóa ảnh banner (Chỉ ADMIN)' })
+  @ApiOperation({ summary: 'Xóa ảnh banner (ADMIN, STAFF)' })
   @ApiResponse({ status: 200, description: 'Xóa ảnh banner thành công' })
   @ApiResponse({ status: 401, description: 'Chưa đăng nhập' })
   @ApiResponse({ status: 403, description: 'Không có quyền' })

@@ -8,6 +8,7 @@ import { RoleGuard } from './common/guards/role.guard';
 import { BannerModule } from './modules-api/banner/banner.module';
 import { CinemaSystemsModule } from './modules-api/cinema-systems/cinema-systems.module';
 import { CinemaComplexesModule } from './modules-api/cinema-complexes/cinema-complexes.module';
+import { CinemasModule } from './modules-api/cinemas/cinemas.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CinemaComplexesModule } from './modules-api/cinema-complexes/cinema-com
     BannerModule,
     CinemaSystemsModule,
     CinemaComplexesModule,
+    CinemasModule,
   ],
   providers: [
     {

@@ -21,7 +21,7 @@ import {
   ApiExtraModels,
 } from '@nestjs/swagger';
 import { Public } from '../../common/decorators/public.decorator';
-import { Role } from '../../common/decorators/role.decorator';
+import { Roles } from '../../common/decorators/role.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerHeThongRapConfig } from '../../common/configs/multer.config';
 import { RoleGuard } from '../../common/guards/role.guard';
@@ -39,11 +39,11 @@ export class CinemaSystemsController {
 
   @Post()
   @UseGuards(RoleGuard)
-  @Role('ADMIN')
+  @Roles('admin')
   @ApiBearerAuth('JWT-auth')
   @UseInterceptors(FileInterceptor('logo', multerHeThongRapConfig))
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Tạo hệ thống rạp mới (Chỉ ADMIN)' })
+  @ApiOperation({ summary: 'Tạo hệ thống rạp mới (ADMIN)' })
   @ApiBody({
     schema: {
       type: 'object',
@@ -80,13 +80,22 @@ export class CinemaSystemsController {
     return this.CinemaSystemsService.findAll();
   }
 
+  @Get('/:cinemaSystemId')
+  @Public()
+  @ApiOperation({ summary: 'Lấy chi tiết hệ thống rạp' })
+  @ApiResponse({ status: 200, description: 'Lấy chi tiết thành công' })
+  @ApiResponse({ status: 404, description: 'Không tìm thấy hệ thống rạp' })
+  findById(@Param('cinemaSystemId') cinemaSystemId: string) {
+    return this.CinemaSystemsService.findById(cinemaSystemId);
+  }
+
   @Put()
   @UseGuards(RoleGuard)
-  @Role('ADMIN')
+  @Roles('admin')
   @ApiBearerAuth('JWT-auth')
   @UseInterceptors(FileInterceptor('logo', multerHeThongRapConfig))
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Cập nhật hệ thống rạp (Chỉ ADMIN)' })
+  @ApiOperation({ summary: 'Cập nhật hệ thống rạp (ADMIN)' })
   @ApiBody({
     schema: {
       type: 'object',
@@ -128,9 +137,9 @@ export class CinemaSystemsController {
 
   @Delete('/:cinemaSystemId')
   @UseGuards(RoleGuard)
-  @Role('ADMIN')
+  @Roles('admin')
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Xóa hệ thống rạp (Chỉ ADMIN)' })
+  @ApiOperation({ summary: 'Xóa hệ thống rạp (ADMIN)' })
   @ApiResponse({ status: 200, description: 'Xóa hệ thống rạp thành công' })
   @ApiResponse({ status: 401, description: 'Chưa đăng nhập' })
   @ApiResponse({ status: 403, description: 'Không có quyền' })

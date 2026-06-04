@@ -36,6 +36,25 @@ export class CinemaSystemsService {
     };
   }
 
+  async findById(cinemaSystemId: string) {
+    const data = await this.prisma.cinemaSystem.findUnique({
+      where: { cinemaSystemId },
+      include: {
+        CinemaComplexes: {
+          include: {
+            Cinemas: true,
+          }
+        }
+      }
+    });
+
+    if (!data) {
+      throw new NotFoundException('Không tìm thấy hệ thống rạp');
+    }
+
+    return data;
+  }
+
   async update(body: UpdateCinemaSystemDto, logoFilename?: string) {
     // Kiểm tra hệ thống rạp có tồn tại không
     const cinemaSystem = await this.prisma.cinemaSystem.findUnique({
