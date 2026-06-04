@@ -79,6 +79,28 @@ export class CinemaComplexesService {
     };
   }
 
+  async findById(cinemaComplexId: string) {
+    const data = await this.prisma.cinemaComplex.findUnique({
+      where: { cinemaComplexId },
+      include: {
+        CinemaSystem: {
+          select: {
+            cinemaSystemId: true,
+            name: true,
+            logo: true,
+          }
+        },
+        Cinemas: true,
+      }
+    });
+
+    if (!data) {
+      throw new NotFoundException('Không tìm thấy cụm rạp');
+    }
+
+    return data;
+  }
+
   async update(body: UpdateCinemaComplexDto) {
     const cinemaComplexId = body.cinemaComplexId;
 

@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { IS_ROLE, RoleType } from '../decorators/role.decorator';
+import { IS_ROLES } from '../decorators/role.decorator';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 @Injectable()
@@ -19,21 +19,37 @@ export class RoleGuard implements CanActivate {
     ]);
     if (isPublic) return true;
 
-    // lấy role từ metadata
-    const requiredRole = this.reflector.getAllAndOverride<RoleType>(IS_ROLE, [
+    // lấy roles từ metadata
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(IS_ROLES, [
       context.getHandler(),
       context.getClass(),
     ]);
+
+    if (!requiredRoles || requiredRoles.length === 0) {
+      return true;
+    }
+
     // lấy thông tin user từ request sau khi đã được AuthGuard xác thực
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    // kiểm tra role
-    if (!user || user.userType !== requiredRole) {
+    // kiểm tra user có đăng nhập và có userType không
+    if (!user || !user.userType) {
       throw new ForbiddenException(
         'Bạn không có quyền truy cập tài nguyên này',
       );
     }
+
+    // chuẩn hóa userType về chữ thường để so sánh
+    const userRole = user.userType.toLowerCase();
+
+    // kiểm tra role của user có nằm trong danh sách các role được cho phép không
+    if (!requiredRoles.map((role) => role.toLowerCase()).includes(userRole)) {
+      throw new ForbiddenException(
+        'Bạn không có quyền truy cập tài nguyên này',
+      );
+    }
+
     return true;
   }
 }
