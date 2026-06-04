@@ -7,6 +7,7 @@ import { AuthGuard } from './common/guards/protect.guard';
 import { RoleGuard } from './common/guards/role.guard';
 import { BannerModule } from './modules-api/banner/banner.module';
 import { CinemaSystemsModule } from './modules-api/cinema-systems/cinema-systems.module';
+import { CinemaComplexesModule } from './modules-api/cinema-complexes/cinema-complexes.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { CinemaSystemsModule } from './modules-api/cinema-systems/cinema-systems
     AuthModule,
     BannerModule,
     CinemaSystemsModule,
+    CinemaComplexesModule,
   ],
   providers: [
     {
