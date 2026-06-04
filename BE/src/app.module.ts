@@ -10,6 +10,7 @@ import { CinemaSystemsModule } from './modules-api/cinema-systems/cinema-systems
 import { CinemaComplexesModule } from './modules-api/cinema-complexes/cinema-complexes.module';
 import { CinemasModule } from './modules-api/cinemas/cinemas.module';
 import { SeatsModule } from './modules-api/seats/seats.module';
+import { MoviesModule } from './modules-api/movies/movies.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { SeatsModule } from './modules-api/seats/seats.module';
     CinemaComplexesModule,
     CinemasModule,
     SeatsModule,
+    MoviesModule,
   ],
   providers: [
     {

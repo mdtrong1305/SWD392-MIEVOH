@@ -16,7 +16,8 @@ export class BannerService {
         imageUrl: true,
         Movie: {
           select: {
-            title: true,
+            title_vi: true,
+            title_en: true,
             imageUrl: true,
           },
         },
@@ -62,7 +63,7 @@ export class BannerService {
       });
     }
 
-    // Tạo banner mới (ma_banner tự động tạo bởi autoincrement)
+    // Tạo banner mới
     const newBanner = await this.prisma.banner.create({
       data: {
         movieId: movieId,

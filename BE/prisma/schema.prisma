@@ -68,13 +68,16 @@ model UserRecommendation {
 
 model Movie {
   movieId        String    @id @default(auto()) @map("_id") @db.ObjectId
-  title          String?
+  title_vi       String?
+  title_en       String?
   trailerUrl     String?
   imageUrl       String?
-  description    String?
+  description_vi String?
+  description_en String?
   releaseDate    DateTime?
   duration       Int?
-  language       String?
+  language_vi    String?
+  language_en    String?
   ageRestriction String? // Phân loại độ tuổi: VD C13, C18
 
   genres         String[] @default([]) // Thể loại phim (Hành động, Viễn tưởng...)
