@@ -5,9 +5,10 @@ import { AuthModule } from './modules-api/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './common/guards/protect.guard';
 import { RoleGuard } from './common/guards/role.guard';
+import { BannerModule } from './modules-api/banner/banner.module';
 
 @Module({
-  imports: [PrismaModule, TokenModule, AuthModule],
+  imports: [PrismaModule, TokenModule, AuthModule, BannerModule],
   providers: [
     {
       provide: APP_GUARD,

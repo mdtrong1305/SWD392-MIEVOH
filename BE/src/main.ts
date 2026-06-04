@@ -8,7 +8,7 @@ import { ResponseSuccessInterceptor } from './common/interceptors/responese-succ
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   app.enableCors({
     origin: 'http://localhost:5173',
     credentials: true,
@@ -33,6 +33,7 @@ async function bootstrap() {
     .setDescription('Tài liệu API cho hệ thống đặt vé xem phim')
     .setVersion('1.0')
     .addTag('Authentication', 'Xác thực và đăng ký')
+    .addTag('Banners', 'Quản lý ảnh banner')
     .addBearerAuth(
       {
         type: 'http',
