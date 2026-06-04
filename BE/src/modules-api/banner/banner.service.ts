@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../modules-system/prisma/prisma.service';
+import { DOMAIN_SERVER } from '../../common/constant/app.constant';
 import { deleteFile } from '../../common/helper/delete-file.helper';
 
 @Injectable()
@@ -61,14 +62,11 @@ export class BannerService {
       });
     }
 
-    // Lưu path với subfolder: banners/filename
-    const imagePath = `banners/${filename}`;
-
     // Tạo banner mới (ma_banner tự động tạo bởi autoincrement)
     const newBanner = await this.prisma.banner.create({
       data: {
         movieId: movieId,
-        imageUrl: imagePath,
+        imageUrl: `${DOMAIN_SERVER}/banners/${filename}`,
       },
       select: {
         bannerId: true,
