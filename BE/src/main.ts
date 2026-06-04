@@ -41,6 +41,7 @@ async function bootstrap() {
     .addTag('Cinema Systems', 'Quản lý hệ thống rạp')
     .addTag('Cinema Complexes', 'Quản lý cụm rạp')
     .addTag('Cinemas', 'Quản lý rạp')
+    .addTag('Seats', 'Quản lý ghế ngồi')
     .addTag('Banners', 'Quản lý ảnh banner')
     .addBearerAuth(
       {

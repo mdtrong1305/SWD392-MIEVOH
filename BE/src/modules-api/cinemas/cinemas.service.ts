@@ -40,26 +40,7 @@ export class CinemasService {
     return cinema;
   }
 
-  async findAll() {
-    const data = await this.prisma.cinema.findMany({
-      orderBy: { cinemaId: 'asc' },
-      include: {
-        CinemaComplex: {
-          select: {
-            cinemaComplexId: true,
-            name: true,
-            CinemaSystem: {
-              select: {
-                cinemaSystemId: true,
-                name: true,
-              },
-            },
-          },
-        },
-      },
-    });
-    return { data, total: data.length };
-  }
+
 
   async findById(cinemaId: string) {
     const data = await this.prisma.cinema.findUnique({
