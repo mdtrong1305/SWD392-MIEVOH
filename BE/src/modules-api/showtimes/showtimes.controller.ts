@@ -24,7 +24,7 @@ export class ShowtimesController {
   @Get('/movie/:movieId')
   @Public()
   @ApiOperation({ summary: 'Lấy lịch chiếu của 1 Phim (Gom nhóm theo Hệ thống rạp)' })
-  @ApiQuery({ name: 'date', required: false, description: 'Ngày chiếu (YYYY-MM-DD)' })
+  @ApiQuery({ name: 'date', required: false, description: 'Ngày chiếu (DD/MM/YYYY)' })
   @ApiResponse({ status: 200, description: 'Lấy lịch chiếu thành công' })
   findByMovie(@Param('movieId') movieId: string, @Query('date') date: string) {
     return this.showtimesService.findByMovie(movieId, date);
@@ -33,7 +33,7 @@ export class ShowtimesController {
   @Get('/complex/:complexId')
   @Public()
   @ApiOperation({ summary: 'Lấy lịch chiếu của 1 Cụm rạp (Gom nhóm theo Phim)' })
-  @ApiQuery({ name: 'date', required: false, description: 'Ngày chiếu (YYYY-MM-DD)' })
+  @ApiQuery({ name: 'date', required: false, description: 'Ngày chiếu (DD/MM/YYYY)' })
   @ApiResponse({ status: 200, description: 'Lấy lịch chiếu thành công' })
   findByComplex(@Param('complexId') complexId: string, @Query('date') date: string) {
     return this.showtimesService.findByComplex(complexId, date);
