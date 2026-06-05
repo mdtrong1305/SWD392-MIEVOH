@@ -12,7 +12,15 @@ export class TimeCalculatorHelper {
    * Lấy thời điểm bắt đầu lúc 00:00:00 và kết thúc lúc 23:59:59 của một ngày
    */
   static getStartAndEndOfDay(targetDate?: Date | string): { startOfDay: Date; endOfDay: Date } {
-    const startOfDay = targetDate ? new Date(targetDate) : new Date();
+    let startOfDay: Date;
+    if (!targetDate) {
+      startOfDay = new Date();
+    } else if (typeof targetDate === 'string' && targetDate.includes('/')) {
+      const [day, month, year] = targetDate.split('/');
+      startOfDay = new Date(`${year}-${month}-${day}T00:00:00Z`);
+    } else {
+      startOfDay = new Date(targetDate);
+    }
 
     startOfDay.setHours(0, 0, 0, 0);
     
