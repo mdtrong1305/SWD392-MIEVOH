@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # Container chạy Backend NestJS
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mievoh-backend
+    restart: always
+    ports:
+      - "3069:3069"
+    env_file:
+      - .env.docker
+    depends_on:
+      - redis-cache
+    networks:
+      - sdn-network
+
+  # Container chạy Redis Cache độc lập
+  redis-cache:
+    image: redis:7-alpine
+    container_name: mievoh-redis
+    restart: always
+    ports:
+      # Map ra cổng 6382 ở máy host để không đụng hàng với redis có sẵn của bạn
+      - "6382:6379"
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis_data:/data
+    networks:
+      - sdn-network
+
+networks:
+  sdn-network:
+    driver: bridge
+
+volumes:
+  redis_data:
