@@ -10,15 +10,13 @@ import { ResponseSuccessInterceptor } from './common/interceptors/responese-succ
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
   // serve thư mục public/images để có thể truy cập ảnh qua link
   app.useStaticAssets(join(process.cwd(), 'public/images'));
-
+  // đặt api global prefix cho toàn bộ route trong ứng dụng
   app.enableCors({
-    origin: 'http://localhost:5173',
-    credentials: true,
+    origin: true,
+    credentials: false,
   });
-
   // đặt api global prefix cho toàn bộ route trong ứng dụng
   app.setGlobalPrefix('api');
   // bật global pipe để tự động validate dữ liệu đầu vào cho toàn bộ ứng dụng
@@ -37,6 +35,8 @@ async function bootstrap() {
     .setTitle('Mievoh Booking API')
     .setDescription('Tài liệu API cho hệ thống đặt vé xem phim')
     .setVersion('1.0')
+    .addServer('https://api.mievoh.io.vn', 'Production Server')
+    .addServer('http://localhost:3069', 'Local Environment')
     .addTag('Authentication', 'Xác thực và đăng ký')
     .addTag('Cinema Systems', 'Quản lý hệ thống rạp')
     .addTag('Cinema Complexes', 'Quản lý cụm rạp')
