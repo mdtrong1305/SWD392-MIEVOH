@@ -43,6 +43,7 @@ async function bootstrap() {
     .addTag('Cinemas', 'Quản lý rạp')
     .addTag('Seats', 'Quản lý ghế ngồi')
     .addTag('Movies', 'Quản lý phim')
+    .addTag('Showtimes', 'Quản lý lịch chiếu')
     .addTag('Banners', 'Quản lý banner')
     .addBearerAuth(
       {
