@@ -12,6 +12,7 @@ import { CinemasModule } from './modules-api/cinemas/cinemas.module';
 import { SeatsModule } from './modules-api/seats/seats.module';
 import { MoviesModule } from './modules-api/movies/movies.module';
 import { ShowtimesModule } from './modules-api/showtimes/showtimes.module';
+import { FoodsModule } from './modules-api/foods/foods.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ShowtimesModule } from './modules-api/showtimes/showtimes.module';
     SeatsModule,
     MoviesModule,
     ShowtimesModule,
+    FoodsModule,
   ],
   providers: [
     {
