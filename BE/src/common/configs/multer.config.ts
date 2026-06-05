@@ -40,3 +40,4 @@ export const createMulterConfig = (subfolder: string) => ({
 export const multerMoviesConfig = createMulterConfig('movies');
 export const multerBannersConfig = createMulterConfig('banners');
 export const multerHeThongRapConfig = createMulterConfig('cinema-system');
+export const multerFoodsConfig = createMulterConfig('foods');

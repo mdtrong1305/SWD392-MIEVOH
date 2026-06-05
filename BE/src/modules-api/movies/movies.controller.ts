@@ -129,7 +129,7 @@ export class MoviesController {
   @ApiBearerAuth('JWT-auth')
   @UseInterceptors(FileInterceptor('image', multerMoviesConfig))
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Thêm phim mới (Upload ảnh Poster) (ADMIN, STAFF)' })
+  @ApiOperation({ summary: 'Thêm phim mới (ADMIN, STAFF)' })
   @ApiResponse({ status: 201, description: 'Tạo phim thành công' })
   create(
     @Body() body: CreateMovieDto,
