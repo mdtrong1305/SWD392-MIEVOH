@@ -34,7 +34,6 @@ model User {
 
   rewardPoints Int @default(0) // Điểm tích lũy thành viên
 
-
   isSubscribedToPromo Boolean? @default(true)
   isActive            Boolean? @default(true)
   favoriteGenres      String[] @default([])
@@ -80,9 +79,9 @@ model Movie {
   language_en    String?
   ageRestriction String? // Phân loại độ tuổi: VD C13, C18
 
-  genres         String[] @default([]) // Thể loại phim (Hành động, Viễn tưởng...)
-  director       String?  // Đạo diễn
-  cast           String?  // Diễn viên
+  genres   String[] @default([]) // Thể loại phim (Hành động, Viễn tưởng...)
+  director String? // Đạo diễn
+  cast     String? // Diễn viên
 
   // Các trường tính toán
   averageRating Float? @default(0)
@@ -214,8 +213,8 @@ model Booking {
   showtimeId  String   @db.ObjectId
   bookingDate DateTime @default(now())
 
-  totalPrice    Int    @default(0)
-  paymentStatus String @default("Pending") // Pending, Success, Failed
+  totalPrice    Int     @default(0)
+  paymentStatus String  @default("Pending") // Pending, Success, Failed
   paymentMethod String? // VNPay, MoMo, Cash
   ticketCode    String? @unique // Mã vé quét QR
 
@@ -235,7 +234,7 @@ model BookingDetail {
   bookingDetailId String @id @default(auto()) @map("_id") @db.ObjectId
   bookingId       String @db.ObjectId
   seatId          String @db.ObjectId
-  price           Int    // Giá ghế lưu lại lúc mua
+  price           Int // Giá ghế lưu lại lúc mua
 
   Booking Booking @relation(fields: [bookingId], references: [bookingId], onDelete: Cascade)
   Seat    Seat    @relation(fields: [seatId], references: [seatId], onDelete: Cascade)
@@ -249,13 +248,13 @@ model BookingDetail {
 // ==========================================
 
 model Food {
-  foodId          String   @id @default(auto()) @map("_id") @db.ObjectId
+  foodId          String  @id @default(auto()) @map("_id") @db.ObjectId
   name            String
   description     String?
   price           Int
   imageUrl        String?
-  isActive        Boolean  @default(true)
-  cinemaComplexId String   @db.ObjectId
+  isActive        Boolean @default(true)
+  cinemaComplexId String  @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -271,7 +270,7 @@ model BookingFood {
   bookingId     String @db.ObjectId
   foodId        String @db.ObjectId
   quantity      Int    @default(1)
-  price         Int    // Giá đồ ăn chốt lúc mua
+  price         Int // Giá đồ ăn chốt lúc mua
 
   Booking Booking @relation(fields: [bookingId], references: [bookingId], onDelete: Cascade)
   Food    Food    @relation(fields: [foodId], references: [foodId], onDelete: Cascade)
