@@ -1,5 +1,16 @@
-import { Injectable, UnauthorizedException, BadRequestException, NotFoundException } from '@nestjs/common';
-import { LoginAuthDto, RegisterAuthDto, VerifyEmailDto, ResetPasswordDto, ChangePasswordDto } from './dto/auth.dto';
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  LoginAuthDto,
+  RegisterAuthDto,
+  VerifyEmailDto,
+  ResetPasswordDto,
+  ChangePasswordDto,
+} from './dto/auth.dto';
 import { PrismaService } from '../../modules-system/prisma/prisma.service';
 import { TokenService } from '../../modules-system/token/token.service';
 import * as bcrypt from 'bcrypt';
@@ -48,12 +59,13 @@ export class AuthService {
   }
 
   async register(registerDto: RegisterAuthDto) {
-    // 1. Kiểm tra user tồn tại qua email hoặc số điện thoại
+    // 1. Kiểm tra user tồn tại qua email hoặc số điện thoại hoặc username
     const user = await this.prisma.user.findFirst({
       where: {
         OR: [
           { email: registerDto.email },
           { phoneNumber: registerDto.phoneNumber },
+          { username: registerDto.username },
         ],
         authProvider: 'local',
       },
@@ -102,10 +114,7 @@ export class AuthService {
     // 1. Kiểm tra user đã tồn tại chưa
     let user = await this.prisma.user.findFirst({
       where: {
-        OR: [
-          { googleId },
-          { email }
-        ]
+        OR: [{ googleId }, { email }],
       },
     });
 
@@ -181,10 +190,15 @@ export class AuthService {
     }
 
     if (user.authProvider !== 'local') {
-      throw new BadRequestException('Tài khoản được đăng nhập bằng bên thứ ba, không thể đổi mật khẩu');
+      throw new BadRequestException(
+        'Tài khoản được đăng nhập bằng bên thứ ba, không thể đổi mật khẩu',
+      );
     }
 
-    const isPasswordValid = bcrypt.compareSync(dto.oldPassword, user.password || '');
+    const isPasswordValid = bcrypt.compareSync(
+      dto.oldPassword,
+      user.password || '',
+    );
     if (!isPasswordValid) {
       throw new BadRequestException('Mật khẩu cũ không chính xác');
     }

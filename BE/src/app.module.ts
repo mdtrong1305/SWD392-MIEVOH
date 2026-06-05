@@ -11,6 +11,7 @@ import { CinemaComplexesModule } from './modules-api/cinema-complexes/cinema-com
 import { CinemasModule } from './modules-api/cinemas/cinemas.module';
 import { SeatsModule } from './modules-api/seats/seats.module';
 import { MoviesModule } from './modules-api/movies/movies.module';
+import { ShowtimesModule } from './modules-api/showtimes/showtimes.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { MoviesModule } from './modules-api/movies/movies.module';
     CinemasModule,
     SeatsModule,
     MoviesModule,
+    ShowtimesModule,
   ],
   providers: [
     {
