@@ -2,17 +2,18 @@ import { useState, useMemo, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store/index.tsx";
-import { MOVIES_DETAILS } from "../mockAPI/movieMock.tsx";
-import { BOOKED_SEATS_MOCK, BOOKING_COMBOS } from "../mockAPI/bookingMock.tsx";
 import { toast } from "../components/Toast/Toast.tsx";
 import {
     initBooking,
+    setMovieInfo,
     toggleSeat,
     updateCombo,
     startBooking,
-    bookingFinished
+    resetBooking
 } from "../pages/User/SelectSeat/slice.ts";
 import { useLanguage } from "../contextAPI/LanguageContext.tsx";
+import { getSeatsStatusApi, getFoodsByComplexApi, createBookingApi } from "../axios/booking.tsx";
+import { getShowtimeDetailApi } from "../axios/cinemas.tsx";
 
 interface LocationState {
     branchName?: string;
@@ -21,18 +22,17 @@ interface LocationState {
     date?: string;
     dateLabel?: string;
     dayOfWeek?: string;
+    showtimeId?: string;
 }
 
 const seatRows = ["A", "B", "C", "D", "E", "F", "G", "H", "J"];
 const standardRows = ["A", "B", "C", "D"];
 const vipRows = ["E", "F", "G", "H"];
-const bookedSeats = BOOKED_SEATS_MOCK;
-
 
 export default function useSelectSeat() {
     const { id } = useParams<{ id: string }>();
     const { t, language } = useLanguage();
-    const movieId = Number(id);
+    const movieId = id || "";
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -45,9 +45,10 @@ export default function useSelectSeat() {
     const routeDate = state.date || new Date().toISOString().split("T")[0];
     const routeDateLabel = state.dateLabel || `${new Date().getDate()}/${new Date().getMonth() + 1}`;
     const routeDayOfWeek = state.dayOfWeek || "Mon";
+    const routeShowtimeId = state.showtimeId || "";
 
     const [activeStep, setActiveStep] = useState(1);
-    const [paymentMethod, setPaymentMethod] = useState("qr");
+    const [paymentMethod, setPaymentMethod] = useState("vnpay");
     const { isAuthenticated, user: authUser } = useSelector((state: RootState) => state.login);
     const [guestName, setGuestName] = useState("");
     const [guestPhone, setGuestPhone] = useState("");
@@ -58,6 +59,45 @@ export default function useSelectSeat() {
     const [paymentTimeLeft, setPaymentTimeLeft] = useState(600);
     const [isVerifying, setIsVerifying] = useState(false);
     const [showQRTransfer, setShowQRTransfer] = useState(false);
+
+    // Dynamic states loaded from API
+    const [showtimeDetail, setShowtimeDetail] = useState<any | null>(null);
+    const [seatsList, setSeatsList] = useState<any[]>([]);
+    const [foodsList, setFoodsList] = useState<any[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    // Fetch dynamic data
+    useEffect(() => {
+        if (!routeShowtimeId) {
+            toast.error("Please select a showtime first!");
+            navigate(-1);
+            return;
+        }
+
+        const fetchShowtimeAndSeats = async () => {
+            setLoading(true);
+            try {
+                const showtimeRes = await getShowtimeDetailApi(routeShowtimeId);
+                const seatsRes = await getSeatsStatusApi(routeShowtimeId);
+                
+                setShowtimeDetail(showtimeRes.data);
+                setSeatsList(seatsRes.data || []);
+                
+                const complexId = showtimeRes.data?.Cinema?.cinemaComplexId;
+                if (complexId) {
+                    const foodsRes = await getFoodsByComplexApi(complexId);
+                    setFoodsList(foodsRes.data || []);
+                }
+            } catch (err) {
+                console.error("Error loading showtime & seats:", err);
+                toast.error("Failed to load showtime details. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchShowtimeAndSeats();
+    }, [routeShowtimeId, navigate]);
 
     // Scroll to top and initialize booking state in Redux when page loaded
     useEffect(() => {
@@ -89,7 +129,7 @@ export default function useSelectSeat() {
             });
         }, 1000);
         return () => clearInterval(timer);
-    }, [showQRTransfer]);
+    }, [showQRTransfer, t]);
 
     const formatTimeLeft = (sec: number) => {
         const m = Math.floor(sec / 60);
@@ -104,58 +144,106 @@ export default function useSelectSeat() {
     const isBooking = booking.isBooking;
     const bookingCode = booking.bookingCode;
 
-    const branchName = booking.branchName || routeBranchName;
-    const format = booking.format || routeFormat;
-    const time = booking.time || routeTime;
+    const branchName = showtimeDetail?.Cinema?.CinemaComplex?.name || booking.branchName || routeBranchName;
+    const format = showtimeDetail?.format || booking.format || routeFormat;
+    const time = showtimeDetail?.showDateTime 
+        ? new Date(showtimeDetail.showDateTime).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", hour12: false })
+        : booking.time || routeTime;
     const dateLabel = booking.dateLabel || routeDateLabel;
     const dayOfWeek = booking.dayOfWeek || routeDayOfWeek;
 
-    // Localized combos list
+    // Dynamic combos list mapped from backend foods
     const combos = useMemo(() => {
-        return BOOKING_COMBOS.map(combo => ({
-            ...combo,
-            name: language === "vi" ? (combo.name_vi || combo.name) : (combo.name_en || combo.name),
-            description: language === "vi" ? (combo.description_vi || combo.description) : (combo.description_en || combo.description),
-        }));
-    }, [language]);
+        return foodsList.map(food => {
+            let image = food.imageUrl || "🍿";
+            if (food.imageUrl && !food.imageUrl.startsWith('http')) {
+                const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://api.mievoh.io.vn/api';
+                const domain = apiBase.replace('/api', '');
+                image = `${domain}/foods/${food.imageUrl}`;
+            }
+            return {
+                id: food.foodId,
+                name: food.name,
+                description: food.description || "",
+                price: food.price,
+                image
+            };
+        });
+    }, [foodsList]);
 
-    // Load movie details
+    // Load movie details dynamically from showtime detail
     const movie = useMemo(() => {
-        const rawMovie = MOVIES_DETAILS[movieId] || MOVIES_DETAILS[1];
+        if (!showtimeDetail || !showtimeDetail.Movie) {
+            return {
+                id: "",
+                title: "Loading Movie...",
+                genres: [],
+                image: "🍿",
+                ageRating: "P",
+                duration: "0 mins",
+                language: "English"
+            };
+        }
+        const data = showtimeDetail.Movie;
+        
+        let genresArr: string[] = [];
+        if (Array.isArray(data.genres)) {
+            genresArr = data.genres;
+        } else if (typeof data.genres === 'string') {
+            genresArr = data.genres.split(',').map((g: string) => g.trim());
+        }
+
+        let image = data.imageUrl || "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80";
+        if (data.imageUrl && !data.imageUrl.startsWith('http')) {
+            const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://api.mievoh.io.vn/api';
+            const domain = apiBase.replace('/api', '');
+            image = `${domain}/movies/${data.imageUrl}`;
+        }
+
         return {
-            ...rawMovie,
-            title: language === "vi" ? (rawMovie.title_vi || rawMovie.title) : (rawMovie.title_en || rawMovie.title),
-            description: language === "vi" ? (rawMovie.description_vi || rawMovie.description) : (rawMovie.description_en || rawMovie.description),
-            language: language === "vi" ? (rawMovie.language_vi || rawMovie.language) : (rawMovie.language_en || rawMovie.language),
+            id: data.movieId,
+            title: language === "vi" ? (data.title_vi || data.title_en) : (data.title_en || data.title_vi),
+            description: language === "vi" ? (data.description_vi || data.description_en) : (data.description_en || data.description_vi),
+            genres: genresArr,
+            image,
+            ageRating: data.ageRestriction || "P",
+            duration: data.duration ? `${data.duration} mins` : "120 mins",
+            language: data.language || "English"
         };
-    }, [movieId, language]);
+    }, [showtimeDetail, language]);
+
+    // Dispatch movie title and image to Redux when it is dynamically resolved from API
+    useEffect(() => {
+        if (movie && movie.title && movie.title !== "Loading Movie...") {
+            dispatch(setMovieInfo({
+                title: movie.title,
+                image: movie.image
+            }));
+        }
+    }, [dispatch, movie]);
 
     // Room name
-    const roomName = useMemo(() => {
-        const num = ((movieId + time.charCodeAt(0) + time.charCodeAt(1)) % 5) + 1;
-        return `Hall 0${num}`;
-    }, [movieId, time]);
+    const roomName = showtimeDetail?.Cinema?.name || "Hall 01";
 
-    const updateComboQuantity = (id: number, delta: number) => {
+    const updateComboQuantity = (id: string, delta: number) => {
         dispatch(updateCombo({ id, delta }));
     };
 
-    // Seat click handler
-    const handleSeatClick = (row: string, num: number) => {
-        const seatCode = row === "J" ? `J${num}` : `${row}${num}`;
-        
-        if (row !== "J" && bookedSeats.has(seatCode)) return;
-        if (row === "J" && bookedSeats.has(`J${num}`)) return;
-
-        if (selectedSeats.includes(seatCode)) {
-            dispatch(toggleSeat(seatCode));
-        } else {
-            if (selectedSeats.length >= 8) {
-                toast.error(t("toast_max_seats_limit"));
-                return;
+    // Construct bookedSeats set dynamically from seats status response
+    const bookedSeats = useMemo(() => {
+        const set = new Set<string>();
+        seatsList.forEach(seat => {
+            if (seat.status === "SOLD" || seat.status === "HELD") {
+                set.add(seat.name);
             }
-            dispatch(toggleSeat(seatCode));
-        }
+        });
+        return set;
+    }, [seatsList]);
+
+    // Seat click handler
+    const handleSeatClick = (seatName: string) => {
+        if (bookedSeats.has(seatName)) return;
+        dispatch(toggleSeat(seatName));
     };
 
     // Calculated amounts
@@ -163,21 +251,21 @@ export default function useSelectSeat() {
         let standardCount = 0;
         let vipCount = 0;
         let coupleCount = 0;
-        let price = 0;
+        const basePrice = showtimeDetail?.ticketPrice || 75000;
 
-        selectedSeats.forEach(seat => {
-            const row = seat[0];
-            if (row === "J") {
+        selectedSeats.forEach(name => {
+            const seatObj = seatsList.find(s => s.name === name);
+            const type = seatObj?.seatType?.toUpperCase();
+            if (type === "COUPLE" || type === "SWEETBOX" || name.startsWith("J")) {
                 coupleCount++;
-                price += 220000;
-            } else if (standardRows.includes(row)) {
-                standardCount++;
-                price += 80000;
-            } else if (vipRows.includes(row)) {
+            } else if (type === "VIP") {
                 vipCount++;
-                price += 110000;
+            } else {
+                standardCount++;
             }
         });
+
+        const price = selectedSeats.length * basePrice;
 
         return {
             standardCount,
@@ -185,7 +273,7 @@ export default function useSelectSeat() {
             coupleCount,
             ticketPrice: price
         };
-    }, [selectedSeats]);
+    }, [selectedSeats, seatsList, showtimeDetail]);
 
     const comboPrice = useMemo(() => {
         let total = 0;
@@ -193,7 +281,7 @@ export default function useSelectSeat() {
             total += (comboQuantities[c.id] || 0) * c.price;
         });
         return total;
-    }, [comboQuantities]);
+    }, [comboQuantities, combos]);
 
     const totalPrice = ticketBreakdown.ticketPrice + comboPrice;
 
@@ -228,27 +316,9 @@ export default function useSelectSeat() {
         }
 
         if (!isAuthenticated) {
-            const errs: { name?: string; phone?: string; email?: string } = {};
-            if (!guestName.trim()) {
-                errs.name = "Full name is required";
-            }
-            if (!guestPhone.trim()) {
-                errs.phone = "Phone number is required";
-            } else if (!/^[0-9]{10}$/.test(guestPhone.trim())) {
-                errs.phone = "Phone number must be exactly 10 digits";
-            }
-            if (!guestEmail.trim()) {
-                errs.email = "Email is required";
-            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail.trim())) {
-                errs.email = "Invalid email format (e.g. example@gmail.com)";
-            }
-
-            setGuestErrors(errs);
-
-            if (Object.keys(errs).length > 0) {
-                toast.error(t("toast_fix_info_errors"));
-                return;
-            }
+            toast.error("Please login to proceed with booking.");
+            navigate("/login");
+            return;
         }
 
         setShowConfirmModal(true);
@@ -262,17 +332,71 @@ export default function useSelectSeat() {
         }, 300);
     };
 
-    const executeCheckout = () => {
+    const executeCheckout = async () => {
         setShowConfirmModal(false);
         setIsClosing(false);
         dispatch(startBooking());
         
-        const randCode = "MV" + Math.floor(100000 + Math.random() * 900000);
-        dispatch(bookingFinished(randCode));
-        
-        setShowQRTransfer(true);
-        setPaymentTimeLeft(600);
-        toast.success(t("toast_payment_initiated"));
+        try {
+            // Map selected seats to their seatId
+            const seatIds = selectedSeats.map(name => {
+                const seatObj = seatsList.find(s => s.name === name);
+                return seatObj ? seatObj.seatId : "";
+            }).filter(id => id !== "");
+
+            // Map combo quantities to foods input
+            const foodsInput = Object.entries(comboQuantities)
+                .filter(([_, qty]) => qty > 0)
+                .map(([foodId, qty]) => ({
+                    foodId,
+                    quantity: qty
+                }));
+
+            const payload = {
+                showtimeId: routeShowtimeId,
+                seats: seatIds,
+                foods: foodsInput.length > 0 ? foodsInput : undefined
+            };
+
+            const res = await createBookingApi(payload);
+
+            const paymentUrl = res.data?.paymentUrl;
+            if (paymentUrl) {
+                // Save details to pending bookings in localStorage
+                const pendingBookings = JSON.parse(localStorage.getItem("mievoh_pending_bookings") || "{}");
+                pendingBookings[res.data.booking.bookingId] = {
+                    id: res.data.booking.bookingId,
+                    bookingCode: "PENDING",
+                    movieId: movieId,
+                    movieTitle: movie.title,
+                    movieImage: movie.image,
+                    branchName: branchName,
+                    time: time,
+                    date: routeDate,
+                    seats: selectedSeats,
+                    combos: Object.entries(comboQuantities)
+                        .filter(([_, qty]) => qty > 0)
+                        .map(([foodId]) => {
+                            const c = combos.find(x => x.id === foodId);
+                            return c ? `${comboQuantities[foodId]}x ${c.name}` : "";
+                        }).filter(Boolean).join(", ") || "None",
+                    totalPrice: totalPrice,
+                    status: "Pending",
+                    dateBooked: new Date().toLocaleDateString("vi-VN")
+                };
+                localStorage.setItem("mievoh_pending_bookings", JSON.stringify(pendingBookings));
+
+                // Redirect user to VNPay
+                window.location.href = paymentUrl;
+            } else {
+                throw new Error("No payment URL returned");
+            }
+        } catch (err: any) {
+            console.error("Checkout failed:", err);
+            const errMsg = err?.response?.data?.message || err?.message || "Booking failed. Please try again.";
+            toast.error(errMsg);
+            dispatch(resetBooking());
+        }
     };
 
     const userPhone = authUser?.soDT || authUser?.phone || "Not updated";
@@ -330,6 +454,8 @@ export default function useSelectSeat() {
         standardRows,
         vipRows,
         bookedSeats,
-        combos
+        combos,
+        loading,
+        seatsList
     };
 }

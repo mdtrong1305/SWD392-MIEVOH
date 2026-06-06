@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Film, ChevronDown, Check } from "lucide-react";
-import { THEATER_CHAINS } from "../../../../mockAPI/cinemaMock.tsx";
-import type { TheaterChain } from "../../../../mockAPI/cinemaMock.tsx";
+import type { TheaterChain } from "../../../../axios/cinemas.tsx";
 import CityFilter from "../../../../components/CityFilter/CityFilter.tsx";
 import SearchInput from "../../../../components/SearchInput/SearchInput";
 import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
@@ -13,6 +12,7 @@ interface CinemaFiltersProps {
     onSelectChain: (chainId: string) => void;
     searchQuery: string;
     onSearchChange: (query: string) => void;
+    theaterChains: TheaterChain[];
     filteredChains: TheaterChain[];
     totalMatchingBranches: number;
 }
@@ -24,13 +24,14 @@ export default function CinemaFilters({
     onSelectChain,
     searchQuery,
     onSearchChange,
+    theaterChains,
     filteredChains,
     totalMatchingBranches,
 }: CinemaFiltersProps) {
     const { t } = useLanguage();
     const [isChainOpen, setIsChainOpen] = useState(false);
 
-    const activeChain = THEATER_CHAINS.find(c => c.id === selectedChainId);
+    const activeChain = theaterChains.find(c => c.id === selectedChainId);
 
     const handleSelectChain = (chainId: string) => {
         onSelectChain(chainId);
@@ -93,7 +94,7 @@ export default function CinemaFilters({
                                 className={`w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-left transition-colors duration-150 cursor-pointer ${
                                     selectedChainId === "all" 
                                         ? "bg-violet-55 text-violet-755 dark:bg-zinc-700/50 dark:!text-violet-400" 
-                                        : "text-gray-700 hover:bg-violet-50/60 hover:text-violet-755 dark:!text-zinc-200 dark:hover:bg-zinc-700 dark:hover:!text-violet-405"
+                                        : "text-gray-700 hover:bg-violet-50/60 hover:text-violet-755 dark:!text-zinc-200 dark:hover:bg-zinc-700 dark:hover:!text-violet-404"
                                 }`}
                             >
                                 <div className="flex items-center gap-2.5">
@@ -102,7 +103,7 @@ export default function CinemaFilters({
                                 </div>
                                 {selectedChainId === "all" && <Check className="h-4 w-4 text-violet-600" />}
                             </button>
-                            {THEATER_CHAINS.map(chain => {
+                            {theaterChains.map(chain => {
                                 const count = filteredChains.find(c => c.id === chain.id)?.branches.length || 0;
                                 const isSelected = selectedChainId === chain.id;
                                 return (

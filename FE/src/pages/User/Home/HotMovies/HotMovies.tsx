@@ -1,18 +1,16 @@
 import { useState, useEffect } from "react";
-import { Star } from "lucide-react";
-import Button from "../../../../components/Button/Button.tsx";
 import Slider from "react-slick";
 import { slickHotMoviesSettings } from "../../../../config/slick/slickConfig.tsx";
-import CountUp from "react-countup";
-import { Link } from "react-router-dom";
 import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
-import { toast } from "../../../../components/Toast/Toast.tsx";
-import { HOT_MOVIES } from "../../../../mockAPI/movieMock.tsx";
+import { getNowShowingMoviesApi } from "../../../../axios/movie.tsx";
+import MovieCard from "../../../../components/MovieCard/MovieCard.tsx";
 
 export default function HotMovies() {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [mounted, setMounted] = useState(false);
     const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1200);
+    const [movies, setMovies] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         setMounted(true);
@@ -35,6 +33,49 @@ export default function HotMovies() {
         };
     }, []);
 
+    useEffect(() => {
+        const fetchHotMovies = async () => {
+            try {
+                setLoading(true);
+                const res = await getNowShowingMoviesApi({ page: 1, pageSize: 20 });
+                const list = (res.data as any)?.data || [];
+                
+                const mapped = list.map((m: any) => {
+                    let genresArr: string[] = [];
+                    if (Array.isArray(m.genres)) {
+                        genresArr = m.genres;
+                    } else if (typeof m.genres === 'string') {
+                        genresArr = m.genres.split(',').map((g: string) => g.trim());
+                    }
+
+                    let image = m.imageUrl || "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80";
+                    if (m.imageUrl && !m.imageUrl.startsWith('http')) {
+                        const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://api.mievoh.io.vn/api';
+                        const domain = apiBase.replace('/api', '');
+                        image = `${domain}/movies/${m.imageUrl}`;
+                    }
+
+                    return {
+                        id: m.movieId,
+                        title: language === "vi" ? (m.title_vi || m.title_en || "Phim") : (m.title_en || m.title_vi || "Movie"),
+                        image,
+                        rating: m.averageRating ?? 4.5,
+                        genres: genresArr,
+                        status: "now_showing",
+                    };
+                });
+                const sorted = mapped.sort((a: any, b: any) => b.rating - a.rating);
+                const top8 = sorted.slice(0, 8);
+                setMovies(top8);
+            } catch (err) {
+                console.error("Lỗi khi lấy danh sách phim hot:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchHotMovies();
+    }, [language]);
+
     const getSlidesToShow = () => {
         if (windowWidth < 420) return 1;
         if (windowWidth < 768) return 2;
@@ -50,67 +91,6 @@ export default function HotMovies() {
 
     // Resolve default export for react-slick in Vite environment
     const SlickSlider = (Slider as any).default || Slider;
-    const CountUpComponent = (CountUp as any).default || CountUp;
-
-
-    const renderMovieCard = (movie: typeof HOT_MOVIES[0]) => (
-        <Link 
-            to={`/movies/${movie.id}`}
-            className="group flex flex-col justify-between overflow-hidden rounded-2xl bg-[#F6F3F9] p-3 shadow-md hover:shadow-xl transition-all duration-300 border border-[#EAE6F0] hover:scale-[1.02] h-full cursor-pointer block no-underline text-inherit"
-        >
-            {/* Movie Image Container */}
-            <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-gray-100 mb-4">
-                <img
-                    src={movie.image}
-                    alt={movie.title}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                
-                {/* Rating Badge */}
-                <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-xs font-bold text-white backdrop-blur-md border border-white/10">
-                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                    <span>
-                        <CountUpComponent end={movie.rating} decimals={1} duration={1.5} enableScrollSpy scrollSpyOnce />
-                    </span>
-                </div>
-            </div>
-
-            {/* Details */}
-            <div className="flex flex-col flex-grow">
-                <h3 className="text-base font-bold text-gray-900 line-clamp-1 group-hover:text-[#6D28D9] transition-colors duration-200 mb-2">
-                    {movie.title}
-                </h3>
-
-                {/* Genres */}
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                    {movie.genres.map((genre, idx) => (
-                        <span 
-                            key={idx}
-                            className="inline-block rounded-md bg-[#F3E8FF] px-2 py-0.5 text-xs font-semibold text-[#6D28D9]"
-                        >
-                            {genre}
-                        </span>
-                    ))}
-                </div>
-            </div>
-
-            {/* {t("quick_book")} Button */}
-            <div className="mt-auto">
-                <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full text-center border-gray-200 hover:border-[#6D28D9]"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toast.success(t("opening_booking_for", { title: movie.title }) || `Opening ticket booking for: ${movie.title}`);
-                    }}
-                >
-                    {t("quick_book")}
-                </Button>
-            </div>
-        </Link>
-    );
 
     return (
         <section className="mx-auto max-w-[85%] px-4 py-16 sm:py-20 font-sans">
@@ -123,11 +103,37 @@ export default function HotMovies() {
 
             {/* Movies Slider */}
             <div className="relative slider-container">
-                {mounted && (
+                <style>{`
+                    .slider-container .slick-track {
+                        display: flex !important;
+                    }
+                    .slider-container .slick-slide {
+                        height: inherit !important;
+                        display: flex !important;
+                        justify-content: center;
+                    }
+                    .slider-container .slick-slide > div {
+                        width: 100%;
+                        height: 100% !important;
+                        display: flex !important;
+                    }
+                `}</style>
+                {loading ? (
+                    <div className="flex items-center justify-center py-10">
+                        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-violet-650"></div>
+                    </div>
+                ) : mounted && (
                     <SlickSlider {...sliderSettings}>
-                        {HOT_MOVIES.map((movie) => (
-                            <div key={movie.id} className="px-2 pb-4">
-                                {renderMovieCard(movie)}
+                        {movies.map((movie) => (
+                            <div key={movie.id} className="px-2 pb-4 flex flex-col h-full w-full">
+                                <MovieCard 
+                                    movie={movie} 
+                                    showStatus={true} 
+                                    buttonVariant="outline" 
+                                    buttonText={t("quick_book")} 
+                                    useCountUp={true} 
+                                    lineClamp={1}
+                                />
                             </div>
                         ))}
                     </SlickSlider>

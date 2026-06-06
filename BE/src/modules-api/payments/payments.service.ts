@@ -47,9 +47,26 @@ export class PaymentsService {
       );
     }
 
+    // Helper to format date in Vietnam (GMT+7) timezone: YYYYMMDDHHmmss
+    const formatVN = (d: Date) => {
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Asia/Ho_Chi_Minh',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      });
+      const parts = formatter.formatToParts(d);
+      const partMap = Object.fromEntries(parts.map((p) => [p.type, p.value]));
+      return `${partMap.year}${partMap.month}${partMap.day}${partMap.hour}${partMap.minute}${partMap.second}`;
+    };
+
     const date = new Date();
-    const createDate = moment(date).format('YYYYMMDDHHmmss');
-    const expireDate = moment(date).add(15, 'minutes').format('YYYYMMDDHHmmss'); // cho phép thời gian thanh toán tối đa là 15 phút
+    const createDate = formatVN(date);
+    const expireDate = formatVN(new Date(date.getTime() + 15 * 60 * 1000)); // cho phép thời gian thanh toán tối đa là 15 phút
 
     const amount = booking.totalPrice * 100;
     const bankCode = 'NCB'; // mặc định dùng thẻ test NCB của vnpay

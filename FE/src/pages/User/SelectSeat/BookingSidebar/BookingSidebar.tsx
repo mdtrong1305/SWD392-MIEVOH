@@ -1,5 +1,5 @@
 import { MapPin, Film, Calendar, Clock, Info, ChevronRight, Loader2, CreditCard } from "lucide-react";
-import { type ComboItem } from "../../../../mockAPI/bookingMock.tsx";
+
 import type { MovieDetailInfo } from "../../MovieDetail/DetailHero/DetailHero.tsx";
 import Button from "../../../../components/Button/Button.tsx";
 import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
@@ -15,8 +15,8 @@ interface BookingSidebarProps {
     selectedSeats: string[];
     ticketBreakdown: { standardCount: number; vipCount: number; coupleCount: number; ticketPrice: number };
     comboPrice: number;
-    combos: ComboItem[];
-    comboQuantities: Record<number, number>;
+    combos: any[];
+    comboQuantities: Record<string, number>;
     totalPrice: number;
     formatPrice: (value: number) => string;
     activeStep: number;

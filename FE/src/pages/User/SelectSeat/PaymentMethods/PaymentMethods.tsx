@@ -24,7 +24,24 @@ export default function PaymentMethods({
     handleGuestChange,
     setActiveStep
 }: PaymentMethodsProps) {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
+
+    const paymentOptions = [
+        { 
+            id: "vnpay", 
+            name: language === "vi" ? "Cổng thanh toán VNPay" : "VNPay Gateway", 
+            desc: language === "vi" 
+                ? "Thanh toán qua ứng dụng ngân hàng (QR-Pay), thẻ ATM nội địa hoặc thẻ quốc tế Visa/Mastercard." 
+                : "Pay via banking applications (QR-Pay), local ATM cards or international credit cards.", 
+            icon: (
+                <svg className="w-5 h-5 text-violet-650" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
+                    <line x1="2" y1="10" x2="22" y2="10" />
+                </svg>
+            ) 
+        }
+    ];
+
     return (
         <div className="flex flex-col gap-6 animate__animated animate__fadeIn">
             <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-3xl p-6 shadow-sm flex flex-col gap-6">
@@ -34,27 +51,7 @@ export default function PaymentMethods({
  
                 {/* Payment Options list */}
                 <div className="flex flex-col gap-3">
-                    {[
-                        { 
-                            id: "qr", 
-                            name: t("qr_transfer_name"), 
-                            desc: t("qr_transfer_desc"), 
-                            icon: (
-                                <svg className="w-5 h-5 text-violet-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <rect x="3" y="3" width="7" height="7" />
-                                    <rect x="14" y="3" width="7" height="7" />
-                                    <rect x="14" y="14" width="7" height="7" />
-                                    <rect x="3" y="14" width="7" height="7" />
-                                    <rect x="7" y="7" width="1" height="1" />
-                                    <rect x="16" y="7" width="1" height="1" />
-                                    <rect x="7" y="16" width="1" height="1" />
-                                </svg>
-                            ) 
-                        },
-                        { id: "momo", name: t("momo_name"), desc: t("momo_desc"), icon: <span className="text-lg">🔴</span> },
-                        { id: "zalopay", name: t("zalopay_name"), desc: t("zalopay_desc"), icon: <span className="text-lg">🔵</span> },
-                        { id: "atm", name: t("atm_name"), desc: t("atm_desc"), icon: <span className="text-lg">🏦</span> }
-                    ].map(method => {
+                    {paymentOptions.map(method => {
                         const isSelected = paymentMethod === method.id;
                         return (
                             <div 

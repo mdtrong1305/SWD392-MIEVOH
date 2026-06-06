@@ -1,30 +1,94 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import MovieHero from "./MovieHero/MovieHero.tsx";
 import MovieFilters from "./MovieFilters/MovieFilters.tsx";
 import MovieGrid from "./MovieGrid/MovieGrid.tsx";
-import { INITIAL_MOVIES } from "../../../mockAPI/movieMock.tsx";
 import { useLanguage } from "../../../contextAPI/LanguageContext.tsx";
-
+import { getNowShowingMoviesApi, getComingSoonMoviesApi } from "../../../axios/movie.tsx";
 
 export default function Movies() {
-    const { language } = useLanguage();
+    const { language, t } = useLanguage();
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedStatus, setSelectedStatus] = useState<"all" | "now_showing" | "coming_soon">("all");
     const [selectedGenre, setSelectedGenre] = useState("");
     const [sortBy, setSortBy] = useState("rating-desc");
 
+    const [moviesList, setMoviesList] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchAllMovies = async () => {
+            try {
+                // Fetch now showing and coming soon movies in parallel
+                const [nowShowingRes, comingSoonRes] = await Promise.all([
+                    getNowShowingMoviesApi({ page: 1, pageSize: 50 }),
+                    getComingSoonMoviesApi({ page: 1, pageSize: 50 })
+                ]);
+
+                const nowShowing = (nowShowingRes.data as any)?.data || [];
+                const comingSoon = (comingSoonRes.data as any)?.data || [];
+
+                const mapMovie = (m: any, status: "now_showing" | "coming_soon") => {
+                    let genresArr: string[] = [];
+                    if (Array.isArray(m.genres)) {
+                        genresArr = m.genres;
+                    } else if (typeof m.genres === 'string') {
+                        genresArr = m.genres.split(',').map((g: string) => g.trim());
+                    }
+
+                    // Build image URL
+                    let image = m.imageUrl || "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80";
+                    if (m.imageUrl && !m.imageUrl.startsWith('http')) {
+                        const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://api.mievoh.io.vn/api';
+                        const domain = apiBase.replace('/api', '');
+                        image = `${domain}/movies/${m.imageUrl}`;
+                    }
+
+                    return {
+                        id: m.movieId,
+                        title: m.title_vi || m.title_en || "Phim",
+                        title_vi: m.title_vi || "",
+                        title_en: m.title_en || "",
+                        image,
+                        rating: m.averageRating ?? 4.5,
+                        genres: genresArr,
+                        status,
+                        releaseDate: m.releaseDate ? new Date(m.releaseDate).toLocaleDateString() : undefined
+                    };
+                };
+
+                const mappedNowShowing = nowShowing.map((m: any) => mapMovie(m, "now_showing"));
+                const mappedComingSoon = comingSoon.map((m: any) => mapMovie(m, "coming_soon"));
+
+                const combined = [...mappedNowShowing, ...mappedComingSoon];
+                
+                if (combined.length > 0) {
+                    setMoviesList(combined);
+                } else {
+                    setMoviesList([]);
+                }
+            } catch (err) {
+                console.error("Lỗi khi lấy danh sách phim:", err);
+                setMoviesList([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAllMovies();
+    }, []);
+
     const localizedMovies = useMemo(() => {
-        return INITIAL_MOVIES.map(movie => ({
+        return moviesList.map(movie => ({
             ...movie,
             title: language === "vi" ? (movie.title_vi || movie.title) : (movie.title_en || movie.title),
         }));
-    }, [language]);
+    }, [language, moviesList]);
 
     // Extract all unique genres from initial list
     const genres = useMemo(() => {
         const set = new Set<string>();
         localizedMovies.forEach((movie) => {
-            movie.genres.forEach((genre) => set.add(genre));
+            movie.genres.forEach((genre: string) => set.add(genre));
         });
         return Array.from(set);
     }, [localizedMovies]);
@@ -73,9 +137,16 @@ export default function Movies() {
                 </div>
 
                 {/* Movies Grid */}
-                <div className="mt-8 animate__animated animate__fadeInUp [animation-delay:200ms]">
-                    <MovieGrid movies={filteredMovies} />
-                </div>
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-20">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-650 mb-4"></div>
+                        <p className="text-gray-500 font-semibold">{t("loading" as any) || "Đang tải danh sách phim..."}</p>
+                    </div>
+                ) : (
+                    <div className="mt-8 animate__animated animate__fadeInUp [animation-delay:200ms]">
+                        <MovieGrid movies={filteredMovies} />
+                    </div>
+                )}
             </div>
         </div>
     );
