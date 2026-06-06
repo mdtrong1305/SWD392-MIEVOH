@@ -8,8 +8,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
-import { RoleGuard } from '../../common/guards/role.guard';
-import { Roles } from '../../common/decorators/role.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { ApiExcludeController } from '@nestjs/swagger';
 
@@ -17,7 +15,6 @@ import { ApiExcludeController } from '@nestjs/swagger';
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
-
 
   @Get('/vnpay-return')
   @Public()
