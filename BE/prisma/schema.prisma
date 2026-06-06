@@ -26,6 +26,9 @@ model User {
 
   userType String? @default("user") // "user", "staff", "admin"
 
+  cinemaComplexId String?        @db.ObjectId // Dành riêng cho staff để giới hạn khu vực
+  CinemaComplex   CinemaComplex? @relation(fields: [cinemaComplexId], references: [cinemaComplexId])
+
   // Thông tin cá nhân bổ sung (mặc định null)
   dateOfBirth DateTime?
   address     String?
@@ -154,6 +157,7 @@ model CinemaComplex {
   CinemaSystem CinemaSystem? @relation(fields: [cinemaSystemId], references: [cinemaSystemId], onDelete: Cascade)
   Cinemas      Cinema[]
   Foods        Food[]
+  Users        User[]
 
   @@index([cinemaSystemId])
 }

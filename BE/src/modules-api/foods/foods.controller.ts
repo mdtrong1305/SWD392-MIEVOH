@@ -10,6 +10,8 @@ import {
   UseInterceptors,
   UploadedFile,
 } from '@nestjs/common';
+import { User } from '../../common/decorators/user.decorator';
+import type { User as PrismaUser } from '../../modules-system/prisma/generated/prisma/client';
 import { FoodsService } from './foods.service';
 import { CreateFoodDto, UpdateFoodDto } from './dto/foods.dto';
 import { RoleGuard } from '../../common/guards/role.guard';
@@ -48,9 +50,10 @@ export class FoodsController {
   @ApiResponse({ status: 201, description: 'Tạo món ăn thành công' })
   create(
     @Body() createFoodDto: CreateFoodDto,
+    @User() user: PrismaUser,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    return this.foodsService.create(createFoodDto, file);
+    return this.foodsService.create(createFoodDto, user, file);
   }
 
   @Put('/:foodId')
@@ -64,9 +67,10 @@ export class FoodsController {
   update(
     @Param('foodId') foodId: string,
     @Body() updateFoodDto: UpdateFoodDto,
+    @User() user: PrismaUser,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    return this.foodsService.update(foodId, updateFoodDto, file);
+    return this.foodsService.update(foodId, updateFoodDto, user, file);
   }
 
   @Delete('/:foodId')
@@ -79,7 +83,7 @@ export class FoodsController {
     status: 400,
     description: 'Không thể xóa vì đã có người đặt vé mua món này',
   })
-  delete(@Param('foodId') foodId: string) {
-    return this.foodsService.delete(foodId);
+  delete(@Param('foodId') foodId: string, @User() user: PrismaUser) {
+    return this.foodsService.delete(foodId, user);
   }
 }

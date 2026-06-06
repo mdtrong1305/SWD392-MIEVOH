@@ -18,6 +18,7 @@ import { PaymentsModule } from './modules-api/payments/payments.module';
 import { Cache, CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
 import { DATABASE_REDIS } from './common/constant/app.constant';
+import { UsersModule } from './modules-api/users/users.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { DATABASE_REDIS } from './common/constant/app.constant';
     FoodsModule,
     BookingsModule,
     PaymentsModule,
+    UsersModule,
   ],
   providers: [
     {

@@ -3,18 +3,21 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
+
+import { PrismaService } from '../../modules-system/prisma/prisma.service';
+import { validateStaffComplex } from '../../common/helper/staff.helper';
+import type { User as PrismaUser } from '../../modules-system/prisma/generated/prisma/client';
 import {
   CreateSeatDto,
   GenerateSeatsDto,
   UpdateSeatDto,
 } from './dto/seats.dto';
-import { PrismaService } from '../../modules-system/prisma/prisma.service';
 
 @Injectable()
 export class SeatsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async generateSeats(body: GenerateSeatsDto) {
+  async generateSeats(body: GenerateSeatsDto, user: PrismaUser) {
     const {
       cinemaId,
       rowLetterStart,
@@ -31,6 +34,8 @@ export class SeatsService {
     if (!cinema) {
       throw new NotFoundException('Không tìm thấy rạp chiếu');
     }
+
+    validateStaffComplex(user, cinema.cinemaComplexId!);
 
     // Convert ký tự chữ sang mã ASCII để lặp (VD: A -> 65, J -> 74)
     const startCode = rowLetterStart.toUpperCase().charCodeAt(0);
@@ -84,13 +89,15 @@ export class SeatsService {
     };
   }
 
-  async findAllByCinemaId(cinemaId: string) {
+  async findAllByCinemaId(cinemaId: string, user: PrismaUser) {
     const cinema = await this.prisma.cinema.findUnique({
       where: { cinemaId },
     });
     if (!cinema) {
       throw new NotFoundException('Không tìm thấy rạp chiếu');
     }
+
+    validateStaffComplex(user, cinema.cinemaComplexId!);
 
     const data = await this.prisma.seat.findMany({
       where: { cinemaId },
@@ -100,13 +107,15 @@ export class SeatsService {
     return { data, total: data.length };
   }
 
-  async create(body: CreateSeatDto) {
+  async create(body: CreateSeatDto, user: PrismaUser) {
     const cinema = await this.prisma.cinema.findUnique({
       where: { cinemaId: body.cinemaId },
     });
     if (!cinema) {
       throw new NotFoundException('Không tìm thấy rạp chiếu');
     }
+
+    validateStaffComplex(user, cinema.cinemaComplexId!);
 
     // Check trùng tên ghế trong cùng 1 rạp
     const existingSeat = await this.prisma.seat.findFirst({
@@ -127,12 +136,19 @@ export class SeatsService {
     return newSeat;
   }
 
-  async update(body: UpdateSeatDto) {
+  async update(body: UpdateSeatDto, user: PrismaUser) {
     const seat = await this.prisma.seat.findUnique({
       where: { seatId: body.seatId },
     });
     if (!seat) {
       throw new NotFoundException('Không tìm thấy ghế');
+    }
+
+    const cinema = await this.prisma.cinema.findUnique({
+      where: { cinemaId: seat.cinemaId },
+    });
+    if (cinema) {
+      validateStaffComplex(user, cinema.cinemaComplexId!);
     }
 
     const dataToUpdate: any = {};
@@ -147,12 +163,19 @@ export class SeatsService {
     return updatedSeat;
   }
 
-  async delete(seatId: string) {
+  async delete(seatId: string, user: PrismaUser) {
     const seat = await this.prisma.seat.findUnique({
       where: { seatId },
     });
     if (!seat) {
       throw new NotFoundException('Không tìm thấy ghế');
+    }
+
+    const cinema = await this.prisma.cinema.findUnique({
+      where: { cinemaId: seat.cinemaId },
+    });
+    if (cinema) {
+      validateStaffComplex(user, cinema.cinemaComplexId!);
     }
 
     await this.prisma.seat.delete({

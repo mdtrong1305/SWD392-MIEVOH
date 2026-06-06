@@ -8,12 +8,14 @@ import { PrismaService } from '../../modules-system/prisma/prisma.service';
 import { CreateShowtimeDto, UpdateShowtimeDto } from './dto/showtimes.dto';
 import { TimeCalculatorHelper } from '../../common/helper/time-calculator.helper';
 import { ShowtimeHelper } from '../../common/helper/showtime.helper';
+import { validateStaffComplex } from '../../common/helper/staff.helper';
+import type { User as PrismaUser } from '../../modules-system/prisma/generated/prisma/client';
 
 @Injectable()
 export class ShowtimesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: CreateShowtimeDto) {
+  async create(data: CreateShowtimeDto, user: PrismaUser) {
     // lấy thông tin phim để tính thời lượng
     const movie = await this.prisma.movie.findUnique({
       where: { movieId: data.movieId },
@@ -31,6 +33,18 @@ export class ShowtimesService {
     if (newStart < new Date()) {
       throw new ConflictException('Không thể tạo lịch chiếu trong thời gian quá khứ!');
     }
+
+    const cinema = await this.prisma.cinema.findUnique({
+      where: { cinemaId: data.cinemaId },
+      select: { cinemaComplexId: true },
+    });
+
+    if (!cinema) {
+      throw new NotFoundException('Không tìm thấy phòng chiếu');
+    }
+
+    // Xác thực quyền Staff đối với cụm rạp của phòng chiếu này
+    validateStaffComplex(user, cinema.cinemaComplexId!);
 
     const newEnd = TimeCalculatorHelper.calculateEndTime(newStart, duration, bufferTime);
 
@@ -51,7 +65,7 @@ export class ShowtimesService {
     return showtime;
   }
 
-  async update(data: UpdateShowtimeDto) {
+  async update(data: UpdateShowtimeDto, user: PrismaUser) {
     const { showtimeId, ...updateData } = data;
 
     // kiểm tra sự tồn tại của lịch chiếu
@@ -60,6 +74,9 @@ export class ShowtimesService {
       include: {
         _count: {
           select: { Bookings: true },
+        },
+        Cinema: {
+          select: { cinemaComplexId: true },
         },
       },
     });
@@ -75,6 +92,9 @@ export class ShowtimesService {
       );
     }
 
+    // Xác thực quyền Staff trên suất chiếu cũ
+    validateStaffComplex(user, existing.Cinema?.cinemaComplexId!);
+
     // nếu đổi ngày/giờ hoặc phòng chiếu -> phải check trùng lịch lại!
     if (data.showDateTime || data.cinemaId) {
       const targetCinemaId = data.cinemaId || existing.cinemaId;
@@ -83,6 +103,16 @@ export class ShowtimesService {
       if (targetCinemaId && targetStart) {
         if (targetStart < new Date()) {
           throw new ConflictException('Không thể dời lịch chiếu về thời gian quá khứ!');
+        }
+
+        if (data.cinemaId && data.cinemaId !== existing.cinemaId) {
+          const newCinema = await this.prisma.cinema.findUnique({
+            where: { cinemaId: data.cinemaId },
+            select: { cinemaComplexId: true },
+          });
+          if (!newCinema) throw new NotFoundException('Không tìm thấy phòng chiếu mới');
+          // Xác thực quyền Staff trên phòng chiếu mới
+          validateStaffComplex(user, newCinema.cinemaComplexId!);
         }
 
         // lấy thời lượng phim hiện tại
@@ -117,7 +147,7 @@ export class ShowtimesService {
     return updatedShowtime;
   }
 
-  async delete(showtimeId: string) {
+  async delete(showtimeId: string, user: PrismaUser) {
     // kiểm tra sự tồn tại
     const existing = await this.prisma.showtime.findUnique({
       where: { showtimeId },
@@ -125,12 +155,18 @@ export class ShowtimesService {
         _count: {
           select: { Bookings: true },
         },
+        Cinema: {
+          select: { cinemaComplexId: true },
+        },
       },
     });
 
     if (!existing) {
       throw new NotFoundException('Không tìm thấy lịch chiếu');
     }
+
+    // Xác thực quyền Staff
+    validateStaffComplex(user, existing.Cinema?.cinemaComplexId!);
 
     // chặn xóa nếu đã có khách mua vé
     if (existing._count.Bookings > 0) {

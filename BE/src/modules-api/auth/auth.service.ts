@@ -53,6 +53,7 @@ export class AuthService {
         email: user.email,
         avatar: user.avatar,
         userType: user.userType,
+        cinemaComplexId: user.cinemaComplexId,
       },
       token,
     };
@@ -99,6 +100,7 @@ export class AuthService {
         email: newUser.email,
         avatar: newUser.avatar,
         userType: newUser.userType,
+        cinemaComplexId: newUser.cinemaComplexId,
       },
       token,
     };
@@ -144,6 +146,7 @@ export class AuthService {
         email: user.email,
         avatar: user.avatar,
         userType: user.userType,
+        cinemaComplexId: user.cinemaComplexId,
       },
       token,
     };

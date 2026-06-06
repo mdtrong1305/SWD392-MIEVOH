@@ -4,6 +4,8 @@ import { CreateFoodDto, UpdateFoodDto } from './dto/foods.dto';
 import { deleteFile } from '../../common/helper/delete-file.helper';
 import { DOMAIN_SERVER } from '../../common/constant/app.constant';
 import { unlinkSync } from 'fs';
+import { validateStaffComplex } from '../../common/helper/staff.helper';
+import type { User as PrismaUser } from '../../modules-system/prisma/generated/prisma/client';
 
 @Injectable()
 export class FoodsService {
@@ -19,7 +21,10 @@ export class FoodsService {
     });
   }
 
-  async create(data: CreateFoodDto, file?: Express.Multer.File) {
+  async create(data: CreateFoodDto, user: PrismaUser, file?: Express.Multer.File) {
+    // Xác thực quyền của Staff
+    validateStaffComplex(user, data.cinemaComplexId);
+
     // Check xem rạp có tồn tại không
     const complex = await this.prisma.cinemaComplex.findUnique({
       where: { cinemaComplexId: data.cinemaComplexId },
@@ -43,7 +48,7 @@ export class FoodsService {
     });
   }
 
-  async update(foodId: string, data: UpdateFoodDto, file?: Express.Multer.File) {
+  async update(foodId: string, data: UpdateFoodDto, user: PrismaUser, file?: Express.Multer.File) {
     const existing = await this.prisma.food.findUnique({
       where: { foodId },
     });
@@ -53,6 +58,9 @@ export class FoodsService {
       throw new NotFoundException('Không tìm thấy món ăn');
     }
 
+    // Xác thực quyền Staff đối với cụm rạp cũ của món ăn
+    validateStaffComplex(user, existing.cinemaComplexId);
+
     if (data.cinemaComplexId && data.cinemaComplexId !== existing.cinemaComplexId) {
       const complex = await this.prisma.cinemaComplex.findUnique({
         where: { cinemaComplexId: data.cinemaComplexId },
@@ -61,6 +69,9 @@ export class FoodsService {
         if (file) unlinkSync(file.path);
         throw new NotFoundException('Không tìm thấy Cụm rạp được chỉ định');
       }
+
+      // Xác thực quyền Staff đối với cụm rạp mới (nếu sửa đổi sang cụm rạp khác)
+      validateStaffComplex(user, data.cinemaComplexId);
     }
 
     let imageUrl = existing.imageUrl;
@@ -85,12 +96,15 @@ export class FoodsService {
     });
   }
 
-  async delete(foodId: string) {
+  async delete(foodId: string, user: PrismaUser) {
     const existing = await this.prisma.food.findUnique({
       where: { foodId },
     });
 
     if (!existing) throw new NotFoundException('Không tìm thấy món ăn');
+
+    // Xác thực quyền Staff
+    validateStaffComplex(user, existing.cinemaComplexId);
 
     // Kiểm tra xem đã có booking nào mua món này chưa
     const isBooked = await this.prisma.bookingFood.findFirst({
