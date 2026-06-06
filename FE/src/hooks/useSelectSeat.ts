@@ -371,6 +371,10 @@ export default function useSelectSeat() {
                     movieTitle: movie.title,
                     movieImage: movie.image,
                     branchName: branchName,
+                    roomName: roomName,
+                    format: format,
+                    dayOfWeek: dayOfWeek,
+                    dateLabel: dateLabel,
                     time: time,
                     date: routeDate,
                     seats: selectedSeats,
@@ -380,9 +384,13 @@ export default function useSelectSeat() {
                             const c = combos.find(x => x.id === foodId);
                             return c ? `${comboQuantities[foodId]}x ${c.name}` : "";
                         }).filter(Boolean).join(", ") || "None",
+                    comboQuantities: comboQuantities,
+                    combosList: combos,
+                    comboPrice: comboPrice,
                     totalPrice: totalPrice,
                     status: "Pending",
-                    dateBooked: new Date().toLocaleDateString("vi-VN")
+                    dateBooked: new Date().toLocaleDateString("vi-VN"),
+                    movie: movie
                 };
                 localStorage.setItem("mievoh_pending_bookings", JSON.stringify(pendingBookings));
 

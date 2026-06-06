@@ -1,9 +1,8 @@
-import { ArrowLeft, ChevronRight, LayoutGrid, ShoppingBag, CreditCard, Ticket } from "lucide-react";
+import { ArrowLeft, ChevronRight, LayoutGrid, ShoppingBag, CreditCard } from "lucide-react";
 import SeatSelection from "./SeatSelection/SeatSelection.tsx";
 import PopcornSelection from "./PopcornSelection/PopcornSelection.tsx";
 import PaymentMethods from "./PaymentMethods/PaymentMethods.tsx";
 import QRTransferPage from "./QRTransferPage/QRTransferPage.tsx";
-import TicketSuccess from "./TicketSuccess/TicketSuccess.tsx";
 import BookingSidebar from "./BookingSidebar/BookingSidebar.tsx";
 import ConfirmationModal from "./ConfirmationModal/ConfirmationModal.tsx";
 import useSelectSeat from "../../../hooks/useSelectSeat.ts";
@@ -136,103 +135,75 @@ export default function SelectSeat() {
                         </div>
                         <span className="text-[9px] xs:text-[10px] sm:text-xs md:text-sm font-extrabold uppercase tracking-wider">{t("stepper_payment")}</span>
                     </div>
-
-                    <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 text-slate-300 dark:text-zinc-500" />
-
-                    <div className={`flex items-center gap-1 sm:gap-2 transition-all duration-300 ${activeStep >= 4 ? "text-[#8E7EFE] dark:text-[#a599ff]" : "text-slate-500 dark:text-white font-extrabold"}`}>
-                        <div className={`p-1 sm:p-2 rounded-xl flex items-center justify-center ${activeStep >= 4 ? "bg-violet-50 dark:bg-[#8E7EFE]/15 text-[#8E7EFE] dark:text-[#a599ff]" : "bg-transparent text-slate-400 dark:text-zinc-300"}`}>
-                            <Ticket className="h-4 w-4 sm:h-5 sm:w-5" />
-                        </div>
-                        <span className="text-[9px] xs:text-[10px] sm:text-xs md:text-sm font-extrabold uppercase tracking-wider">{t("stepper_ticket_info")}</span>
-                    </div>
                 </div>
 
-                {activeStep < 4 ? (
-                    showQRTransfer ? (
-                        <QRTransferPage
-                            isVerifying={isVerifying}
-                            paymentTimeLeft={paymentTimeLeft}
-                            formatTimeLeft={formatTimeLeft}
-                            bookingCode={bookingCode}
-                            totalPrice={totalPrice}
-                            formatPrice={formatPrice}
-                            setShowQRTransfer={setShowQRTransfer}
-                            setIsVerifying={setIsVerifying}
-                            setActiveStep={setActiveStep}
-                        />
-                    ) : (
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start w-full min-w-0">
-                            <div className="lg:col-span-2 flex flex-col gap-6 w-full min-w-0">
-                                {activeStep === 1 && (
-                                    <SeatSelection
-                                        selectedSeats={selectedSeats}
-                                        handleSeatClick={handleSeatClick}
-                                        seatsList={seatsList}
-                                    />
-                                )}
-                                {activeStep === 2 && (
-                                    <PopcornSelection
-                                        combos={combos}
-                                        comboQuantities={comboQuantities}
-                                        updateComboQuantity={updateComboQuantity}
-                                        setActiveStep={setActiveStep}
-                                        formatPrice={formatPrice}
-                                    />
-                                )}
-                                {activeStep === 3 && (
-                                    <PaymentMethods
-                                        paymentMethod={paymentMethod}
-                                        setPaymentMethod={setPaymentMethod}
-                                        isAuthenticated={isAuthenticated}
-                                        guestName={guestName}
-                                        guestPhone={guestPhone}
-                                        guestEmail={guestEmail}
-                                        guestErrors={guestErrors}
-                                        handleGuestChange={handleGuestChange}
-                                        setActiveStep={setActiveStep}
-                                    />
-                                )}
-                            </div>
-
-                            <BookingSidebar
-                                movie={movie}
-                                branchName={branchName}
-                                roomName={roomName}
-                                time={time}
-                                dayOfWeek={dayOfWeek}
-                                dateLabel={dateLabel}
-                                format={format}
-                                selectedSeats={selectedSeats}
-                                ticketBreakdown={ticketBreakdown}
-                                comboPrice={comboPrice}
-                                combos={combos}
-                                comboQuantities={comboQuantities}
-                                totalPrice={totalPrice}
-                                formatPrice={formatPrice}
-                                activeStep={activeStep}
-                                setActiveStep={setActiveStep}
-                                isBooking={isBooking}
-                                handleCheckout={handleCheckout}
-                            />
-                        </div>
-                    )
-                ) : (
-                    <TicketSuccess
-                        movie={movie}
-                        branchName={branchName}
-                        roomName={roomName}
-                        selectedSeats={selectedSeats}
-                        time={time}
-                        dayOfWeek={dayOfWeek}
-                        dateLabel={dateLabel}
-                        format={format}
-                        comboPrice={comboPrice}
-                        combos={combos}
-                        comboQuantities={comboQuantities}
+                {showQRTransfer ? (
+                    <QRTransferPage
+                        isVerifying={isVerifying}
+                        paymentTimeLeft={paymentTimeLeft}
+                        formatTimeLeft={formatTimeLeft}
+                        bookingCode={bookingCode}
                         totalPrice={totalPrice}
                         formatPrice={formatPrice}
-                        bookingCode={bookingCode}
+                        setShowQRTransfer={setShowQRTransfer}
+                        setIsVerifying={setIsVerifying}
+                        setActiveStep={setActiveStep}
                     />
+                ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start w-full min-w-0">
+                        <div className="lg:col-span-2 flex flex-col gap-6 w-full min-w-0">
+                            {activeStep === 1 && (
+                                <SeatSelection
+                                    selectedSeats={selectedSeats}
+                                    handleSeatClick={handleSeatClick}
+                                    seatsList={seatsList}
+                                />
+                            )}
+                            {activeStep === 2 && (
+                                <PopcornSelection
+                                    combos={combos}
+                                    comboQuantities={comboQuantities}
+                                    updateComboQuantity={updateComboQuantity}
+                                    setActiveStep={setActiveStep}
+                                    formatPrice={formatPrice}
+                                />
+                            )}
+                            {activeStep === 3 && (
+                                <PaymentMethods
+                                    paymentMethod={paymentMethod}
+                                    setPaymentMethod={setPaymentMethod}
+                                    isAuthenticated={isAuthenticated}
+                                    guestName={guestName}
+                                    guestPhone={guestPhone}
+                                    guestEmail={guestEmail}
+                                    guestErrors={guestErrors}
+                                    handleGuestChange={handleGuestChange}
+                                    setActiveStep={setActiveStep}
+                                />
+                            )}
+                        </div>
+
+                        <BookingSidebar
+                            movie={movie}
+                            branchName={branchName}
+                            roomName={roomName}
+                            time={time}
+                            dayOfWeek={dayOfWeek}
+                            dateLabel={dateLabel}
+                            format={format}
+                            selectedSeats={selectedSeats}
+                            ticketBreakdown={ticketBreakdown}
+                            comboPrice={comboPrice}
+                            combos={combos}
+                            comboQuantities={comboQuantities}
+                            totalPrice={totalPrice}
+                            formatPrice={formatPrice}
+                            activeStep={activeStep}
+                            setActiveStep={setActiveStep}
+                            isBooking={isBooking}
+                            handleCheckout={handleCheckout}
+                        />
+                    </div>
                 )}
             </div>
 
