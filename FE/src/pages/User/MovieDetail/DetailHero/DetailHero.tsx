@@ -6,7 +6,7 @@ import Button from "../../../../components/Button/Button.tsx";
 import TrailerModal from "../TrailerModal/TrailerModal.tsx";
 
 export interface MovieDetailInfo {
-    id: number;
+    id: string | number;
     title: string;
     title_vi?: string;
     title_en?: string;
@@ -247,7 +247,7 @@ export default function DetailHero({ movie }: DetailHeroProps) {
                 isOpen={showTrailer}
                 isClosing={isClosing}
                 onClose={handleCloseTrailer}
-                trailerUrl={getTrailerUrl(movie.id)}
+                trailerUrl={movie.trailerUrl || getTrailerUrl(Number(movie.id) || 1)}
                 movieTitle={displayTitle}
             />
         </div>

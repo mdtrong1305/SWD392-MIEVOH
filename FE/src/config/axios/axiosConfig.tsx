@@ -20,4 +20,18 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-export default api
+// Add response interceptor to automatically clean up expired sessions
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('mievoh_user');
+      // Redirect to login page
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;

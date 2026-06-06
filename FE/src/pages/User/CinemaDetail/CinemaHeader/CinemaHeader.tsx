@@ -1,14 +1,11 @@
 import { MapPin, Compass } from "lucide-react";
 import type { DisplayBranch } from "../../Cinemas/CinemaBranches/CinemaBranches.tsx";
-import { THEATER_CHAINS } from "../../../../mockAPI/cinemaMock.tsx";
-
 interface CinemaHeaderProps {
     branch: DisplayBranch;
 }
 
 export default function CinemaHeader({ branch }: CinemaHeaderProps) {
-    const chainInfo = THEATER_CHAINS.find(c => c.id === branch.id.toString().substring(0, 1));
-    const description = chainInfo?.description || "Modern cinema system with premium hall quality and immersive sound technology.";
+    const description = `${branch.chainName} - Modern cinema system with premium hall quality and immersive sound technology.`;
 
     return (
         <div className="relative w-full overflow-hidden shadow-lg border-b border-black/20 animate__animated animate__fadeIn">

@@ -1,40 +1,112 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { THEATER_CHAINS } from "../../../mockAPI/cinemaMock.tsx";
 import type { DisplayBranch } from "../Cinemas/CinemaBranches/CinemaBranches.tsx";
 import CinemaHeader from "./CinemaHeader/CinemaHeader.tsx";
 import DateSelector from "./DateSelector/DateSelector.tsx";
 import type { DateOption } from "./DateSelector/DateSelector.tsx";
 import MovieShowtimesList from "./MovieShowtimesList/MovieShowtimesList.tsx";
 import { Search } from "lucide-react";
+import { getCinemaComplexDetailApi } from "../../../axios/cinemas.tsx";
 
 export default function CinemaDetailPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [selectedDate, setSelectedDate] = useState<DateOption | null>(null);
+    const [activeBranch, setActiveBranch] = useState<DisplayBranch | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    // Scroll to top on mount or when cinema ID changes
+    // Scroll to top and fetch complex details
     useEffect(() => {
         window.scrollTo(0, 0);
-    }, [id]);
+        if (!id) return;
 
-    // Find the current cinema branch and include chain logos and names
-    const activeBranch = useMemo(() => {
-        if (!id) return null;
-        const targetId = parseInt(id, 10);
+        const fetchComplexDetail = async () => {
+            try {
+                setLoading(true);
+                const res = await getCinemaComplexDetailApi(id);
+                const comp = res.data;
 
-        for (const chain of THEATER_CHAINS) {
-            const branch = chain.branches.find(b => b.id === targetId);
-            if (branch) {
-                return {
-                    ...branch,
-                    chainName: chain.name,
-                    chainLogo: chain.logo
-                } as DisplayBranch;
+                if (comp) {
+                    const sysName = comp.CinemaSystem?.name || "Cinema";
+                    const sysLogo = comp.CinemaSystem?.logo || "";
+                    const sysNameLower = sysName.toLowerCase();
+                    
+                    let rating = 4.5;
+                    let priceRange = "70,000 VND - 120,000 VND";
+                    let phone = "1900 1000";
+
+                    if (sysNameLower.includes("cgv")) {
+                        rating = 4.8;
+                        priceRange = "80,000 VND - 160,000 VND";
+                        phone = "1900 6017";
+                    } else if (sysNameLower.includes("bhd")) {
+                        rating = 4.6;
+                        priceRange = "65,000 VND - 120,000 VND";
+                        phone = "1900 2099";
+                    } else if (sysNameLower.includes("lotte")) {
+                        rating = 4.7;
+                        priceRange = "70,000 VND - 130,000 VND";
+                        phone = "028 3775 2524";
+                    } else if (sysNameLower.includes("cine")) {
+                        rating = 4.4;
+                        priceRange = "45,000 VND - 90,000 VND";
+                        phone = "028 7300 8881";
+                    } else if (sysNameLower.includes("beta")) {
+                        rating = 4.3;
+                        priceRange = "50,000 VND - 100,000 VND";
+                        phone = "024 7302 8885";
+                    }
+
+                    let logoUrl = sysLogo || "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=120&q=80";
+                    if (sysLogo && !sysLogo.startsWith('http')) {
+                        const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://api.mievoh.io.vn/api';
+                        const domain = apiBase.replace('/api', '');
+                        logoUrl = `${domain}/cinema-system/${sysLogo}`;
+                    }
+
+                    const address = comp.address || "";
+                    let city = "Ho Chi Minh City";
+                    if (address.toLowerCase().includes("hà nội") || address.toLowerCase().includes("hanoi")) {
+                        city = "Hanoi";
+                    } else if (address.toLowerCase().includes("đà nẵng") || address.toLowerCase().includes("da nang")) {
+                        city = "Da Nang";
+                    } else if (address.toLowerCase().includes("bình dương") || address.toLowerCase().includes("binh duong")) {
+                        city = "Binh Duong";
+                    }
+
+                    setActiveBranch({
+                        id: comp.cinemaComplexId,
+                        name: comp.name || "Cụm rạp",
+                        address,
+                        phone,
+                        city,
+                        rating,
+                        priceRange,
+                        image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80",
+                        chainName: sysName,
+                        chainLogo: logoUrl
+                    });
+                } else {
+                    setActiveBranch(null);
+                }
+            } catch (err) {
+                console.error("Lỗi khi tải chi tiết cụm rạp:", err);
+                setActiveBranch(null);
+            } finally {
+                setLoading(false);
             }
-        }
-        return null;
+        };
+
+        fetchComplexDetail();
     }, [id]);
+
+    if (loading) {
+        return (
+            <div className="bg-[#EFEBF4] min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-650"></div>
+            </div>
+        );
+    }
 
     if (!activeBranch) {
         return (
@@ -72,7 +144,7 @@ export default function CinemaDetailPage() {
                 <h2 className="text-xs font-extrabold text-slate-800 mb-6 tracking-widest uppercase border-l-4 border-[#6C5CE7] pl-3">
                     Showtimes at {activeBranch.name}
                 </h2>
-                <MovieShowtimesList selectedDate={selectedDate} cinemaName={activeBranch.name} />
+                <MovieShowtimesList complexId={activeBranch.id.toString()} selectedDate={selectedDate} cinemaName={activeBranch.name} />
             </div>
         </div>
     );

@@ -1,5 +1,4 @@
-import { THEATER_CHAINS } from "../../../../mockAPI/cinemaMock.tsx";
-import type { TheaterChain } from "../../../../mockAPI/cinemaMock.tsx";
+import type { TheaterChain } from "../../../../axios/cinemas.tsx";
 
 interface CinemaChainsProps {
     selectedChainId: string;
@@ -32,8 +31,8 @@ export default function CinemaChains({
                     <span className="text-[10px] text-gray-400 mt-1">({totalMatchingBranches} cinemas)</span>
                 </button>
 
-                {THEATER_CHAINS.map(chain => {
-                    const count = filteredChains.find(c => c.id === chain.id)?.branches.length || 0;
+                {filteredChains.map(chain => {
+                    const count = chain.branches.length;
                     const isSelected = selectedChainId === chain.id;
                     return (
                         <button

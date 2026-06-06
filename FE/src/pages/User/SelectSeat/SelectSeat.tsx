@@ -31,7 +31,7 @@ export default function SelectSeat() {
         setIsVerifying,
         showQRTransfer,
         setShowQRTransfer,
-        movie,
+        movie: movieRaw,
         branchName,
         roomName,
         time,
@@ -54,15 +54,24 @@ export default function SelectSeat() {
         userPhone,
         userEmailAddress,
         navigate,
-        seatRows,
-        standardRows,
-        vipRows,
-        bookedSeats,
-        combos
+        combos,
+        loading,
+        seatsList
     } = useSelectSeat();
 
+    const movie = movieRaw as any;
+
+    if (loading) {
+        return (
+            <div className="w-full min-h-screen bg-[#EFEBF4] dark:bg-zinc-950 flex flex-col items-center justify-center">
+                <div className="w-12 h-12 border-4 border-[#8E7EFE] border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-[#8E7EFE] dark:text-[#a599ff] font-black mt-4 text-base tracking-wide animate-pulse">Loading booking details...</p>
+            </div>
+        );
+    }
+
     return (
-        <div className="w-full bg-[#EFEBF4] min-h-screen pb-16 font-sans">
+        <div className="w-full bg-[#EFEBF4] dark:bg-zinc-955 min-h-screen pb-16 font-sans">
             {/* Header info banner with movie backdrops */}
             <div className="relative w-full overflow-hidden bg-[#0F0C15] text-white py-8 border-b border-violet-950/20">
                 <div 
@@ -158,10 +167,7 @@ export default function SelectSeat() {
                                     <SeatSelection
                                         selectedSeats={selectedSeats}
                                         handleSeatClick={handleSeatClick}
-                                        seatRows={seatRows}
-                                        standardRows={standardRows}
-                                        vipRows={vipRows}
-                                        bookedSeats={bookedSeats}
+                                        seatsList={seatsList}
                                     />
                                 )}
                                 {activeStep === 2 && (

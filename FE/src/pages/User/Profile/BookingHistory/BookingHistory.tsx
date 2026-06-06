@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { Ticket, Calendar, Clock, MapPin, Receipt, CheckCircle, Info } from "lucide-react";
 import type { RootState } from "../../../../store/index.tsx";
 import { resetBooking } from "../../SelectSeat/slice.ts";
-import { MOVIES_DETAILS } from "../../../../mockAPI/movieMock.tsx";
 import { toast } from "../../../../components/Toast/Toast.tsx";
 import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 
@@ -11,7 +10,7 @@ import type { BookingRecord } from "../../../../mockAPI/historyMock.tsx";
 import { DEFAULT_BOOKING_HISTORY } from "../../../../mockAPI/historyMock.tsx";
 
 export default function BookingHistory() {
-    const { t, language } = useLanguage();
+    const { t } = useLanguage();
     const dispatch = useDispatch();
     const [history, setHistory] = useState<BookingRecord[]>([]);
     const [selectedRecordForModal, setSelectedRecordForModal] = useState<BookingRecord | null>(null);
@@ -29,9 +28,8 @@ export default function BookingHistory() {
             const alreadyExists = currentHistory.some((rec: BookingRecord) => rec.bookingCode === booking.bookingCode);
             
             if (!alreadyExists) {
-                const movieInfo = MOVIES_DETAILS[booking.movieId];
-                const movieTitle = movieInfo ? movieInfo.title : "Unknown Movie";
-                const movieImage = movieInfo ? movieInfo.image : "🍿";
+                const movieTitle = booking.movieTitle || "Unknown Movie";
+                const movieImage = booking.movieImage || "🍿";
 
                 // Format combos
                 const comboNames = [
@@ -63,7 +61,7 @@ export default function BookingHistory() {
                 const newBookingRecord: BookingRecord = {
                     id: "booking-" + Date.now(),
                     bookingCode: booking.bookingCode,
-                    movieId: booking.movieId,
+                    movieId: Number(booking.movieId) || 0,
                     movieTitle,
                     movieImage,
                     branchName: booking.branchName || "CGV Vincom Center Dong Khoi",
@@ -167,11 +165,7 @@ export default function BookingHistory() {
                                 <div className="flex flex-col gap-2">
                                     <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
                                         <h4 className="text-base font-black text-gray-900">
-                                            {(() => {
-                                                const mInfo = MOVIES_DETAILS[record.movieId];
-                                                if (!mInfo) return record.movieTitle;
-                                                return language === "vi" ? (mInfo.title_vi || mInfo.title) : (mInfo.title_en || mInfo.title);
-                                            })()}
+                                            {record.movieTitle}
                                         </h4>
                                         <span className="inline-flex self-start items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
                                             <CheckCircle className="h-3.5 w-3.5" />

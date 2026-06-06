@@ -1,7 +1,13 @@
 import { Link } from "react-router-dom";
 import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 import { Check } from "lucide-react";
-import { type ComboItem } from "../../../../mockAPI/bookingMock.tsx";
+interface ComboItem {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    image: string;
+}
 import type { MovieDetailInfo } from "../../MovieDetail/DetailHero/DetailHero.tsx";
 
 interface TicketSuccessProps {
@@ -15,7 +21,7 @@ interface TicketSuccessProps {
     format: string;
     comboPrice: number;
     combos: ComboItem[];
-    comboQuantities: Record<number, number>;
+    comboQuantities: Record<string, number>;
     totalPrice: number;
     formatPrice: (value: number) => string;
     bookingCode: string;

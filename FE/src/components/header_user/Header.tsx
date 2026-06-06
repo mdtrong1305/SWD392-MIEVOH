@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { User, Menu, X, Ticket, LogOut, Lock, Sun, Moon, Globe } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "../../store/index.tsx";
@@ -8,6 +8,7 @@ import Button from "../Button/Button";
 import { useTheme } from "../../contextAPI/ThemeContext.tsx";
 import { useLanguage } from "../../contextAPI/LanguageContext.tsx";
 import SearchInput from "../SearchInput/SearchInput";
+import { getNowShowingMoviesApi, getComingSoonMoviesApi, getCinemaComplexesApi } from "../../axios/cinemas.tsx";
 
 type NavItem = {
     label: string;
@@ -61,6 +62,272 @@ export default function Header({
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [userMenuOpen, isOpen]);
+
+    // Search States & Logic
+    const [searchQuery, setSearchQuery] = useState("");
+    const [allMovies, setAllMovies] = useState<any[]>([]);
+    const [allComplexes, setAllComplexes] = useState<any[]>([]);
+    const [hasLoadedData, setHasLoadedData] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
+    const [searchDropdownOpen, setSearchDropdownOpen] = useState(false);
+    const searchContainerRef = useRef<HTMLDivElement>(null);
+    const mobileSearchContainerRef = useRef<HTMLDivElement>(null);
+
+    const handleSearchFocus = async () => {
+        setSearchDropdownOpen(true);
+        if (hasLoadedData) return;
+        
+        setIsSearching(true);
+        try {
+            const [nowShowingRes, comingSoonRes, complexesRes] = await Promise.all([
+                getNowShowingMoviesApi({ pageSize: 100 }),
+                getComingSoonMoviesApi({ pageSize: 100 }),
+                getCinemaComplexesApi()
+            ]);
+            
+            // Safely parse nowShowing movies
+            let nowShowing = [];
+            const nowData = nowShowingRes.data as any;
+            if (nowData) {
+                if (Array.isArray(nowData)) {
+                    nowShowing = nowData;
+                } else if (Array.isArray(nowData.movies)) {
+                    nowShowing = nowData.movies;
+                } else if (Array.isArray(nowData.data)) {
+                    nowShowing = nowData.data;
+                }
+            }
+
+            // Safely parse comingSoon movies
+            let comingSoon = [];
+            const comingData = comingSoonRes.data as any;
+            if (comingData) {
+                if (Array.isArray(comingData)) {
+                    comingSoon = comingData;
+                } else if (Array.isArray(comingData.movies)) {
+                    comingSoon = comingData.movies;
+                } else if (Array.isArray(comingData.data)) {
+                    comingSoon = comingData.data;
+                }
+            }
+
+            // Combine and de-duplicate movies
+            const movieMap = new Map();
+            [...nowShowing, ...comingSoon].forEach(movie => {
+                if (movie?.movieId) {
+                    movieMap.set(movie.movieId, movie);
+                }
+            });
+
+            // Safely parse complexes
+            let complexes = [];
+            const complexesData = complexesRes.data as any;
+            if (complexesData) {
+                if (Array.isArray(complexesData)) {
+                    complexes = complexesData;
+                } else if (Array.isArray(complexesData.data)) {
+                    complexes = complexesData.data;
+                } else if (Array.isArray(complexesData.cinemaComplexes)) {
+                    complexes = complexesData.cinemaComplexes;
+                }
+            }
+
+            setAllMovies(Array.from(movieMap.values()));
+            setAllComplexes(complexes);
+            setHasLoadedData(true);
+        } catch (err) {
+            console.error("Error loading search data:", err);
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
+    useEffect(() => {
+        const handleClickOutsideSearch = (event: MouseEvent) => {
+            if (
+                searchContainerRef.current && 
+                !searchContainerRef.current.contains(event.target as Node)
+            ) {
+                setSearchDropdownOpen(false);
+            }
+            if (
+                mobileSearchContainerRef.current &&
+                !mobileSearchContainerRef.current.contains(event.target as Node)
+            ) {
+                setSearchDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutsideSearch);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutsideSearch);
+        };
+    }, []);
+
+    const filteredMovies = useMemo(() => {
+        if (!searchQuery.trim()) return [];
+        const q = searchQuery.toLowerCase().trim();
+        return allMovies.filter(movie => {
+            const titleVi = (movie.title_vi || "").toLowerCase();
+            const titleEn = (movie.title_en || "").toLowerCase();
+            const genres = Array.isArray(movie.genres) 
+                ? movie.genres.join(" ").toLowerCase() 
+                : (movie.genres || "").toLowerCase();
+            return titleVi.includes(q) || titleEn.includes(q) || genres.includes(q);
+        });
+    }, [searchQuery, allMovies]);
+
+    const filteredComplexes = useMemo(() => {
+        if (!searchQuery.trim()) return [];
+        const q = searchQuery.toLowerCase().trim();
+        return allComplexes.filter(complex => {
+            const name = (complex.name || "").toLowerCase();
+            const address = (complex.address || "").toLowerCase();
+            return name.includes(q) || address.includes(q);
+        });
+    }, [searchQuery, allComplexes]);
+
+    const getMovieImage = (movie: any) => {
+        let image = movie.imageUrl || "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80";
+        if (movie.imageUrl && !movie.imageUrl.startsWith('http')) {
+            const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://api.mievoh.io.vn/api';
+            const domain = apiBase.replace('/api', '');
+            image = `${domain}/movies/${movie.imageUrl}`;
+        }
+        return image;
+    };
+
+    const getComplexLogo = (complex: any) => {
+        const system = complex.CinemaSystem;
+        if (!system) return "🍿";
+        let logo = system.logo || "🍿";
+        if (system.logo && !system.logo.startsWith('http')) {
+            const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://api.mievoh.io.vn/api';
+            const domain = apiBase.replace('/api', '');
+            logo = `${domain}/cinemas/${system.logo}`;
+        }
+        return logo;
+    };
+
+    const renderSearchDropdown = (isMobile: boolean) => {
+        if (!searchDropdownOpen || !searchQuery.trim()) return null;
+        
+        return (
+            <div className={`absolute top-full z-[100] mt-2 max-h-[380px] overflow-y-auto bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-2xl p-4 flex flex-col gap-4 custom-search-scrollbar ${
+                isMobile 
+                    ? "left-0 right-0 w-full" 
+                    : "right-0 w-96 lg:w-[26rem]"
+            }`}>
+                <style>{`
+                    .custom-search-scrollbar::-webkit-scrollbar {
+                        width: 6px;
+                    }
+                    .custom-search-scrollbar::-webkit-scrollbar-track {
+                        background: transparent;
+                    }
+                    .custom-search-scrollbar::-webkit-scrollbar-thumb {
+                        background: #E9D5FF;
+                        border-radius: 9999px;
+                    }
+                    .custom-search-scrollbar::-webkit-scrollbar-thumb:hover {
+                        background: #D8B4FE;
+                    }
+                `}</style>
+                {isSearching ? (
+                    <div className="flex items-center justify-center py-6 text-sm text-gray-500 font-bold gap-2">
+                        <span className="h-4 w-4 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+                        <span>{language === "vi" ? "Đang tìm kiếm..." : "Searching..."}</span>
+                    </div>
+                ) : filteredMovies.length === 0 && filteredComplexes.length === 0 ? (
+                    <div className="text-center py-6 text-sm text-gray-400 font-medium">
+                        {language === "vi" ? "Không tìm thấy kết quả nào" : "No results found"}
+                    </div>
+                ) : (
+                    <>
+                        {/* Movies section */}
+                        {filteredMovies.length > 0 && (
+                            <div className="flex flex-col gap-2">
+                                <h5 className="text-[10px] font-black text-gray-400 dark:text-zinc-500 uppercase tracking-wider px-1 text-left">
+                                    {language === "vi" ? "Phim" : "Movies"}
+                                </h5>
+                                <div className="flex flex-col gap-1.5">
+                                    {filteredMovies.map(movie => {
+                                        const title = language === "vi" ? (movie.title_vi || movie.title_en) : (movie.title_en || movie.title_vi);
+                                        const img = getMovieImage(movie);
+                                        return (
+                                            <Link
+                                                key={movie.movieId}
+                                                to={`/movies/${movie.movieId}`}
+                                                onClick={() => {
+                                                    setSearchQuery("");
+                                                    setSearchDropdownOpen(false);
+                                                    setIsOpen(false);
+                                                }}
+                                                className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-900 transition-colors"
+                                            >
+                                                <img src={img} alt={title} className="w-10 h-14 object-cover rounded-lg shadow-sm" />
+                                                <div className="flex-1 min-w-0 text-left">
+                                                    <h6 className="text-sm font-bold text-gray-800 dark:text-zinc-100 truncate">{title}</h6>
+                                                    <p className="text-[11px] text-[#8E7EFE] font-extrabold mt-0.5 truncate">
+                                                        {Array.isArray(movie.genres) ? movie.genres.join(" / ") : movie.genres}
+                                                    </p>
+                                                    {movie.duration && (
+                                                        <span className="text-[10px] text-gray-400 font-semibold">{movie.duration}m</span>
+                                                    )}
+                                                </div>
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Divider */}
+                        {filteredMovies.length > 0 && filteredComplexes.length > 0 && (
+                            <div className="border-t border-slate-100 dark:border-zinc-800" />
+                        )}
+
+                        {/* Cinema Complexes section */}
+                        {filteredComplexes.length > 0 && (
+                            <div className="flex flex-col gap-2">
+                                <h5 className="text-[10px] font-black text-gray-400 dark:text-zinc-500 uppercase tracking-wider px-1 text-left">
+                                    {language === "vi" ? "Rạp chiếu" : "Cinemas"}
+                                </h5>
+                                <div className="flex flex-col gap-1.5">
+                                    {filteredComplexes.map(complex => {
+                                        const logo = getComplexLogo(complex);
+                                        return (
+                                            <Link
+                                                key={complex.cinemaComplexId}
+                                                to={`/cinemas/${complex.cinemaComplexId}`}
+                                                onClick={() => {
+                                                    setSearchQuery("");
+                                                    setSearchDropdownOpen(false);
+                                                    setIsOpen(false);
+                                                }}
+                                                className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-900 transition-colors"
+                                            >
+                                                {logo.startsWith('http') || logo.includes('/') ? (
+                                                    <img src={logo} alt={complex.name} className="w-10 h-10 object-contain rounded-lg p-0.5 border border-slate-100 dark:border-zinc-800 bg-white" />
+                                                ) : (
+                                                    <div className="w-10 h-10 rounded-lg bg-violet-50 dark:bg-zinc-900 flex items-center justify-center text-lg">{logo}</div>
+                                                )}
+                                                <div className="flex-1 min-w-0 text-left">
+                                                    <h6 className="text-sm font-bold text-gray-800 dark:text-zinc-100 truncate">{complex.name}</h6>
+                                                    <p className="text-[11px] text-gray-400 font-medium truncate mt-0.5">
+                                                        {complex.address}
+                                                    </p>
+                                                </div>
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
+        );
+    };
 
     const isAnimatedPath = true;
 
@@ -149,10 +416,16 @@ export default function Header({
                 {/* Right: Search, Auth actions and Hamburger */}
                 <div className="flex items-center gap-3 lg:gap-6">
                     {/* Search Bar (desktop only) */}
-                    <SearchInput
-                        containerClassName="hidden lg:flex"
-                        className="w-44 lg:w-72 border-violet-100/80 dark:border-zinc-800 bg-violet-50/10 dark:bg-zinc-800/30 hover:border-violet-300 hover:bg-violet-50/20 hover:shadow-[0_4px_12px_rgba(124,58,237,0.05)] focus:w-56 lg:focus:w-[26rem] focus:ring-2 focus:ring-violet-100 dark:focus:ring-zinc-800"
-                    />
+                    <div className="relative hidden lg:flex" ref={searchContainerRef}>
+                        <SearchInput
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onFocus={handleSearchFocus}
+                            containerClassName="w-full"
+                            className="w-44 lg:w-72 border-violet-100/80 dark:border-zinc-800 bg-violet-50/10 dark:bg-zinc-800/30 hover:border-violet-300 hover:bg-violet-50/20 hover:shadow-[0_4px_12px_rgba(124,58,237,0.05)] focus:w-56 lg:focus:w-[26rem] focus:ring-2 focus:ring-violet-100 dark:focus:ring-zinc-800"
+                        />
+                        {renderSearchDropdown(false)}
+                    </div>
 
                     {/* Auth Actions (desktop only) */}
                     <div className="hidden items-center gap-2.5 lg:gap-4 md:flex">
@@ -316,11 +589,17 @@ export default function Header({
                 >
                     <nav className="flex flex-col gap-2">
                         {/* Mobile Search input */}
-                        <SearchInput
-                            size="sm"
-                            containerClassName="mb-2 w-full"
-                            className="w-full border-violet-100 dark:border-zinc-800 bg-violet-50/10 dark:bg-zinc-800/30"
-                        />
+                        <div className="relative mb-2 w-full" ref={mobileSearchContainerRef}>
+                            <SearchInput
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onFocus={handleSearchFocus}
+                                size="sm"
+                                containerClassName="w-full"
+                                className="w-full border-violet-100 dark:border-zinc-800 bg-violet-50/10 dark:bg-zinc-800/30"
+                            />
+                            {renderSearchDropdown(true)}
+                        </div>
 
                         {navItems.map((item) => {
                             const isActive =

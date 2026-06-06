@@ -2,7 +2,9 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 export interface BookingState {
-    movieId: number | null;
+    movieId: string | null;
+    movieTitle: string;
+    movieImage: string;
     branchName: string;
     format: string;
     time: string;
@@ -10,7 +12,7 @@ export interface BookingState {
     dateLabel: string;
     dayOfWeek: string;
     selectedSeats: string[];
-    comboQuantities: Record<number, number>;
+    comboQuantities: Record<string, number>;
     isBooking: boolean;
     bookingSuccess: boolean;
     bookingCode: string;
@@ -18,6 +20,8 @@ export interface BookingState {
 
 const initialState: BookingState = {
     movieId: null,
+    movieTitle: "",
+    movieImage: "",
     branchName: "",
     format: "",
     time: "",
@@ -25,11 +29,7 @@ const initialState: BookingState = {
     dateLabel: "",
     dayOfWeek: "",
     selectedSeats: [],
-    comboQuantities: {
-        1: 0,
-        2: 0,
-        3: 0
-    },
+    comboQuantities: {},
     isBooking: false,
     bookingSuccess: false,
     bookingCode: ""
@@ -40,7 +40,7 @@ const bookingSlice = createSlice({
     initialState,
     reducers: {
         initBooking: (state, action: PayloadAction<{
-            movieId: number;
+            movieId: string;
             branchName: string;
             format: string;
             time: string;
@@ -55,11 +55,17 @@ const bookingSlice = createSlice({
             state.date = action.payload.date;
             state.dateLabel = action.payload.dateLabel;
             state.dayOfWeek = action.payload.dayOfWeek;
+            state.movieTitle = "";
+            state.movieImage = "";
             state.selectedSeats = [];
-            state.comboQuantities = { 1: 0, 2: 0, 3: 0 };
+            state.comboQuantities = {};
             state.isBooking = false;
             state.bookingSuccess = false;
             state.bookingCode = "";
+        },
+        setMovieInfo: (state, action: PayloadAction<{ title: string; image: string }>) => {
+            state.movieTitle = action.payload.title;
+            state.movieImage = action.payload.image;
         },
         toggleSeat: (state, action: PayloadAction<string>) => {
             const seatCode = action.payload;
@@ -71,7 +77,7 @@ const bookingSlice = createSlice({
                 }
             }
         },
-        updateCombo: (state, action: PayloadAction<{ id: number; delta: number }>) => {
+        updateCombo: (state, action: PayloadAction<{ id: string; delta: number }>) => {
             const { id, delta } = action.payload;
             const current = state.comboQuantities[id] || 0;
             state.comboQuantities[id] = Math.max(0, current + delta);
@@ -86,7 +92,7 @@ const bookingSlice = createSlice({
         },
         resetBooking: (state) => {
             state.selectedSeats = [];
-            state.comboQuantities = { 1: 0, 2: 0, 3: 0 };
+            state.comboQuantities = {};
             state.isBooking = false;
             state.bookingSuccess = false;
             state.bookingCode = "";
@@ -96,6 +102,7 @@ const bookingSlice = createSlice({
 
 export const {
     initBooking,
+    setMovieInfo,
     toggleSeat,
     updateCombo,
     startBooking,

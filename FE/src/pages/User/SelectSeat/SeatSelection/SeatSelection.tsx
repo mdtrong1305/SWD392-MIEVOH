@@ -1,23 +1,48 @@
+import { useMemo } from "react";
+import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
+
 interface SeatSelectionProps {
     selectedSeats: string[];
-    handleSeatClick: (row: string, num: number) => void;
-    seatRows: string[];
-    standardRows: string[];
-    vipRows: string[];
-    bookedSeats: Set<string>;
+    handleSeatClick: (seatName: string) => void;
+    seatsList: any[];
 }
-
-import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 
 export default function SeatSelection({
     selectedSeats,
     handleSeatClick,
-    seatRows,
-    standardRows,
-    vipRows,
-    bookedSeats
+    seatsList
 }: SeatSelectionProps) {
     const { t } = useLanguage();
+
+    // Group seats by their row letter (first character of seat name, e.g., "A")
+    const seatsByRow = useMemo(() => {
+        const groups: { [row: string]: any[] } = {};
+        seatsList.forEach(seat => {
+            if (!seat.name) return;
+            const row = seat.name[0];
+            if (!groups[row]) {
+                groups[row] = [];
+            }
+            groups[row].push(seat);
+        });
+
+        // Sort the seats inside each row by their column number (numeric suffix of name)
+        Object.keys(groups).forEach(row => {
+            groups[row].sort((a, b) => {
+                const numA = parseInt(a.name.substring(1), 10) || 0;
+                const numB = parseInt(b.name.substring(1), 10) || 0;
+                return numA - numB;
+            });
+        });
+
+        return groups;
+    }, [seatsList]);
+
+    // Sorted list of unique row names (A, B, C, etc.)
+    const sortedRows = useMemo(() => {
+        return Object.keys(seatsByRow).sort();
+    }, [seatsByRow]);
+
     return (
         <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-3xl p-4 sm:p-6 shadow-sm overflow-hidden flex flex-col items-center animate__animated animate__fadeIn w-full min-w-0">
             {/* Screen Visualizer */}
@@ -30,54 +55,53 @@ export default function SeatSelection({
             {/* Grid container */}
             <div className="w-full overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent min-w-0">
                 <div className="min-w-[580px] flex flex-col gap-2.5 items-center px-4">
-                    {seatRows.map(row => {
-                        const isCoupleRow = row === "J";
-                        const totalCols = isCoupleRow ? 5 : 10;
-                        
+                    {sortedRows.map(row => {
+                        const seatsInRow = seatsByRow[row];
                         return (
                             <div key={row} className="flex items-center gap-3.5">
-                                <span className="w-5 text-center text-xs font-black text-slate-400 dark:text-zinc-500 select-none">{row}</span>
+                                <span className="w-5 text-center text-xs font-black text-slate-400 dark:text-zinc-550 select-none">{row}</span>
                                 <div className="flex gap-2">
-                                    {Array.from({ length: totalCols }).map((_, index) => {
-                                        const num = index + 1;
-                                        const seatCode = isCoupleRow ? `J${num}` : `${row}${num}`;
-                                        const isBooked = bookedSeats.has(seatCode);
-                                        const isSelected = selectedSeats.includes(seatCode);
-                                        let seatColorClass: string;
+                                    {seatsInRow.map(seat => {
+                                        const isBooked = seat.status === "SOLD" || seat.status === "HELD";
+                                        const isSelected = selectedSeats.includes(seat.name);
+                                        const seatTypeUpper = seat.seatType?.toUpperCase();
+                                        const isCouple = seatTypeUpper === "COUPLE" || seatTypeUpper === "SWEETBOX";
 
+                                        let seatColorClass: string;
                                         if (isBooked) {
                                             seatColorClass = "bg-slate-200/60 border-slate-200 text-slate-400 dark:bg-zinc-800/40 dark:border-zinc-850 dark:text-zinc-650 cursor-not-allowed";
                                         } else if (isSelected) {
                                             seatColorClass = "bg-gradient-to-tr from-[#9E90FD] to-[#8E7EFE] border-[#8E7EFE] text-white shadow-md shadow-[#8E7EFE]/30 scale-105 font-bold";
                                         } else {
-                                            if (standardRows.includes(row)) {
-                                                seatColorClass = "bg-white border-slate-350 text-slate-800 hover:bg-violet-50/60 hover:text-[#8E7EFE] hover:border-[#8E7EFE] dark:bg-zinc-800 dark:border-zinc-500 dark:text-white dark:hover:bg-zinc-700 dark:hover:text-white dark:hover:border-zinc-400";
-                                            } else if (vipRows.includes(row)) {
+                                            if (seatTypeUpper === "VIP") {
                                                 seatColorClass = "bg-indigo-50 border-indigo-400 text-indigo-900 hover:bg-indigo-100 hover:border-indigo-500 hover:text-indigo-955 dark:bg-indigo-950/40 dark:border-indigo-800 dark:text-indigo-200 dark:hover:bg-indigo-900/60 dark:hover:text-white dark:hover:border-indigo-500";
-                                            } else {
+                                            } else if (isCouple) {
                                                 seatColorClass = "bg-rose-50 border-rose-400 text-rose-900 hover:bg-rose-100 hover:border-rose-500 hover:text-rose-950 dark:bg-rose-950/20 dark:border-rose-800 dark:text-rose-200 dark:hover:bg-rose-900/60 dark:hover:text-white dark:hover:border-rose-500";
+                                            } else {
+                                                // NORMAL / STANDARD
+                                                seatColorClass = "bg-white border-slate-350 text-slate-800 hover:bg-violet-50/60 hover:text-[#8E7EFE] hover:border-[#8E7EFE] dark:bg-zinc-800 dark:border-zinc-500 dark:text-white dark:hover:bg-zinc-700 dark:hover:text-white dark:hover:border-zinc-400";
                                             }
                                         }
 
-                                        if (isCoupleRow) {
-                                            const pairLabel = `J${num}`;
+                                        const num = seat.name.substring(1);
+                                        if (isCouple) {
                                             return (
                                                 <button
-                                                    key={seatCode}
+                                                    key={seat.seatId}
                                                     disabled={isBooked}
-                                                    onClick={() => handleSeatClick(row, num)}
+                                                    onClick={() => handleSeatClick(seat.name)}
                                                     className={`w-[78px] h-8 rounded-xl border flex items-center justify-center text-xs font-bold transition-all duration-200 select-none cursor-pointer ${seatColorClass} ${isBooked ? "" : "active:scale-95"}`}
                                                 >
-                                                    {isBooked ? "✖" : pairLabel}
+                                                    {isBooked ? "✖" : seat.name}
                                                 </button>
                                             );
                                         }
 
                                         return (
                                             <button
-                                                key={seatCode}
+                                                key={seat.seatId}
                                                 disabled={isBooked}
-                                                onClick={() => handleSeatClick(row, num)}
+                                                onClick={() => handleSeatClick(seat.name)}
                                                 className={`w-8 h-8 rounded-lg border flex items-center justify-center text-xs font-bold transition-all duration-200 select-none cursor-pointer ${seatColorClass} ${isBooked ? "" : "active:scale-95"}`}
                                             >
                                                 {isBooked ? "✖" : num}
@@ -111,7 +135,7 @@ export default function SeatSelection({
                     <span>{t("seat_status_selected")}</span>
                 </div>
                 <div className="flex items-center gap-2.5 w-full justify-start">
-                    <div className="w-4.5 h-4.5 rounded bg-slate-200/60 border border-slate-200 dark:bg-zinc-800/40 dark:border-zinc-800 flex items-center justify-center text-[9px] text-slate-400 dark:text-zinc-500 font-black">✖</div>
+                    <div className="w-4.5 h-4.5 rounded bg-slate-200/60 border border-slate-200 dark:bg-zinc-800/40 dark:border-zinc-850 flex items-center justify-center text-[9px] text-slate-400 dark:text-zinc-500 font-black">✖</div>
                     <span>{t("seat_status_booked")}</span>
                 </div>
             </div>

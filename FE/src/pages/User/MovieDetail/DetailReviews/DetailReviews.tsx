@@ -132,7 +132,7 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
                             <div key={review.id} className="flex gap-4 p-4 rounded-xl border border-[#EAE6F0] dark:border-zinc-800/60 bg-[#F6F3F9]/30">
                                 {/* User avatar icon */}
                                 <div className="h-10 w-10 rounded-full bg-[#E9D5FF] text-[#6D28D9] font-black flex items-center justify-center text-sm shrink-0">
-                                    {review.name.charAt(0).toUpperCase()}
+                                    {(review.name || "U").charAt(0).toUpperCase()}
                                 </div>
                                 
                                 <div className="flex flex-col gap-1 w-full">

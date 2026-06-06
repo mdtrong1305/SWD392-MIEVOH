@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { MapPin, ChevronDown, Check } from "lucide-react";
-import { CITIES } from "../../mockAPI/cinemaMock.tsx";
+const CITIES = ["All", "Ho Chi Minh City", "Hanoi", "Da Nang", "Binh Duong"];
 import { useLanguage } from "../../contextAPI/LanguageContext.tsx";
 
 interface CityFilterProps {

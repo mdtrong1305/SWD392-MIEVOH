@@ -39,9 +39,11 @@ export default function DateSelector({ selectedDate, onSelectDate }: DateSelecto
     }, [language]);
 
     // Set first day as default if not selected
-    if (dates.length > 0 && !selectedDate) {
-        onSelectDate(dates[0]);
-    }
+    useEffect(() => {
+        if (dates.length > 0 && !selectedDate) {
+            onSelectDate(dates[0]);
+        }
+    }, [dates, selectedDate, onSelectDate]);
 
     // Keep selectedDate language details in sync
     useEffect(() => {

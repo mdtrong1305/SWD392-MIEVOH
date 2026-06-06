@@ -1,11 +1,12 @@
-import { useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { INITIAL_MOVIES, MOVIES_DETAILS } from "../../../../mockAPI/movieMock.tsx";
 import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 import type { DateOption } from "../DateSelector/DateSelector.tsx";
-import { Clock, Film, User, Star } from "lucide-react";
+import { Clock, Film, User } from "lucide-react";
+import { getShowtimesByComplexApi } from "../../../../axios/cinemas.tsx";
 
 interface MovieShowtimesListProps {
+    complexId: string;
     selectedDate: DateOption | null;
     cinemaName: string;
 }
@@ -29,17 +30,35 @@ const genreKeys: Record<string, string> = {
     "Nature": "genre_nature"
 };
 
-export default function MovieShowtimesList({ selectedDate, cinemaName }: MovieShowtimesListProps) {
+export default function MovieShowtimesList({ complexId, selectedDate, cinemaName }: MovieShowtimesListProps) {
     const navigate = useNavigate();
     const { t, language } = useLanguage();
+    const [movies, setMovies] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    // Filter active movies
-    const activeMovies = useMemo(() => {
-        return INITIAL_MOVIES.filter(movie => movie.status === "now_showing").map(movie => ({
-            ...movie,
-            title: language === "vi" ? (movie.title_vi || movie.title) : (movie.title_en || movie.title),
-        }));
-    }, [language]);
+    useEffect(() => {
+        if (!complexId) return;
+
+        const fetchShowtimes = async () => {
+            try {
+                setLoading(true);
+                let dateParam: string | undefined = undefined;
+                if (selectedDate?.dateString) {
+                    const [yyyy, mm, dd] = selectedDate.dateString.split("-");
+                    dateParam = `${dd}/${mm}/${yyyy}`;
+                }
+                const res = await getShowtimesByComplexApi(complexId, dateParam);
+                setMovies(res.data || []);
+            } catch (err) {
+                console.error("Lỗi khi lấy lịch chiếu:", err);
+                setMovies([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchShowtimes();
+    }, [complexId, selectedDate]);
 
     // Check if selected date is today
     const isToday = useMemo(() => {
@@ -58,7 +77,7 @@ export default function MovieShowtimesList({ selectedDate, cinemaName }: MovieSh
         return currentHours > hours || (currentHours === hours && currentMinutes >= minutes);
     };
 
-    const handleSelectShowtime = (movieId: number, format: string, time: string) => {
+    const handleSelectShowtime = (movieId: string, showtimeId: string, format: string, time: string) => {
         navigate(`/movies/${movieId}/book/seats`, {
             state: {
                 branchName: cinemaName,
@@ -66,16 +85,13 @@ export default function MovieShowtimesList({ selectedDate, cinemaName }: MovieSh
                 time,
                 date: selectedDate?.dateString,
                 dateLabel: selectedDate?.label,
-                dayOfWeek: selectedDate?.dayOfWeek
+                dayOfWeek: selectedDate?.dayOfWeek,
+                showtimeId
             }
         });
     };
 
-    // Predefined mock showtimes lists
-    const showtimes2DDubbed = ["10:00", "12:00", "13:00", "14:00", "15:00", "16:00", "16:30", "18:00", "19:00", "20:00", "21:00", "22:00"];
-    const showtimes2DSubbed = ["09:30", "11:00", "13:30", "15:45", "17:00", "18:30", "20:15", "22:30", "23:45"];
-
-    const getAgeBadgeStyle = (ageRating: string) => {
+    const getAgeBadgeStyle = (ageRating: string = "P") => {
         const cleanRating = ageRating.toUpperCase();
         if (cleanRating.includes("P")) return "bg-emerald-500 text-white";
         if (cleanRating.includes("T13")) return "bg-amber-500 text-white";
@@ -83,43 +99,67 @@ export default function MovieShowtimesList({ selectedDate, cinemaName }: MovieSh
         return "bg-rose-500 text-white";
     };
 
+    const formatTime = (dateTimeStr: string) => {
+        const d = new Date(dateTimeStr);
+        const hours = d.getHours().toString().padStart(2, '0');
+        const minutes = d.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+    };
+
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#6C5CE7] mb-2"></div>
+                <p className="text-gray-500 font-semibold">{t("loading" as any) || "Đang tải lịch chiếu..."}</p>
+            </div>
+        );
+    }
+
+    if (movies.length === 0) {
+        return (
+            <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800 rounded-3xl p-12 text-center shadow-md">
+                <p className="text-gray-500 font-semibold">{t("no_showtimes" as any) || "Không có suất chiếu nào cho ngày này."}</p>
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-6 animate__animated animate__fadeIn">
-            {activeMovies.map(movie => {
-                const details = MOVIES_DETAILS[movie.id] || {
-                    duration: "120 mins",
-                    ageRating: "T13",
-                    language: "English Subtitles",
-                    director: "TBA"
-                };
-
-                // Dubbing is generally only for animated and family/kids movies
-                const hasDubbing = movie.genres.includes("Animation") ||
-                    movie.genres.includes("Family") ||
-                    movie.id === 4 ||
-                    movie.id === 6;
+            {movies.map(movie => {
+                const title = language === "vi" ? (movie.title_vi || movie.title_en) : (movie.title_en || movie.title_vi);
+                const genresList = movie.genres || [];
+                const age = movie.ageRestriction || "P";
+                
+                // Group showtimes by format
+                const groupedShowtimes: Record<string, any[]> = {};
+                movie.showtimes.forEach((st: any) => {
+                    let fmt = st.format || "2D Sub";
+                    if (fmt.toLowerCase() === "2d-sub-en" || fmt.toLowerCase() === "2d-sub-vi") {
+                        fmt = "2D Phụ Đề";
+                    } else if (fmt.toLowerCase() === "2d-dub") {
+                        fmt = "2D Lồng Tiếng";
+                    }
+                    if (!groupedShowtimes[fmt]) {
+                        groupedShowtimes[fmt] = [];
+                    }
+                    groupedShowtimes[fmt].push(st);
+                });
 
                 return (
                     <div
-                        key={movie.id}
+                        key={movie.movieId}
                         className="bg-white dark:bg-zinc-900/50 border border-slate-100/80 dark:border-zinc-800/80 rounded-3xl p-6 shadow-md shadow-slate-100/50 dark:shadow-none hover:shadow-xl hover:shadow-indigo-100/20 hover:border-indigo-200/50 dark:hover:border-zinc-700/80 transition-all duration-300 flex flex-col md:flex-row gap-6 group"
                     >
                         {/* Poster with hover scale and age tag */}
                         <div className="w-full md:w-32 aspect-[2/3] md:h-48 rounded-2xl overflow-hidden shrink-0 shadow-md relative group/poster border border-slate-100 dark:border-zinc-800">
                             <img
-                                src={movie.image}
-                                alt={movie.title}
+                                src={movie.imageUrl || "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80"}
+                                alt={title}
                                 className="w-full h-full object-cover group-hover/poster:scale-105 transition-transform duration-500"
                             />
                             {/* Age badge */}
-                            <div className={`absolute top-3 left-3 font-extrabold text-[10px] px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-sm ${getAgeBadgeStyle(details.ageRating)}`}>
-                                {details.ageRating}
-                            </div>
-
-                            {/* Rating overlay badge */}
-                            <div className="absolute bottom-3 right-3 bg-black/75 backdrop-blur-sm text-white font-extrabold text-[10px] px-2.5 py-1 rounded-lg flex items-center gap-1">
-                                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                                <span>{movie.rating}</span>
+                            <div className={`absolute top-3 left-3 font-extrabold text-[10px] px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-sm ${getAgeBadgeStyle(age)}`}>
+                                {age}
                             </div>
                         </div>
 
@@ -127,47 +167,53 @@ export default function MovieShowtimesList({ selectedDate, cinemaName }: MovieSh
                         <div className="flex-grow flex flex-col justify-between">
                             <div>
                                 <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-3 group-hover:text-[#6C5CE7] dark:group-hover:text-violet-400 transition-colors duration-200">
-                                    {movie.title}
+                                    {title}
                                 </h3>
 
                                 {/* Info tags row */}
                                 <div className="flex flex-wrap gap-2.5 mb-5">
-                                    <span className="flex items-center gap-1.5 bg-amber-50 border border-amber-200/50 text-amber-800 dark:bg-amber-500/10 dark:border-amber-500/30 dark:text-amber-400 font-bold px-3 py-1.5 rounded-xl text-xs">
-                                        <Clock className="h-3.5 w-3.5 text-amber-600" />
-                                        {details.duration}
-                                    </span>
-                                    <span className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200/50 text-indigo-800 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400 font-bold px-3 py-1.5 rounded-xl text-xs">
-                                        <Film className="h-3.5 w-3.5 text-indigo-600" />
-                                        {movie.genres.map(genre => {
-                                            const key = genreKeys[genre];
-                                            return key ? t(key as any) : genre;
-                                        }).join(", ")}
-                                    </span>
-                                    <span className="flex items-center gap-1.5 bg-slate-100 border border-slate-200 text-slate-700 dark:bg-zinc-800 dark:border-zinc-700/80 dark:text-zinc-300 font-bold px-3 py-1.5 rounded-xl text-xs">
-                                        <User className="h-3.5 w-3.5 text-slate-500" />
-                                        {t("director")}: {details.director}
-                                    </span>
+                                    {movie.duration && (
+                                        <span className="flex items-center gap-1.5 bg-amber-50 border border-amber-200/50 text-amber-800 dark:bg-amber-500/10 dark:border-amber-500/30 dark:text-amber-400 font-bold px-3 py-1.5 rounded-xl text-xs">
+                                            <Clock className="h-3.5 w-3.5 text-amber-600" />
+                                            {movie.duration} mins
+                                        </span>
+                                    )}
+                                    {genresList.length > 0 && (
+                                        <span className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200/50 text-indigo-800 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400 font-bold px-3 py-1.5 rounded-xl text-xs">
+                                            <Film className="h-3.5 w-3.5 text-indigo-600" />
+                                            {genresList.map((genre: string) => {
+                                                const key = genreKeys[genre];
+                                                return key ? t(key as any) : genre;
+                                            }).join(", ")}
+                                        </span>
+                                    )}
+                                    {movie.director && (
+                                        <span className="flex items-center gap-1.5 bg-slate-100 border border-slate-200 text-slate-700 dark:bg-zinc-800 dark:border-zinc-700/80 dark:text-zinc-300 font-bold px-3 py-1.5 rounded-xl text-xs">
+                                            <User className="h-3.5 w-3.5 text-slate-500" />
+                                            {t("director")}: {movie.director}
+                                        </span>
+                                    )}
                                 </div>
 
                                 {/* Formats & time buttons grid */}
                                 <div className="space-y-5 pt-5 border-t border-slate-100 dark:border-zinc-800/80">
-                                    {/* 2D Long Tieng - only shown if hasDubbing is true */}
-                                    {hasDubbing && (
-                                        <div>
+                                    {Object.entries(groupedShowtimes).map(([formatName, showtimes]) => (
+                                        <div key={formatName}>
                                             <div className="flex items-center gap-2 mb-3">
                                                 <span className="h-3 w-1.5 bg-[#6C5CE7] rounded-full animate-pulse" />
                                                 <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                                                    {t("twod_dubbed")}
+                                                    {formatName}
                                                 </h4>
                                             </div>
                                             <div className="flex flex-wrap gap-2.5">
-                                                {showtimes2DDubbed.map(time => {
+                                                {showtimes.map((st: any) => {
+                                                    const time = formatTime(st.showDateTime);
                                                     const expired = isExpired(time);
                                                     return (
                                                         <button
-                                                            key={time}
+                                                            key={st.showtimeId}
                                                             disabled={expired}
-                                                            onClick={() => handleSelectShowtime(movie.id, "2D Dubbed", time)}
+                                                            onClick={() => handleSelectShowtime(movie.movieId, st.showtimeId, formatName, time)}
                                                             className={`px-5.5 py-2.5 text-xs font-black rounded-xl border transition-all duration-200 ${expired
                                                                     ? "bg-slate-50 border-slate-100/65 text-slate-300 dark:bg-zinc-800/20 dark:border-zinc-800/55 dark:text-zinc-600 dark:line-through cursor-not-allowed line-through text-[11px] font-bold"
                                                                     : "bg-slate-50/80 border-slate-200 text-slate-900 dark:bg-zinc-800/50 dark:border-zinc-700/80 dark:text-zinc-200 dark:hover:bg-[#6C5CE7] dark:hover:border-[#6C5CE7] dark:hover:text-white hover:bg-[#6C5CE7] hover:border-[#6C5CE7] hover:text-white hover:scale-[1.03] cursor-pointer shadow-sm active:scale-95"
@@ -179,35 +225,7 @@ export default function MovieShowtimesList({ selectedDate, cinemaName }: MovieSh
                                                 })}
                                             </div>
                                         </div>
-                                    )}
-
-                                    {/* 2D Phu De Viet */}
-                                    <div>
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <span className="h-3 w-1.5 bg-[#6C5CE7] rounded-full animate-pulse" />
-                                            <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                                                {t("twod_subbed")}
-                                            </h4>
-                                        </div>
-                                        <div className="flex flex-wrap gap-2.5">
-                                            {showtimes2DSubbed.map(time => {
-                                                const expired = isExpired(time);
-                                                return (
-                                                    <button
-                                                        key={time}
-                                                        disabled={expired}
-                                                        onClick={() => handleSelectShowtime(movie.id, "2D Subbed", time)}
-                                                        className={`px-5.5 py-2.5 text-xs font-black rounded-xl border transition-all duration-200 ${expired
-                                                                ? "bg-slate-50 border-slate-100/65 text-slate-300 dark:bg-zinc-800/20 dark:border-zinc-800/55 dark:text-zinc-600 dark:line-through cursor-not-allowed line-through text-[11px] font-bold"
-                                                                : "bg-slate-50/80 border-slate-200 text-slate-900 dark:bg-zinc-800/50 dark:border-zinc-700/80 dark:text-zinc-200 dark:hover:bg-[#6C5CE7] dark:hover:border-[#6C5CE7] dark:hover:text-white hover:bg-[#6C5CE7] hover:border-[#6C5CE7] hover:text-white hover:scale-[1.03] cursor-pointer shadow-sm active:scale-95"
-                                                            }`}
-                                                    >
-                                                        {time}
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>

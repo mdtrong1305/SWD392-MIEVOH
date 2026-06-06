@@ -1,5 +1,5 @@
-import MovieCard from "../MovieCard/MovieCard.tsx";
-import type { Movie } from "../MovieCard/MovieCard.tsx";
+import MovieCard from "../../../../components/MovieCard/MovieCard.tsx";
+import type { Movie } from "../../../../components/MovieCard/MovieCard.tsx";
 import { Film } from "lucide-react";
 
 interface MovieGridProps {

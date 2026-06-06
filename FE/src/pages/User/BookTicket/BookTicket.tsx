@@ -2,10 +2,9 @@ import DateSelector from "../CinemaDetail/DateSelector/DateSelector.tsx";
 import { useLanguage } from "../../../contextAPI/LanguageContext.tsx";
 import { useState, useMemo, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Clock, Star, ChevronDown } from "lucide-react";
-import { MOVIES_DETAILS } from "../../../mockAPI/movieMock.tsx";
-import { THEATER_CHAINS } from "../../../mockAPI/cinemaMock.tsx";
+import { ArrowLeft, Clock, Star, ChevronDown, Loader2 } from "lucide-react";
 import CityFilter from "../../../components/CityFilter/CityFilter.tsx";
+import { getMovieDetailApi, getShowtimesByMovieApi } from "../../../axios/movie.tsx";
 
 interface DateOption {
     label: string;      // e.g. "29/5"
@@ -86,23 +85,115 @@ const DEFAULT_THEME: ChainTheme = {
 export default function BookTicket() {
     const { t, language } = useLanguage();
     const { id } = useParams<{ id: string }>();
-    const movieId = Number(id);
     const navigate = useNavigate();
 
-    const movie = useMemo(() => {
-        return MOVIES_DETAILS[movieId] || null;
-    }, [movieId]);
-
-    // Scroll to top when page loaded
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
-
+    const [movieDetail, setMovieDetail] = useState<any | null>(null);
+    const [showtimesList, setShowtimesList] = useState<any[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
     const [selectedDate, setSelectedDate] = useState<DateOption | null>(null);
     const [selectedCity, setSelectedCity] = useState<string>("All");
 
     const [expandedChains, setExpandedChains] = useState<Record<string, boolean>>({});
-    const [expandedBranches, setExpandedBranches] = useState<Record<number, boolean>>({});
+    const [expandedBranches, setExpandedBranches] = useState<Record<string, boolean>>({});
+
+    // Scroll to top and fetch movie detail
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        const fetchMovie = async () => {
+            try {
+                const res = await getMovieDetailApi(id || "");
+                setMovieDetail(res.data);
+            } catch (err) {
+                console.error("Error loading movie details:", err);
+            }
+        };
+        fetchMovie();
+    }, [id]);
+
+    // Fetch showtimes list when date changes
+    useEffect(() => {
+        if (!selectedDate) return;
+        const fetchShowtimes = async () => {
+            setLoading(true);
+            try {
+                let dateParam: string | undefined = undefined;
+                if (selectedDate?.dateString) {
+                    const [yyyy, mm, dd] = selectedDate.dateString.split("-");
+                    dateParam = `${dd}/${mm}/${yyyy}`;
+                }
+                const res = await getShowtimesByMovieApi(id || "", dateParam);
+                const cinemaSystems = res.data?.cinemaSystems || [];
+                const flatShowtimes: any[] = [];
+                cinemaSystems.forEach((system: any) => {
+                    const complexes = system.cinemaComplexes || [];
+                    complexes.forEach((complex: any) => {
+                        const showtimes = complex.showtimes || [];
+                        showtimes.forEach((st: any) => {
+                            flatShowtimes.push({
+                                showtimeId: st.showtimeId,
+                                showDateTime: st.showDateTime,
+                                format: st.format,
+                                ticketPrice: st.ticketPrice,
+                                Cinema: {
+                                    name: st.cinemaName,
+                                    CinemaComplex: {
+                                        cinemaComplexId: complex.cinemaComplexId,
+                                        name: complex.name,
+                                        address: complex.address,
+                                        CinemaSystem: {
+                                            cinemaSystemId: system.cinemaSystemId,
+                                            name: system.name,
+                                            logo: system.logo
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                    });
+                });
+                setShowtimesList(flatShowtimes);
+            } catch (err) {
+                console.error("Error loading showtimes:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchShowtimes();
+    }, [id, selectedDate]);
+
+    const movie = useMemo(() => {
+        if (!movieDetail) return null;
+        const data = movieDetail;
+
+        let genresArr: string[] = [];
+        if (Array.isArray(data.genres)) {
+            genresArr = data.genres;
+        } else if (typeof data.genres === 'string') {
+            genresArr = data.genres.split(',').map((g: string) => g.trim());
+        }
+
+        let image = data.imageUrl || "🍿";
+        if (data.imageUrl && !data.imageUrl.startsWith('http')) {
+            const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://api.mievoh.io.vn/api';
+            const domain = apiBase.replace('/api', '');
+            image = `${domain}/movies/${data.imageUrl}`;
+        }
+
+        return {
+            id: data.movieId,
+            title: language === "vi" ? (data.title_vi || data.title_en) : (data.title_en || data.title_vi),
+            description: language === "vi" ? (data.description_vi || data.description_en) : (data.description_en || data.description_vi),
+            genres: genresArr,
+            image,
+            backdrop: image,
+            ageRating: data.ageRestriction || "P",
+            duration: data.duration ? `${data.duration} mins` : "120 mins",
+            rating: data.rating || 5,
+            releaseDate: data.releaseDate ? new Date(data.releaseDate).toLocaleDateString() : "Now showing",
+            director: data.director || "Unknown",
+            cast: Array.isArray(data.cast) ? data.cast : (typeof data.cast === 'string' ? data.cast.split(',').map((c: string) => c.trim()) : ["Unknown Cast"])
+        };
+    }, [movieDetail, language]);
 
     const toggleChain = (chainId: string) => {
         setExpandedChains(prev => ({
@@ -111,45 +202,96 @@ export default function BookTicket() {
         }));
     };
 
-    const toggleBranch = (branchId: number) => {
+    const toggleBranch = (branchId: string) => {
         setExpandedBranches(prev => ({
             ...prev,
             [branchId]: !prev[branchId]
         }));
     };
 
-    // Group branches by theater chains based on selected city
+    // Group showtimes dynamically
     const groupedChains = useMemo(() => {
-        const list: {
+        const systemMap: Record<string, {
             chainId: string;
             chainName: string;
             chainLogo: string;
-            branches: {
-                id: number;
+            branches: Record<string, {
+                id: string;
                 name: string;
                 address: string;
-                city: string;
                 rating: number;
-            }[];
-        }[] = [];
+                showtimesByFormat: Record<string, any[]>;
+            }>;
+        }> = {};
 
-        THEATER_CHAINS.forEach(chain => {
-            const matchingBranches = chain.branches.filter(branch => {
-                return selectedCity === "All" || branch.city === selectedCity;
-            });
+        showtimesList.forEach(st => {
+            const complex = st.Cinema?.CinemaComplex;
+            const system = complex?.CinemaSystem;
+            if (!complex || !system) return;
 
-            if (matchingBranches.length > 0) {
-                list.push({
-                    chainId: chain.id,
-                    chainName: chain.name,
-                    chainLogo: chain.logo,
-                    branches: matchingBranches
-                });
+            // Filter by city address match
+            if (selectedCity !== "All") {
+                const addressUpper = complex.address.toUpperCase();
+                const cityUpper = selectedCity.toUpperCase();
+                
+                let matches = false;
+                if (cityUpper === "HỒ CHÍ MINH" || cityUpper === "TP.HCM" || cityUpper === "HO CHI MINH") {
+                    matches = addressUpper.includes("HỒ CHÍ MINH") || addressUpper.includes("TP.HCM") || addressUpper.includes("Q.") || addressUpper.includes("DISTRICT");
+                } else if (cityUpper === "HÀ NỘI" || cityUpper === "HANOI") {
+                    matches = addressUpper.includes("HÀ NỘI") || addressUpper.includes("HANOI");
+                } else if (cityUpper === "ĐÀ NẴNG" || cityUpper === "DA NANG") {
+                    matches = addressUpper.includes("ĐÀ NẴNG") || addressUpper.includes("DA NANG");
+                } else {
+                    matches = addressUpper.includes(cityUpper);
+                }
+
+                if (!matches) return;
             }
+
+            const systemId = system.cinemaSystemId;
+            if (!systemMap[systemId]) {
+                let logo = system.logo || "🍿";
+                if (system.logo && !system.logo.startsWith('http')) {
+                    const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://api.mievoh.io.vn/api';
+                    const domain = apiBase.replace('/api', '');
+                    logo = `${domain}/cinemas/${system.logo}`;
+                }
+                systemMap[systemId] = {
+                    chainId: systemId,
+                    chainName: system.name,
+                    chainLogo: logo,
+                    branches: {}
+                };
+            }
+
+            const complexId = complex.cinemaComplexId;
+            if (!systemMap[systemId].branches[complexId]) {
+                systemMap[systemId].branches[complexId] = {
+                    id: complexId,
+                    name: complex.name,
+                    address: complex.address,
+                    rating: 4.8,
+                    showtimesByFormat: {}
+                };
+            }
+
+            const isDub = st.format?.toLowerCase().includes("dub") || st.format?.toLowerCase().includes("lồng tiếng");
+            const formatLabel = isDub 
+                ? (language === "vi" ? "2D Lồng Tiếng" : "2D Dubbed") 
+                : (language === "vi" ? "2D Phụ Đề" : "2D Subtitles");
+
+            if (!systemMap[systemId].branches[complexId].showtimesByFormat[formatLabel]) {
+                systemMap[systemId].branches[complexId].showtimesByFormat[formatLabel] = [];
+            }
+
+            systemMap[systemId].branches[complexId].showtimesByFormat[formatLabel].push(st);
         });
 
-        return list;
-    }, [selectedCity]);
+        return Object.values(systemMap).map(sys => ({
+            ...sys,
+            branches: Object.values(sys.branches)
+        }));
+    }, [showtimesList, selectedCity, language]);
 
     // Check if time slot is expired (for today)
     const isTodaySelected = useMemo(() => {
@@ -167,22 +309,19 @@ export default function BookTicket() {
         return currentHours > hours || (currentHours === hours && currentMinutes >= minutes);
     };
 
-    const handleSelectShowtime = (branchName: string, format: string, time: string) => {
-        navigate(`/movies/${movieId}/book/seats`, {
+    const handleSelectShowtime = (branchName: string, format: string, time: string, showtimeId: string) => {
+        navigate(`/movies/${id}/book/seats`, {
             state: {
                 branchName,
                 format,
                 time,
                 date: selectedDate?.dateString || "",
                 dateLabel: selectedDate?.label || "",
-                dayOfWeek: selectedDate?.dayOfWeek || ""
+                dayOfWeek: selectedDate?.dayOfWeek || "",
+                showtimeId
             }
         });
     };
-
-    // Predefined showtime list templates
-    const showtimes2DDubbed = ["10:00", "12:00", "13:00", "14:00", "15:00", "16:00", "16:30", "18:00", "19:00", "20:00", "21:00", "22:00"];
-    const showtimes2DSubbed = ["09:30", "11:00", "13:30", "15:45", "17:00", "18:30", "20:15", "22:30", "23:45"];
 
     if (!movie) {
         return (
@@ -197,11 +336,6 @@ export default function BookTicket() {
         );
     }
 
-    const hasDubbing = movie.genres.includes("Animation") || 
-                       movie.genres.includes("Family") ||
-                       movie.id === 4 || 
-                       movie.id === 6;
-
     const getAgeBadgeStyle = (ageRating: string) => {
         const cleanRating = ageRating.toUpperCase();
         if (cleanRating.includes("P")) return "bg-emerald-500 text-white";
@@ -214,22 +348,18 @@ export default function BookTicket() {
         <div className="w-full bg-[#EFEBF4] min-h-screen pb-16 font-sans">
             {/* Header info banner with blurred backdrop image */}
             <div className="relative w-full overflow-hidden bg-[#0F0C15] text-white py-8 sm:py-10 border-b border-violet-955/20">
-                {/* Backdrop Underlay */}
                 <div 
                     className="absolute inset-0 bg-cover bg-center filter blur-[6px] scale-105 opacity-55 pointer-events-none"
                     style={{ backgroundImage: `url(${movie.backdrop || movie.image})` }}
                 />
-                {/* Dark gradient mask */}
                 <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-black/90" />
 
                 <div className="relative max-w-5xl mx-auto px-4 z-10">
                     <div className="flex flex-col sm:flex-row gap-5 sm:gap-8 items-center sm:items-start text-center sm:text-left">
-                        {/* Movie Poster preview */}
                         <div className="w-24 h-36 sm:w-28 sm:h-40 rounded-xl overflow-hidden shrink-0 border border-white/20 shadow-xl transition-transform duration-300 hover:scale-[1.02]">
                             <img src={movie.image} alt={movie.title} className="w-full h-full object-cover" />
                         </div>
                         
-                        {/* Movie Details */}
                         <div className="flex-1 space-y-3">
                             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
                                 <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-lg uppercase tracking-wider ${getAgeBadgeStyle(movie.ageRating)}`}>
@@ -246,21 +376,19 @@ export default function BookTicket() {
                             </div>
                             
                             <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white">{movie.title}</h1>
-                            
                             <p className="text-violet-300 font-extrabold text-xs uppercase tracking-wide">{movie.genres.join(" / ")}</p>
                             
-                            {/* Additional Meta Information Grid */}
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-350 border-t border-white/10 pt-3 max-w-2xl font-medium text-left">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-355 border-t border-white/10 pt-3 max-w-2xl font-medium text-left">
                                 <div>
                                     <span className="text-slate-450 font-bold block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">{t("release_date")}</span>
-                                    <span className="text-slate-100 font-extrabold">{movie.releaseDate || "Now showing"}</span>
+                                    <span className="text-slate-100 font-extrabold">{movie.releaseDate}</span>
                                 </div>
                                 <div>
-                                    <span className="text-slate-450 font-bold block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">{t("director")}</span>
+                                    <span className="text-slate-455 font-bold block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">{t("director")}</span>
                                     <span className="text-slate-100 font-extrabold">{movie.director}</span>
                                 </div>
                                 <div className="sm:col-span-1">
-                                    <span className="text-slate-450 font-bold block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">{t("cast")}</span>
+                                    <span className="text-slate-455 font-bold block text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">{t("cast")}</span>
                                     <span className="text-slate-100 font-semibold block truncate" title={movie.cast.join(", ")}>{movie.cast.join(", ")}</span>
                                 </div>
                             </div>
@@ -272,13 +400,13 @@ export default function BookTicket() {
             {/* Main Content Area */}
             <div className="max-w-5xl mx-auto px-4 mt-8 flex flex-col gap-6">
                 
-                {/* 1. Date Selector Block */
+                {/* 1. Date Selector Block */}
                 <DateSelector
                     selectedDate={selectedDate}
                     onSelectDate={setSelectedDate}
                 />
 
-                /* 2. City Filter Panel */}
+                {/* 2. City Filter Panel */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/70 dark:bg-zinc-900/50 border border-white/60 dark:border-zinc-800/80 backdrop-blur-md rounded-2xl px-5 py-4 shadow-sm relative z-30">
                     <div className="flex items-center gap-2 text-slate-700 dark:text-zinc-300">
                         <span className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-white">{t("cinema_locations_label")}</span>
@@ -294,7 +422,12 @@ export default function BookTicket() {
 
                 {/* 3. Theater Chains & Branches & Showtimes List */}
                 <div className="space-y-8">
-                    {groupedChains.length === 0 ? (
+                    {loading ? (
+                        <div className="bg-white dark:bg-zinc-900/50 rounded-3xl p-12 text-center border border-slate-100 dark:border-zinc-800/80 shadow-sm flex flex-col items-center justify-center">
+                            <Loader2 className="h-10 w-10 text-[#8E7EFE] animate-spin" />
+                            <p className="text-slate-500 dark:text-zinc-400 font-bold mt-4 text-sm">Loading showtimes...</p>
+                        </div>
+                    ) : groupedChains.length === 0 ? (
                         <div className="bg-white dark:bg-zinc-900/50 rounded-3xl p-12 text-center border border-slate-100 dark:border-zinc-800/80 shadow-sm flex flex-col items-center">
                             <span className="text-4xl mb-3">📍</span>
                             <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-1">{t("no_cinemas_available")}</h3>
@@ -311,9 +444,8 @@ export default function BookTicket() {
                                         isChainExpanded ? "p-6 rounded-3xl space-y-6" : "p-3 px-4 rounded-2xl"
                                     }`}
                                 >
-                                    {/* Content Wrapper */}
                                     <div className={`relative z-10 ${isChainExpanded ? "space-y-6" : ""}`}>
-                                        {/* Theater Chain Header (Collapsible) */}
+                                        {/* Theater Chain Header */}
                                         <div
                                             onClick={() => toggleChain(chain.chainId)}
                                             className={`flex items-center justify-between cursor-pointer select-none group transition-all duration-300 ${
@@ -339,15 +471,12 @@ export default function BookTicket() {
                                                             key={branch.id}
                                                             className={`relative overflow-hidden ${theme.branchBg} border ${theme.borderColor} rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300`}
                                                         >
-                                                            {/* Content on top */}
                                                             <div className="relative z-10">
-                                                                {/* Branch Details (Collapsible) */}
                                                                 <div
                                                                     onClick={() => toggleBranch(branch.id)}
                                                                     className="flex items-center justify-between cursor-pointer select-none group"
                                                                 >
                                                                     <div className="flex items-center gap-3.5 min-w-0 pr-4">
-                                                                        {/* Branch Logo */}
                                                                         <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 shadow-sm transition-transform duration-200 group-hover:scale-105">
                                                                             <img src={chain.chainLogo} alt={chain.chainName} className="w-full h-full object-cover" />
                                                                         </div>
@@ -366,65 +495,36 @@ export default function BookTicket() {
                                                                 {/* Showtimes Formats */}
                                                                 {isBranchExpanded && (
                                                                     <div className="space-y-5 mt-5 pt-5 border-t border-slate-100 dark:border-zinc-800/80 animate__animated animate__fadeIn">
-                                                                        {/* {t("format_2d_dubbed")} - conditionally rendered */}
-                                                                        {hasDubbing && (
-                                                                            <div>
+                                                                        {Object.entries(branch.showtimesByFormat).map(([formatLabel, stList]) => (
+                                                                            <div key={formatLabel}>
                                                                                 <div className="flex items-center gap-2 mb-3">
                                                                                     <span className="h-3 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: theme.glowColor }} />
                                                                                     <h4 className="text-xs font-black text-slate-700 dark:text-white uppercase tracking-wider">
-                                                                                        {t("format_2d_dubbed")}
+                                                                                        {formatLabel}
                                                                                     </h4>
                                                                                 </div>
                                                                                 <div className="flex flex-wrap gap-2.5">
-                                                                                    {showtimes2DDubbed.map(time => {
-                                                                                        const expired = isExpired(time);
+                                                                                    {stList.map(st => {
+                                                                                        const timeString = new Date(st.showDateTime).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", hour12: false });
+                                                                                        const expired = isExpired(timeString);
                                                                                         return (
                                                                                             <button
-                                                                                                key={time}
+                                                                                                key={st.showtimeId}
                                                                                                 disabled={expired}
-                                                                                                onClick={() => handleSelectShowtime(branch.name, language === "vi" ? "2D Lồng Tiếng" : "2D Dubbed", time)}
+                                                                                                onClick={() => handleSelectShowtime(branch.name, formatLabel, timeString, st.showtimeId)}
                                                                                                 className={`px-5.5 py-2.5 text-xs font-black rounded-xl border transition-all duration-200 ${
                                                                                                     expired
                                                                                                         ? "bg-slate-50 border-slate-100 text-slate-300 dark:bg-zinc-800/20 dark:border-zinc-805 dark:text-zinc-600 dark:line-through cursor-not-allowed line-through text-[11px] font-bold"
                                                                                                         : `bg-white border-slate-200 text-slate-800 dark:bg-zinc-800/50 dark:border-zinc-700/80 dark:text-zinc-200 ${theme.buttonActive} hover:scale-[1.03] cursor-pointer shadow-sm active:scale-95`
                                                                                                 }`}
                                                                                             >
-                                                                                                {time}
+                                                                                                {timeString}
                                                                                             </button>
                                                                                         );
                                                                                     })}
                                                                                 </div>
                                                                             </div>
-                                                                        )}
-
-                                                                        {/* {t("format_2d_subbed")} */}
-                                                                        <div>
-                                                                            <div className="flex items-center gap-2 mb-3">
-                                                                                <span className="h-3 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: theme.glowColor }} />
-                                                                                <h4 className="text-xs font-black text-slate-700 dark:text-white uppercase tracking-wider">
-                                                                                    {t("format_2d_subbed")}
-                                                                                </h4>
-                                                                            </div>
-                                                                            <div className="flex flex-wrap gap-2.5">
-                                                                                {showtimes2DSubbed.map(time => {
-                                                                                    const expired = isExpired(time);
-                                                                                    return (
-                                                                                        <button
-                                                                                            key={time}
-                                                                                            disabled={expired}
-                                                                                            onClick={() => handleSelectShowtime(branch.name, language === "vi" ? "2D Phụ Đề" : "2D Subtitles", time)}
-                                                                                            className={`px-5.5 py-2.5 text-xs font-black rounded-xl border transition-all duration-200 ${
-                                                                                                expired
-                                                                                                    ? "bg-slate-50 border-slate-100 text-slate-305 dark:bg-zinc-800/20 dark:border-zinc-805 dark:text-zinc-600 dark:line-through cursor-not-allowed line-through text-[11px] font-bold"
-                                                                                                    : `bg-white border-slate-200 text-slate-800 dark:bg-zinc-800/50 dark:border-zinc-700/80 dark:text-zinc-200 ${theme.buttonActive} hover:scale-[1.03] cursor-pointer shadow-sm active:scale-95`
-                                                                                            }`}
-                                                                                        >
-                                                                                            {time}
-                                                                                        </button>
-                                                                                    );
-                                                                                })}
-                                                                            </div>
-                                                                        </div>
+                                                                        ))}
                                                                     </div>
                                                                 )}
                                                             </div>

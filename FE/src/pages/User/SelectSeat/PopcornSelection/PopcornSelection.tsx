@@ -1,11 +1,11 @@
 import { ChevronLeft } from "lucide-react";
 import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
-import { type ComboItem } from "../../../../mockAPI/bookingMock.tsx";
+
 
 interface PopcornSelectionProps {
-    combos: ComboItem[];
-    comboQuantities: Record<number, number>;
-    updateComboQuantity: (id: number, delta: number) => void;
+    combos: any[];
+    comboQuantities: Record<string, number>;
+    updateComboQuantity: (id: string, delta: number) => void;
     setActiveStep: (step: number) => void;
     formatPrice: (value: number) => string;
 }
@@ -27,7 +27,7 @@ export default function PopcornSelection({
                 <span className="text-xs font-bold text-[#8E7EFE] bg-[#8E7EFE]/10 dark:bg-[#8E7EFE]/15 px-3 py-1 rounded-full">{t("popcorn_combo_discount_desc")}</span>
             </div>
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 max-h-[480px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-zinc-800 scrollbar-track-transparent">
                 {combos.map(combo => {
                     const qty = comboQuantities[combo.id] || 0;
                     return (
