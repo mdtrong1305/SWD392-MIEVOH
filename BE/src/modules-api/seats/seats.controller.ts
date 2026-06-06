@@ -1,10 +1,33 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Put,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
+import { User } from '../../common/decorators/user.decorator';
+import type { User as PrismaUser } from '../../modules-system/prisma/generated/prisma/client';
 import { SeatsService } from './seats.service';
-import { CreateSeatDto, GenerateSeatsDto, UpdateSeatDto } from './dto/seats.dto';
+import {
+  CreateSeatDto,
+  GenerateSeatsDto,
+  UpdateSeatDto,
+} from './dto/seats.dto';
 import { RoleGuard } from '../../common/guards/role.guard';
 import { Roles } from '../../common/decorators/role.decorator';
 import { Public } from '../../common/decorators/public.decorator';
-import { ApiBearerAuth, ApiExtraModels, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiExtraModels,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('Seats')
 @ApiExtraModels(CreateSeatDto, UpdateSeatDto, GenerateSeatsDto)
@@ -20,20 +43,29 @@ export class SeatsController {
   @ApiResponse({ status: 201, description: 'Tạo danh sách ghế thành công' })
   @ApiResponse({ status: 400, description: 'Dữ liệu cấu hình không hợp lệ' })
   @ApiResponse({ status: 404, description: 'Không tìm thấy rạp chiếu' })
-  generateSeats(@Body() body: GenerateSeatsDto) {
-    return this.seatsService.generateSeats(body);
+  generateSeats(@Body() body: GenerateSeatsDto, @User() user: PrismaUser) {
+    return this.seatsService.generateSeats(body, user);
   }
 
   @Get()
   @UseGuards(RoleGuard)
   @Roles('admin', 'staff')
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Lấy toàn bộ sơ đồ ghế tĩnh của một rạp (ADMIN, STAFF)' })
-  @ApiQuery({ name: 'cinemaId', required: true, description: 'Mã rạp chiếu (Phòng chiếu)' })
+  @ApiOperation({
+    summary: 'Lấy toàn bộ sơ đồ ghế tĩnh của một rạp (ADMIN, STAFF)',
+  })
+  @ApiQuery({
+    name: 'cinemaId',
+    required: true,
+    description: 'Mã rạp chiếu (Phòng chiếu)',
+  })
   @ApiResponse({ status: 200, description: 'Lấy danh sách thành công' })
   @ApiResponse({ status: 404, description: 'Không tìm thấy rạp chiếu' })
-  findAllByCinemaId(@Query('cinemaId') cinemaId: string) {
-    return this.seatsService.findAllByCinemaId(cinemaId);
+  findAllByCinemaId(
+    @Query('cinemaId') cinemaId: string,
+    @User() user: PrismaUser,
+  ) {
+    return this.seatsService.findAllByCinemaId(cinemaId, user);
   }
 
   @Post()
@@ -44,8 +76,8 @@ export class SeatsController {
   @ApiResponse({ status: 201, description: 'Tạo ghế thành công' })
   @ApiResponse({ status: 400, description: 'Tên ghế đã tồn tại' })
   @ApiResponse({ status: 404, description: 'Không tìm thấy rạp chiếu' })
-  createSeat(@Body() body: CreateSeatDto) {
-    return this.seatsService.create(body);
+  createSeat(@Body() body: CreateSeatDto, @User() user: PrismaUser) {
+    return this.seatsService.create(body, user);
   }
 
   @Put()
@@ -55,8 +87,8 @@ export class SeatsController {
   @ApiOperation({ summary: 'Cập nhật thông tin 1 ghế (ADMIN, STAFF)' })
   @ApiResponse({ status: 200, description: 'Cập nhật thành công' })
   @ApiResponse({ status: 404, description: 'Không tìm thấy ghế' })
-  updateSeat(@Body() body: UpdateSeatDto) {
-    return this.seatsService.update(body);
+  updateSeat(@Body() body: UpdateSeatDto, @User() user: PrismaUser) {
+    return this.seatsService.update(body, user);
   }
 
   @Delete('/:seatId')
@@ -66,7 +98,7 @@ export class SeatsController {
   @ApiOperation({ summary: 'Xóa 1 ghế (ADMIN, STAFF)' })
   @ApiResponse({ status: 200, description: 'Xóa ghế thành công' })
   @ApiResponse({ status: 404, description: 'Không tìm thấy ghế' })
-  deleteSeat(@Param('seatId') seatId: string) {
-    return this.seatsService.delete(seatId);
+  deleteSeat(@Param('seatId') seatId: string, @User() user: PrismaUser) {
+    return this.seatsService.delete(seatId, user);
   }
 }

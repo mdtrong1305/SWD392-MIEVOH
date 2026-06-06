@@ -10,6 +10,8 @@ import {
   Query,
   BadRequestException,
 } from '@nestjs/common';
+import { User } from '../../common/decorators/user.decorator';
+import type { User as PrismaUser } from '../../modules-system/prisma/generated/prisma/client';
 import { CinemasService } from './cinemas.service';
 import { Roles } from '../../common/decorators/role.decorator';
 import {
@@ -40,24 +42,35 @@ export class CinemasController {
   @ApiResponse({ status: 401, description: 'Chưa đăng nhập' })
   @ApiResponse({ status: 403, description: 'Không có quyền' })
   @ApiResponse({ status: 404, description: 'Không tìm thấy cụm rạp' })
-  createCinema(@Body() body: CreateCinemaDto) {
-    return this.cinemasService.create(body);
+  createCinema(@Body() body: CreateCinemaDto, @User() user: PrismaUser) {
+    return this.cinemasService.create(body, user);
   }
 
   @Get()
   @UseGuards(RoleGuard)
   @Roles('admin', 'staff')
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Lấy danh sách rạp chiếu thuộc một cụm rạp (ADMIN, STAFF)' })
-  @ApiQuery({ name: 'cinemaComplexId', required: true, description: 'Mã cụm rạp' })
+  @ApiOperation({
+    summary: 'Lấy danh sách rạp chiếu thuộc một cụm rạp (ADMIN, STAFF)',
+  })
+  @ApiQuery({
+    name: 'cinemaComplexId',
+    required: true,
+    description: 'Mã cụm rạp',
+  })
   @ApiResponse({ status: 200, description: 'Lấy danh sách thành công' })
   @ApiResponse({ status: 400, description: 'Thiếu mã cụm rạp' })
   @ApiResponse({ status: 404, description: 'Không tìm thấy cụm rạp' })
-  getCinemas(@Query('cinemaComplexId') cinemaComplexId: string) {
+  getCinemas(
+    @Query('cinemaComplexId') cinemaComplexId: string,
+    @User() user: PrismaUser,
+  ) {
     if (!cinemaComplexId) {
-      throw new BadRequestException('Vui lòng cung cấp mã cụm rạp (cinemaComplexId)');
+      throw new BadRequestException(
+        'Vui lòng cung cấp mã cụm rạp (cinemaComplexId)',
+      );
     }
-    return this.cinemasService.getCinemasByComplexId(cinemaComplexId);
+    return this.cinemasService.getCinemasByComplexId(cinemaComplexId, user);
   }
 
   @Get('/:cinemaId')
@@ -82,8 +95,8 @@ export class CinemasController {
     status: 404,
     description: 'Không tìm thấy rạp chiếu hoặc cụm rạp',
   })
-  updateCinema(@Body() body: UpdateCinemaDto) {
-    return this.cinemasService.update(body);
+  updateCinema(@Body() body: UpdateCinemaDto, @User() user: PrismaUser) {
+    return this.cinemasService.update(body, user);
   }
 
   @Delete('/:cinemaId')
@@ -95,7 +108,7 @@ export class CinemasController {
   @ApiResponse({ status: 401, description: 'Chưa đăng nhập' })
   @ApiResponse({ status: 403, description: 'Không có quyền' })
   @ApiResponse({ status: 404, description: 'Không tìm thấy rạp chiếu' })
-  deleteCinema(@Param('cinemaId') cinemaId: string) {
-    return this.cinemasService.delete(cinemaId);
+  deleteCinema(@Param('cinemaId') cinemaId: string, @User() user: PrismaUser) {
+    return this.cinemasService.delete(cinemaId, user);
   }
 }
