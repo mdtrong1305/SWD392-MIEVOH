@@ -3,6 +3,7 @@ import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 import { Copy } from "lucide-react";
 import { toast } from "../../../../components/Toast/Toast.tsx";
 import Loading from "../../../../components/Loading/Loading.tsx";
+import { useNavigate } from "react-router-dom";
 
 interface QRTransferPageProps {
     isVerifying: boolean;
@@ -29,6 +30,7 @@ export default function QRTransferPage({
 }: QRTransferPageProps) {
     const { t } = useLanguage();
     const [qrLoaded, setQrLoaded] = useState(false);
+    const navigate = useNavigate();
 
     return (
         <div className="max-w-4xl mx-auto py-6 animate__animated animate__fadeIn w-full">
@@ -36,7 +38,7 @@ export default function QRTransferPage({
                 <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 text-white">
                     <Loading size="lg" className="mb-4" />
                     <p className="text-lg font-bold">{t("verifying_bank_transfer")}</p>
-                    <p className="text-sm text-slate-350 mt-2">{t("please_wait_moment")}</p>
+                    <p className="text-sm text-slate-355 mt-2">{t("please_wait_moment")}</p>
                 </div>
             )}
             <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-[2.5rem] shadow-xl overflow-hidden p-5 sm:p-8 md:p-10">
@@ -101,12 +103,11 @@ export default function QRTransferPage({
                                 <span className="text-slate-850 dark:!text-white font-black text-lg sm:text-xl text-[#8E7EFE]">{formatPrice(totalPrice)}</span>
                             </div>
                         </div>
-                        
+
                         <div className="text-left space-y-1.5 text-xs font-bold text-slate-500 dark:text-zinc-400 pt-2 leading-relaxed">
-                            
                             {t("hotline_reminder_desc")}
                         </div>
-                        
+
                         <div className="pt-4 flex flex-col-reverse sm:flex-row gap-3 w-full">
                             <button 
                                 onClick={() => setShowQRTransfer(false)}
@@ -120,8 +121,8 @@ export default function QRTransferPage({
                                     setTimeout(() => {
                                         setIsVerifying(false);
                                         setShowQRTransfer(false);
-                                        setActiveStep(4);
                                         toast.success(t("toast_payment_success"));
+                                        navigate(`/payments/vnpay-return?vnp_ResponseCode=00&vnp_TxnRef=${bookingCode}`);
                                     }, 2200);
                                 }}
                                 className="w-full sm:flex-1 py-3.5 bg-[#8E7EFE] hover:bg-[#7d6dfc] text-white font-extrabold text-sm rounded-2xl transition-all cursor-pointer shadow-lg shadow-violet-100 dark:shadow-none text-center"
