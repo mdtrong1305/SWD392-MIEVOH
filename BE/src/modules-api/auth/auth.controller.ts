@@ -4,7 +4,7 @@ import { LoginAuthDto, RegisterAuthDto, VerifyEmailDto, ResetPasswordDto, Change
 import { AuthGuard } from '@nestjs/passport';
 import type { Request } from 'express';
 import { Public } from '../../common/decorators/public.decorator';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -50,6 +50,7 @@ export class AuthController {
   @Public()
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
+  @ApiExcludeEndpoint()
   @ApiOperation({ summary: 'Callback nhận dữ liệu từ Google trả về' })
   @ApiResponse({
     status: 302,

@@ -47,7 +47,6 @@ async function bootstrap() {
     .addTag('Banners', 'Quản lý banner')
     .addTag('Foods', 'Quản lý đồ ăn')
     .addTag('Bookings', 'Quản lý đặt vé')
-    .addTag('Payments', 'Tích hợp thanh toán VNPay')
     .addTag('Users', 'Quản lý người dùng (Profile & Admin)')
     .addBearerAuth(
       {
