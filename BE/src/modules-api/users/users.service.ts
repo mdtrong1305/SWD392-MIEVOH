@@ -79,6 +79,36 @@ export class UsersService {
     return user;
   }
 
+  async getProfile(username: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { username },
+      select: {
+        username: true,
+        fullName: true,
+        email: true,
+        phoneNumber: true,
+        avatar: true,
+        userType: true,
+        cinemaComplexId: true,
+        dateOfBirth: true,
+        address: true,
+        gender: true,
+        cccd: true,
+        rewardPoints: true,
+        favoriteGenres: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Không tìm thấy tài khoản');
+    }
+
+    return user;
+  }
+
   async createStaff(createStaffDto: CreateStaffDto) {
     // Kiểm tra username đã tồn tại chưa
     const existingUsername = await this.prisma.user.findUnique({
