@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { User, Menu, X, Ticket, LogOut, Lock, Sun, Moon, Globe } from "lucide-react";
+import { User, Menu, X, Ticket, LogOut, Lock, Sun, Moon, Globe, LayoutDashboard } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "../../store/index.tsx";
-import { logout } from "../../pages/User/Login/slice.ts";
-import { useLocation, Link } from "react-router-dom";
+import { logout, updateUser } from "../../pages/User/Login/slice.ts";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import Button from "../Button/Button";
 import { useTheme } from "../../contextAPI/ThemeContext.tsx";
 import { useLanguage } from "../../contextAPI/LanguageContext.tsx";
@@ -33,6 +33,17 @@ export default function Header({
     const location = useLocation();
     const { theme, toggleTheme } = useTheme();
     const { language, setLanguage, t } = useLanguage();
+    const navigate = useNavigate();
+
+    const isAdminOrStaff = ['admin', 'staff'].includes((user?.role || '').toLowerCase()) ||
+        ['admin', 'staff'].includes((user?.realRole || '').toLowerCase());
+
+    const handleSwitchToAdmin = () => {
+        if (user?.realRole) {
+            dispatch(updateUser({ role: user.realRole, realRole: undefined }));
+        }
+        navigate('/admin');
+    };
 
     const menuRef = useRef<HTMLDivElement>(null);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -76,7 +87,7 @@ export default function Header({
     const handleSearchFocus = async () => {
         setSearchDropdownOpen(true);
         if (hasLoadedData) return;
-        
+
         setIsSearching(true);
         try {
             const [nowShowingRes, comingSoonRes, complexesRes] = await Promise.all([
@@ -84,7 +95,7 @@ export default function Header({
                 getComingSoonMoviesApi({ pageSize: 100 }),
                 getCinemaComplexesApi()
             ]);
-            
+
             // Safely parse nowShowing movies
             let nowShowing = [];
             const nowData = nowShowingRes.data as any;
@@ -145,7 +156,7 @@ export default function Header({
     useEffect(() => {
         const handleClickOutsideSearch = (event: MouseEvent) => {
             if (
-                searchContainerRef.current && 
+                searchContainerRef.current &&
                 !searchContainerRef.current.contains(event.target as Node)
             ) {
                 setSearchDropdownOpen(false);
@@ -169,8 +180,8 @@ export default function Header({
         return allMovies.filter(movie => {
             const titleVi = (movie.title_vi || "").toLowerCase();
             const titleEn = (movie.title_en || "").toLowerCase();
-            const genres = Array.isArray(movie.genres) 
-                ? movie.genres.join(" ").toLowerCase() 
+            const genres = Array.isArray(movie.genres)
+                ? movie.genres.join(" ").toLowerCase()
                 : (movie.genres || "").toLowerCase();
             return titleVi.includes(q) || titleEn.includes(q) || genres.includes(q);
         });
@@ -210,13 +221,12 @@ export default function Header({
 
     const renderSearchDropdown = (isMobile: boolean) => {
         if (!searchDropdownOpen || !searchQuery.trim()) return null;
-        
+
         return (
-            <div className={`absolute top-full z-[100] mt-2 max-h-[380px] overflow-y-auto bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-2xl p-4 flex flex-col gap-4 custom-search-scrollbar ${
-                isMobile 
-                    ? "left-0 right-0 w-full" 
-                    : "right-0 w-96 lg:w-[26rem]"
-            }`}>
+            <div className={`absolute top-full z-[100] mt-2 max-h-[380px] overflow-y-auto bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-2xl p-4 flex flex-col gap-4 custom-search-scrollbar ${isMobile
+                ? "left-0 right-0 w-full"
+                : "right-0 w-96 lg:w-[26rem]"
+                }`}>
                 <style>{`
                     .custom-search-scrollbar::-webkit-scrollbar {
                         width: 6px;
@@ -359,11 +369,10 @@ export default function Header({
     const redirectQuery = `?redirect=${encodeURIComponent(location.pathname + location.search)}`;
 
     return (
-        <header className={`sticky top-0 z-50 w-full bg-[#F6F3F9] dark:bg-zinc-900 border-b border-[#EAE6F0] dark:border-zinc-800/50 shadow-sm ${
-            isAnimatedPath 
-                ? "transition-transform duration-300 animate__animated animate__fadeInDown" 
-                : ""
-        } ${isVisible ? "translate-y-0" : "-translate-y-full"}`}>
+        <header className={`sticky top-0 z-50 w-full bg-[#F6F3F9] dark:bg-zinc-900 border-b border-[#EAE6F0] dark:border-zinc-800/50 shadow-sm ${isAnimatedPath
+            ? "transition-transform duration-300 animate__animated animate__fadeInDown"
+            : ""
+            } ${isVisible ? "translate-y-0" : "-translate-y-full"}`}>
             <div className="mx-auto flex max-w-[85%] items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
                 {/* Left: Logo and Brand Name */}
                 <Link to="/" className={`flex items-center gap-0 shrink-0 ${isAnimatedPath ? "group" : ""}`} aria-label="Mievoh Homepage">
@@ -390,18 +399,18 @@ export default function Header({
                             item.label === "Movies"
                                 ? t("nav_movies")
                                 : item.label === "Cinemas"
-                                ? t("nav_cinemas")
-                                : item.label === "News"
-                                ? t("nav_news")
-                                : item.label;
+                                    ? t("nav_cinemas")
+                                    : item.label === "News"
+                                        ? t("nav_news")
+                                        : item.label;
 
                         return (
                             <Link
                                 key={item.label}
                                 to={item.href}
                                 className={`relative py-2 text-base transition-all duration-200 whitespace-nowrap ${isActive
-                                        ? "nav-active font-bold"
-                                        : "text-gray-600 dark:text-violet-400 font-semibold hover:text-[#5B21B6] dark:hover:text-violet-200"
+                                    ? "nav-active font-bold"
+                                    : "text-gray-600 dark:text-violet-400 font-semibold hover:text-[#5B21B6] dark:hover:text-violet-200"
                                     }`}
                             >
                                 {translatedLabel}
@@ -479,29 +488,29 @@ export default function Header({
                                                 <div className="text-xs text-gray-400 dark:text-zinc-400 truncate">{user?.email}</div>
                                             </div>
                                         </div>
-                                        
+
                                         {/* Menu List */}
                                         <div className="flex flex-col gap-0.5">
-                                            <Link 
-                                                to="/profile?tab=info" 
+                                            <Link
+                                                to="/profile?tab=info"
                                                 onClick={() => setUserMenuOpen(false)}
                                                 className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-600 dark:text-zinc-300 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-400 transition-all duration-200"
                                             >
                                                 <User className="h-4.5 w-4.5 text-violet-500" />
                                                 <span>{t("profile")}</span>
                                             </Link>
-                                            
-                                            <Link 
-                                                to="/profile?tab=tickets" 
+
+                                            <Link
+                                                to="/profile?tab=tickets"
                                                 onClick={() => setUserMenuOpen(false)}
                                                 className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-600 dark:text-zinc-300 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-400 transition-all duration-200"
                                             >
                                                 <Ticket className="h-4.5 w-4.5 text-violet-500" />
                                                 <span>{t("booked_tickets")}</span>
                                             </Link>
- 
-                                            <Link 
-                                                to="/profile?tab=password" 
+
+                                            <Link
+                                                to="/profile?tab=password"
                                                 onClick={() => setUserMenuOpen(false)}
                                                 className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-600 dark:text-zinc-300 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-400 transition-all duration-200"
                                             >
@@ -509,7 +518,19 @@ export default function Header({
                                                 <span>{t("change_password")}</span>
                                             </Link>
                                         </div>
-                                        
+
+                                        {isAdminOrStaff && (
+                                            <div className="border-t border-violet-50/60 dark:border-zinc-800 mt-1 pt-1">
+                                                <button
+                                                    onClick={() => { setUserMenuOpen(false); handleSwitchToAdmin(); }}
+                                                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-850 dark:hover:text-violet-200 transition-all duration-200 cursor-pointer"
+                                                >
+                                                    <LayoutDashboard className="h-4.5 w-4.5 text-violet-500" />
+                                                    <span>Trang quản trị</span>
+                                                </button>
+                                            </div>
+                                        )}
+
                                         <div className="border-t border-violet-50/60 dark:border-zinc-800 mt-1 pt-1">
                                             <button
                                                 onClick={() => { setUserMenuOpen(false); dispatch(logout()); }}
@@ -581,11 +602,10 @@ export default function Header({
 
             {/* Mobile nav dropdown */}
             {isOpen && (
-                <div 
+                <div
                     ref={mobileMenuRef}
-                    className={`absolute right-6 top-20 w-64 rounded-xl border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-xl z-50 md:hidden ${
-                        isAnimatedPath ? "animate-in fade-in slide-in-from-top-2 duration-200" : ""
-                    }`}
+                    className={`absolute right-6 top-20 w-64 rounded-xl border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 shadow-xl z-50 md:hidden ${isAnimatedPath ? "animate-in fade-in slide-in-from-top-2 duration-200" : ""
+                        }`}
                 >
                     <nav className="flex flex-col gap-2">
                         {/* Mobile Search input */}
@@ -610,18 +630,18 @@ export default function Header({
                                 item.label === "Movies"
                                     ? t("nav_movies")
                                     : item.label === "Cinemas"
-                                    ? t("nav_cinemas")
-                                    : item.label === "News"
-                                    ? t("nav_news")
-                                    : item.label;
+                                        ? t("nav_cinemas")
+                                        : item.label === "News"
+                                            ? t("nav_news")
+                                            : item.label;
 
                             return (
                                 <Link
                                     key={item.label}
                                     to={item.href}
                                     className={`rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${isActive
-                                            ? "bg-violet-50 dark:bg-zinc-800 text-violet-700 dark:text-violet-400"
-                                            : "text-gray-700 dark:text-violet-400 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-violet-600 dark:hover:text-violet-200"
+                                        ? "bg-violet-50 dark:bg-zinc-800 text-violet-700 dark:text-violet-400"
+                                        : "text-gray-700 dark:text-violet-400 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-violet-600 dark:hover:text-violet-200"
                                         }`}
                                     onClick={() => setIsOpen(false)}
                                 >
@@ -631,73 +651,84 @@ export default function Header({
                         })}
 
                         <div className="mt-2 border-t border-gray-100 dark:border-zinc-800 pt-3">
-                             {isAuthenticated ? (
-                                  <>
-                                      <div className="flex items-center gap-3 px-2 py-2 border-b border-violet-50 dark:border-zinc-800 mb-2">
-                                          <img
-                                              src={user?.avatar || "/images/avatar.jpg"}
-                                              alt={user?.name || "avatar"}
-                                              className="h-10 w-10 rounded-full object-cover border-2 border-violet-200 dark:border-zinc-700"
-                                          />
-                                          <div className="flex flex-col min-w-0">
-                                              <div className="text-sm font-bold text-gray-800 dark:text-zinc-200 truncate">{user?.name}</div>
-                                              <div className="text-xs text-gray-400 dark:text-zinc-400 truncate">{user?.email}</div>
-                                          </div>
-                                      </div>
-                                      <Link
-                                          to="/profile?tab=info"
-                                          className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 dark:text-zinc-300 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-400 transition-colors"
-                                          onClick={() => setIsOpen(false)}
-                                      >
-                                          <User className="h-4 w-4 text-violet-500" />
-                                          <span>{t("profile")}</span>
-                                      </Link>
-                                      <Link
-                                          to="/profile?tab=tickets"
-                                          className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 dark:text-zinc-300 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-400 transition-colors"
-                                          onClick={() => setIsOpen(false)}
-                                      >
-                                          <Ticket className="h-4 w-4 text-violet-500" />
-                                          <span>{t("booked_tickets")}</span>
-                                      </Link>
-                                      <Link
-                                          to="/profile?tab=password"
-                                          className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 dark:text-zinc-300 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-400 transition-colors"
-                                          onClick={() => setIsOpen(false)}
-                                      >
-                                          <Lock className="h-4 w-4 text-violet-500" />
-                                          <span>{t("change_password")}</span>
-                                      </Link>
-                                      <div className="border-t border-violet-50 dark:border-zinc-800 mt-2 pt-2">
-                                          <button
-                                              onClick={() => { setIsOpen(false); dispatch(logout()); }}
-                                              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-850 dark:hover:text-violet-200 transition-colors cursor-pointer"
-                                          >
-                                              <LogOut className="h-4 w-4 text-violet-500" />
-                                              <span>{t("logout")}</span>
-                                          </button>
-                                      </div>
-                                  </>
-                             ) : (
-                                 <div className="flex flex-col gap-2">
-                                     <Button
-                                         variant="outline-purple"
-                                         href={`/login${redirectQuery}`}
-                                         className="w-full text-center py-2 text-sm"
-                                         onClick={() => setIsOpen(false)}
-                                     >
-                                         {t("login")}
-                                     </Button>
-                                     <Button
-                                         variant="primary"
-                                         href={`/register${redirectQuery}`}
-                                         className="w-full text-center py-2 text-sm"
-                                         onClick={() => setIsOpen(false)}
-                                     >
-                                         {t("register")}
-                                     </Button>
-                                 </div>
-                             )}
+                            {isAuthenticated ? (
+                                <>
+                                    <div className="flex items-center gap-3 px-2 py-2 border-b border-violet-50 dark:border-zinc-800 mb-2">
+                                        <img
+                                            src={user?.avatar || "/images/avatar.jpg"}
+                                            alt={user?.name || "avatar"}
+                                            className="h-10 w-10 rounded-full object-cover border-2 border-violet-200 dark:border-zinc-700"
+                                        />
+                                        <div className="flex flex-col min-w-0">
+                                            <div className="text-sm font-bold text-gray-800 dark:text-zinc-200 truncate">{user?.name}</div>
+                                            <div className="text-xs text-gray-400 dark:text-zinc-400 truncate">{user?.email}</div>
+                                        </div>
+                                    </div>
+                                    <Link
+                                        to="/profile?tab=info"
+                                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 dark:text-zinc-300 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-400 transition-colors"
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        <User className="h-4 w-4 text-violet-500" />
+                                        <span>{t("profile")}</span>
+                                    </Link>
+                                    <Link
+                                        to="/profile?tab=tickets"
+                                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 dark:text-zinc-300 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-400 transition-colors"
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        <Ticket className="h-4 w-4 text-violet-500" />
+                                        <span>{t("booked_tickets")}</span>
+                                    </Link>
+                                    <Link
+                                        to="/profile?tab=password"
+                                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 dark:text-zinc-300 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-400 transition-colors"
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        <Lock className="h-4 w-4 text-violet-500" />
+                                        <span>{t("change_password")}</span>
+                                    </Link>
+                                    {isAdminOrStaff && (
+                                        <div className="border-t border-violet-50 dark:border-zinc-800 mt-2 pt-2">
+                                            <button
+                                                onClick={() => { setIsOpen(false); handleSwitchToAdmin(); }}
+                                                className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-850 dark:hover:text-violet-200 transition-colors cursor-pointer"
+                                            >
+                                                <LayoutDashboard className="h-4 w-4 text-violet-500" />
+                                                <span>Trang quản trị</span>
+                                            </button>
+                                        </div>
+                                    )}
+                                    <div className="border-t border-violet-50 dark:border-zinc-800 mt-2 pt-2">
+                                        <button
+                                            onClick={() => { setIsOpen(false); dispatch(logout()); }}
+                                            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-bold text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-850 dark:hover:text-violet-200 transition-colors cursor-pointer"
+                                        >
+                                            <LogOut className="h-4 w-4 text-violet-500" />
+                                            <span>{t("logout")}</span>
+                                        </button>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="flex flex-col gap-2">
+                                    <Button
+                                        variant="outline-purple"
+                                        href={`/login${redirectQuery}`}
+                                        className="w-full text-center py-2 text-sm"
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        {t("login")}
+                                    </Button>
+                                    <Button
+                                        variant="primary"
+                                        href={`/register${redirectQuery}`}
+                                        className="w-full text-center py-2 text-sm"
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        {t("register")}
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </nav>
                 </div>

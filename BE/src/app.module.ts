@@ -15,6 +15,7 @@ import { ShowtimesModule } from './modules-api/showtimes/showtimes.module';
 import { FoodsModule } from './modules-api/foods/foods.module';
 import { BookingsModule } from './modules-api/bookings/bookings.module';
 import { PaymentsModule } from './modules-api/payments/payments.module';
+import { StaffModule } from './modules-api/staff/staff.module';
 import { Cache, CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
 import { DATABASE_REDIS } from './common/constant/app.constant';
@@ -24,7 +25,9 @@ import { DATABASE_REDIS } from './common/constant/app.constant';
     CacheModule.register({
       // cấu hình cache toàn cục sử dụng Redis
       isGlobal: true, // cho phép sử dụng cache ở mọi module
-      stores: [new KeyvRedis(DATABASE_REDIS)], // cấu hình kết nối Redis
+      // chỉ kết nối Redis khi có cấu hình DATABASE_REDIS; nếu không, dùng cache in-memory mặc định
+      // (tránh treo khởi động ở môi trường local không có Redis)
+      ...(DATABASE_REDIS ? { stores: [new KeyvRedis(DATABASE_REDIS)] } : {}),
     }),
     PrismaModule,
     TokenModule,
@@ -39,6 +42,7 @@ import { DATABASE_REDIS } from './common/constant/app.constant';
     FoodsModule,
     BookingsModule,
     PaymentsModule,
+    StaffModule,
   ],
   providers: [
     {
@@ -49,7 +53,7 @@ import { DATABASE_REDIS } from './common/constant/app.constant';
   ],
 })
 export class AppModule implements OnModuleInit {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) { }
   // check kết nối cache khi khởi tạo module
   async onModuleInit() {
     try {

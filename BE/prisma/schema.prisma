@@ -26,6 +26,9 @@ model User {
 
   userType String? @default("user") // "user", "staff", "admin"
 
+  // Cụm rạp mà staff được phân công quản lý (chỉ áp dụng cho userType = "staff")
+  managedComplexId String? @db.ObjectId
+
   // Thông tin cá nhân bổ sung (mặc định null)
   dateOfBirth DateTime?
   address     String?
