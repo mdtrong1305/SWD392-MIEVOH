@@ -19,9 +19,11 @@ import { Cache, CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
 import { DATABASE_REDIS } from './common/constant/app.constant';
 import { UsersModule } from './modules-api/users/users.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     CacheModule.register({
       // cấu hình cache toàn cục sử dụng Redis
       isGlobal: true, // cho phép sử dụng cache ở mọi module

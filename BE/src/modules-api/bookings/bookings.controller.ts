@@ -49,4 +49,15 @@ export class BookingsController {
       '127.0.0.1';
     return this.bookingsService.createBooking(username, data, ipAddr);
   }
+
+  @Get('my-history')
+  @UseGuards(RoleGuard)
+  @Roles('user', 'admin', 'staff')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Lấy lịch sử đặt vé của người dùng hiện tại' })
+  @ApiResponse({ status: 200, description: 'Lấy danh sách thành công' })
+  getMyHistory(@Req() req: any) {
+    const username = req.user.username;
+    return this.bookingsService.getMyHistory(username);
+  }
 }

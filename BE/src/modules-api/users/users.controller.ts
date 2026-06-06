@@ -12,6 +12,8 @@ import {
   DefaultValuePipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { User } from '../../common/decorators/user.decorator';
+import type { User as PrismaUser } from '../../modules-system/prisma/generated/prisma/client';
 import { CreateStaffDto, UpdateStaffDto } from './dto/users.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { RoleGuard } from '../../common/guards/role.guard';
@@ -21,6 +23,16 @@ import { Roles } from '../../common/decorators/role.decorator';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Get('profile')
+  @UseGuards(RoleGuard)
+  @Roles('admin', 'staff', 'user') // Hoặc bỏ Roles nếu chỉ cần JwtAuthGuard, nhưng cứ để cho đồng nhất
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Lấy thông tin cá nhân (Profile)' })
+  @ApiResponse({ status: 200, description: 'Lấy thông tin thành công' })
+  getProfile(@User() user: PrismaUser) {
+    return this.usersService.getProfile(user.username);
+  }
 
   @Get()
   @UseGuards(RoleGuard)
