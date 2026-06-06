@@ -14,6 +14,9 @@ export default function HomeTemplate() {
     const txnRef = query.get("vnp_TxnRef"); // bookingId
 
     if (responseCode && txnRef) {
+      if (window.location.pathname.includes("/book/seats")) {
+        return;
+      }
       const pendingBookings = JSON.parse(localStorage.getItem("mievoh_pending_bookings") || "{}");
       const pending = pendingBookings[txnRef];
 

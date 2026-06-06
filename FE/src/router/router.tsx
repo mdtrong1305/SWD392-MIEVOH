@@ -12,6 +12,8 @@ import SelectSeat from "../pages/User/SelectSeat/SelectSeat.tsx";
 import Cinemas from "../pages/User/Cinemas/Cinemas.tsx";
 import CinemaDetail from "../pages/User/CinemaDetail/CinemaDetail.tsx";
 import Profile from "../pages/User/Profile/Profile.tsx";
+import VNPayReturn from "../pages/User/VNPayReturn/VNPayReturn.tsx";
+
 
 export type AppRoute = {
   path: string;
@@ -55,6 +57,18 @@ export const routes: AppRoute[] = [
       {
         path: "profile",
         element: <Profile />,
+      },
+      {
+        path: "payments/vnpay-return",
+        element: <VNPayReturn />,
+      },
+      {
+        path: "vnpay-return",
+        element: <VNPayReturn />,
+      },
+      {
+        path: "ReturnUrl",
+        element: <VNPayReturn />,
       },
     ],
   },
