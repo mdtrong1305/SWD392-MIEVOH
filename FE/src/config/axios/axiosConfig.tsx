@@ -26,6 +26,9 @@ api.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('accessToken');
+      localStorage.removeItem('auth_user');
+      localStorage.removeItem('auth_isAuthenticated');
+      localStorage.removeItem('lastActivity');
       localStorage.removeItem('mievoh_user');
       // Redirect to login page
       window.location.href = '/login';
