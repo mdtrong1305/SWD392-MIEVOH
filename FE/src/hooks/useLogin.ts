@@ -81,6 +81,14 @@ export default function useLogin(initialSliding: boolean) {
             }
             (window as any).__google_oauth_processed__ = token;
 
+            // Check if user agent is mobile / emulator
+            const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (isMobileUA) {
+                const deepLinkUrl = `mievohmobile://login?token=${token}&username=${username}&fullName=${encodeURIComponent(fullName || '')}&email=${email || ''}&avatar=${encodeURIComponent(avatar || '')}`;
+                window.location.href = deepLinkUrl;
+                return;
+            }
+
             // Write to localStorage
             localStorage.setItem('accessToken', token);
             localStorage.setItem('auth_isAuthenticated', 'true');
