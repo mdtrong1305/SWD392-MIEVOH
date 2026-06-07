@@ -77,8 +77,9 @@ export default function Cinemas() {
                     };
                 });
 
-                // Take first 3 for home page 3-column display
-                setCinemas(mapped.slice(0, 3));
+                // Sort by rating descending and take the first 3 for home page 3-column display
+                const sortedByRating = [...mapped].sort((a, b) => b.rating - a.rating);
+                setCinemas(sortedByRating.slice(0, 3));
             } catch (error) {
                 console.error("Lỗi khi tải thông tin rạp tại Home:", error);
             } finally {
