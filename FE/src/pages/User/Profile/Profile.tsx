@@ -10,6 +10,7 @@ import BookingHistory from "./BookingHistory/BookingHistory.tsx";
 import ChangePassword from "./ChangePassword/ChangePassword.tsx";
 import Button from "../../../components/Button/Button.tsx";
 import { useLanguage } from "../../../contextAPI/LanguageContext.tsx";
+import { updateProfileApi } from "../../../axios/profile";
 
 export default function Profile() {
     const { t } = useLanguage();
@@ -45,11 +46,20 @@ export default function Profile() {
             const reader = new FileReader();
             reader.onloadend = () => {
                 const base64String = reader.result as string;
-                dispatch(updateUser({
-                    ...user,
-                    avatar: base64String
-                }));
-                toast.success(t("avatar_updated_success"));
+                updateProfileApi({ avatar: base64String })
+                    .then((res) => {
+                        if (res && res.data) {
+                            dispatch(updateUser({
+                                ...user,
+                                avatar: res.data.avatar || base64String
+                            }));
+                            toast.success(t("avatar_updated_success"));
+                        }
+                    })
+                    .catch((err) => {
+                        console.error("Failed to update avatar:", err);
+                        toast.error("Không thể cập nhật ảnh đại diện");
+                    });
             };
             reader.readAsDataURL(file);
         }

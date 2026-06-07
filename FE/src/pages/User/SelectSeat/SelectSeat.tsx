@@ -147,7 +147,6 @@ export default function SelectSeat() {
                         formatPrice={formatPrice}
                         setShowQRTransfer={setShowQRTransfer}
                         setIsVerifying={setIsVerifying}
-                        setActiveStep={setActiveStep}
                     />
                 ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start w-full min-w-0">

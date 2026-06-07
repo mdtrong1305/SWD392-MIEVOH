@@ -14,7 +14,6 @@ interface QRTransferPageProps {
     formatPrice: (value: number) => string;
     setShowQRTransfer: (show: boolean) => void;
     setIsVerifying: (verifying: boolean) => void;
-    setActiveStep: (step: number) => void;
 }
 
 export default function QRTransferPage({
@@ -25,8 +24,7 @@ export default function QRTransferPage({
     totalPrice,
     formatPrice,
     setShowQRTransfer,
-    setIsVerifying,
-    setActiveStep
+    setIsVerifying
 }: QRTransferPageProps) {
     const { t } = useLanguage();
     const [qrLoaded, setQrLoaded] = useState(false);

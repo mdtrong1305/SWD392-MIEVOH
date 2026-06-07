@@ -6,8 +6,84 @@ import { resetBooking } from "../../SelectSeat/slice.ts";
 import { toast } from "../../../../components/Toast/Toast.tsx";
 import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 
-import type { BookingRecord } from "../../../../mockAPI/historyMock.tsx";
-import { DEFAULT_BOOKING_HISTORY } from "../../../../mockAPI/historyMock.tsx";
+export interface BookingRecord {
+    id: string;
+    bookingCode: string;
+    movieId: number;
+    movieTitle: string;
+    movieImage: string;
+    branchName: string;
+    time: string;
+    date: string;
+    seats: string[];
+    combos: string;
+    totalPrice: number;
+    status: "Paid" | "Pending" | "Cancelled";
+    dateBooked: string;
+}
+
+import { getBookingHistoryApi } from "../../../../axios/profile";
+
+const mapApiHistoryToRecord = (item: any): BookingRecord => {
+    let showtimeDate = "";
+    let showtimeTime = "";
+    if (item.Showtime?.showDateTime) {
+        try {
+            const d = new Date(item.Showtime.showDateTime);
+            const day = String(d.getDate()).padStart(2, "0");
+            const month = String(d.getMonth() + 1).padStart(2, "0");
+            const year = d.getFullYear();
+            showtimeDate = `${year}-${month}-${day}`;
+            
+            const hours = String(d.getHours()).padStart(2, "0");
+            const minutes = String(d.getMinutes()).padStart(2, "0");
+            showtimeTime = `${hours}:${minutes}`;
+        } catch (e) {
+            console.error(e);
+        }
+    }
+    
+    let dateBookedStr = "";
+    if (item.createdAt) {
+        try {
+            const d = new Date(item.createdAt);
+            const day = String(d.getDate()).padStart(2, "0");
+            const month = String(d.getMonth() + 1).padStart(2, "0");
+            const year = d.getFullYear();
+            dateBookedStr = `${day}/${month}/${year}`;
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    const seats = item.BookingDetails ? item.BookingDetails.map((d: any) => d.Seat?.name).filter(Boolean) : [];
+    const combos = item.BookingFoods && item.BookingFoods.length > 0 
+        ? item.BookingFoods.map((f: any) => `${f.quantity}x ${f.Food?.name}`).join(", ") 
+        : "None";
+
+    let statusMapped: "Paid" | "Pending" | "Cancelled" = "Pending";
+    if (item.paymentStatus === "Success") {
+        statusMapped = "Paid";
+    } else if (item.paymentStatus === "Failed") {
+        statusMapped = "Cancelled";
+    }
+
+    return {
+        id: item.bookingId,
+        bookingCode: item.ticketCode || "",
+        movieId: 0,
+        movieTitle: item.Showtime?.Movie?.title_vi || item.Showtime?.Movie?.title_en || "Phim",
+        movieImage: item.Showtime?.Movie?.imageUrl || "🍿",
+        branchName: item.Showtime?.Cinema?.CinemaComplex?.name || "Rạp chiếu phim",
+        time: showtimeTime || "12:00",
+        date: showtimeDate || "",
+        seats,
+        combos,
+        totalPrice: item.totalPrice || 0,
+        status: statusMapped,
+        dateBooked: dateBookedStr || ""
+    };
+};
 
 export default function BookingHistory() {
     const { t } = useLanguage();
@@ -19,74 +95,24 @@ export default function BookingHistory() {
     const booking = useSelector((state: RootState) => state.booking);
 
     useEffect(() => {
-        // Load history from localStorage or load defaults
-        const stored = localStorage.getItem("mievoh_booking_history");
-        let currentHistory = stored ? JSON.parse(stored) : DEFAULT_BOOKING_HISTORY;
-        
-        if (booking.bookingSuccess && booking.bookingCode && booking.movieId) {
-            // Check if this bookingCode already exists in the history list to prevent duplication
-            const alreadyExists = currentHistory.some((rec: BookingRecord) => rec.bookingCode === booking.bookingCode);
-            
-            if (!alreadyExists) {
-                const movieTitle = booking.movieTitle || "Unknown Movie";
-                const movieImage = booking.movieImage || "🍿";
-
-                // Format combos
-                const comboNames = [
-                    { id: 1, name: "Combo Solo" },
-                    { id: 2, name: "Combo Buddy" },
-                    { id: 3, name: "Combo Family" }
-                ];
-                const selectedCombos = comboNames
-                    .filter(c => (booking.comboQuantities[c.id] || 0) > 0)
-                    .map(c => `${booking.comboQuantities[c.id]}x ${c.name}`)
-                    .join(", ") || "None";
-
-                // Calculate total price
-                let seatPrice = 0;
-                booking.selectedSeats.forEach(seat => {
-                    const row = seat[0];
-                    if (row === "J") seatPrice += 220000;
-                    else if (["A", "B", "C", "D"].includes(row)) seatPrice += 80000;
-                    else seatPrice += 110000;
-                });
-                let comboPrice = 0;
-                const comboPrices: Record<number, number> = { 1: 75000, 2: 115000, 3: 165000 };
-                Object.entries(booking.comboQuantities).forEach(([idStr, qty]) => {
-                    const id = Number(idStr);
-                    comboPrice += (qty || 0) * (comboPrices[id] || 0);
-                });
-                const totalPrice = seatPrice + comboPrice;
-
-                const newBookingRecord: BookingRecord = {
-                    id: "booking-" + Date.now(),
-                    bookingCode: booking.bookingCode,
-                    movieId: Number(booking.movieId) || 0,
-                    movieTitle,
-                    movieImage,
-                    branchName: booking.branchName || "CGV Vincom Center Dong Khoi",
-                    time: booking.time || "18:30",
-                    date: booking.date || new Date().toISOString().split("T")[0],
-                    seats: booking.selectedSeats,
-                    combos: selectedCombos,
-                    totalPrice,
-                    status: "Paid",
-                    dateBooked: new Date().toLocaleDateString("vi-VN")
-                };
-
-                currentHistory = [newBookingRecord, ...currentHistory];
-                localStorage.setItem("mievoh_booking_history", JSON.stringify(currentHistory));
-                
-                // Clear current booking state so it doesn't duplicate
-                dispatch(resetBooking());
-                toast.success(t("booking_saved_history_success", { code: booking.bookingCode }));
-            } else {
-                // If already recorded, clean up Redux state
-                dispatch(resetBooking());
-            }
+        if (booking.bookingSuccess && booking.bookingCode) {
+            dispatch(resetBooking());
         }
 
-        setHistory(currentHistory);
+        const fetchHistory = async () => {
+            try {
+                const res = await getBookingHistoryApi();
+                if (res && res.data) {
+                    const mapped = res.data.map(mapApiHistoryToRecord);
+                    setHistory(mapped);
+                }
+            } catch (err) {
+                console.error("Failed to load booking history:", err);
+                toast.error("Không thể tải lịch sử đặt vé");
+            }
+        };
+
+        fetchHistory();
     }, [booking, dispatch]);
 
     const formatPrice = (value: number) => {
@@ -283,11 +309,17 @@ export default function BookingHistory() {
                                         <rect x="94" width="2" height="30" fill="#111827" />
                                     </svg>
                                 </div>
-                                <div className="flex justify-between w-full px-2 mt-5 font-mono font-black text-xl sm:text-2xl text-gray-900 mievoh-barcode-text tracking-normal select-all">
-                                    {selectedRecordForModal.bookingCode.toUpperCase().split("").map((char, index) => (
-                                        <span key={index}>{char}</span>
-                                    ))}
-                                </div>
+                                {selectedRecordForModal.bookingCode.length <= 10 ? (
+                                    <div className="flex justify-between w-full px-2 mt-5 font-mono font-black text-xl sm:text-2xl text-gray-900 mievoh-barcode-text tracking-normal select-all">
+                                        {selectedRecordForModal.bookingCode.toUpperCase().split("").map((char, index) => (
+                                            <span key={index}>{char}</span>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="w-full mt-5 font-mono font-black text-[10px] sm:text-xs text-gray-900 mievoh-barcode-text tracking-tighter select-all text-center break-all leading-normal">
+                                        {selectedRecordForModal.bookingCode.toUpperCase()}
+                                    </div>
+                                )}
                             </div>
 
                             <span className="text-[10px] font-bold text-gray-400 text-center uppercase tracking-wider">

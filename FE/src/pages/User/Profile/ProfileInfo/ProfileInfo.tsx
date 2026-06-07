@@ -6,6 +6,36 @@ import { toast } from "../../../../components/Toast/Toast.tsx";
 import Button from "../../../../components/Button/Button.tsx";
 import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 import { validateEmail, validatePhone, validateName, validateDateOfBirth, validateCccd } from "../../../../validation/validation";
+import { getProfileApi, updateProfileApi } from "../../../../axios/profile";
+
+// Helper to convert date from backend (ISO string) to DD-MM-YYYY
+const formatDobFromBackend = (dobStr: string | null): string => {
+    if (!dobStr) return "";
+    try {
+        const date = new Date(dobStr);
+        if (isNaN(date.getTime())) return "";
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    } catch {
+        return "";
+    }
+};
+
+// Helper to convert date from DD-MM-YYYY to YYYY-MM-DD for backend
+const formatDobForBackend = (dobString: string): string | undefined => {
+    if (!dobString) return undefined;
+    const parts = dobString.split(/[-/.]/);
+    if (parts.length === 3) {
+        const day = parts[0];
+        const month = parts[1];
+        const year = parts[2];
+        return `${year}-${month}-${day}`;
+    }
+    return dobString;
+};
+
 
 interface ProfileInfoProps {
     user: any;
@@ -138,9 +168,56 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
 
     const [errors, setErrors] = useState<Record<string, string>>({});
 
+    // Fetch user profile from backend API on mount
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const response = await getProfileApi();
+                if (response && response.data) {
+                    const data = response.data;
+                    const formattedDob = formatDobFromBackend(data.dateOfBirth);
+                    const age = formattedDob ? calculateAge(formattedDob) : "";
+                    
+                    const profileData = {
+                        name: data.fullName || "",
+                        email: data.email || "",
+                        phone: data.phoneNumber || "",
+                        gender: data.gender || "",
+                        age: age,
+                        dateOfBirth: formattedDob,
+                        address: data.address || "",
+                        cccd: data.cccd || "",
+                        avatar: data.avatar || "/images/avatar.jpg"
+                    };
+                    
+                    setFormData(profileData);
+                    
+                    dispatch(updateUser({
+                        name: data.fullName || "",
+                        hoTen: data.fullName || "",
+                        fullName: data.fullName || "",
+                        email: data.email || "",
+                        phone: data.phoneNumber || "",
+                        soDT: data.phoneNumber || "",
+                        gender: data.gender || "",
+                        age: age,
+                        dateOfBirth: formattedDob,
+                        address: data.address || "",
+                        cccd: data.cccd || "",
+                        avatar: data.avatar || "/images/avatar.jpg"
+                    }));
+                }
+            } catch (error) {
+                console.error("Failed to fetch profile:", error);
+            }
+        };
+
+        fetchProfile();
+    }, [dispatch]);
+
     // Sync state with user prop changes
     useEffect(() => {
-        if (user) {
+        if (user && !isEditing) {
             setFormData({
                 name: user.name || user.hoTen || "",
                 email: user.email || "",
@@ -153,7 +230,7 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
                 avatar: user.avatar || "/images/avatar.jpg"
             });
         }
-    }, [user]);
+    }, [user, isEditing]);
 
     // Parse dateOfBirth helper into separate parts
     const parseDob = (dobString: string) => {
@@ -266,27 +343,53 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
         setIsSaving(true);
         setIsSaved(false);
 
-        // Simulate API network latency
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        try {
+            const updateData = {
+                fullName: formData.name,
+                email: formData.email,
+                phoneNumber: formData.phone,
+                gender: formData.gender,
+                dateOfBirth: formatDobForBackend(formData.dateOfBirth),
+                address: formData.address,
+                cccd: formData.cccd,
+                avatar: formData.avatar
+            };
 
-        dispatch(updateUser({
-            name: formData.name,
-            hoTen: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            soDT: formData.phone,
-            gender: formData.gender,
-            age: formData.age,
-            dateOfBirth: formData.dateOfBirth,
-            address: formData.address,
-            cccd: formData.cccd,
-            avatar: formData.avatar
-        }));
+            const response = await updateProfileApi(updateData);
+            
+            if (response && response.data) {
+                const data = response.data;
+                const formattedDob = formatDobFromBackend(data.dateOfBirth);
+                const age = formattedDob ? calculateAge(formattedDob) : "";
 
-        setIsSaving(false);
-        setIsSaved(true);
-        setIsEditing(false);
-        toast.success(t("profile_updated_success"));
+                dispatch(updateUser({
+                    name: data.fullName || "",
+                    hoTen: data.fullName || "",
+                    fullName: data.fullName || "",
+                    email: data.email || "",
+                    phone: data.phoneNumber || "",
+                    soDT: data.phoneNumber || "",
+                    gender: data.gender || "",
+                    age: age,
+                    dateOfBirth: formattedDob,
+                    address: data.address || "",
+                    cccd: data.cccd || "",
+                    avatar: data.avatar || "/images/avatar.jpg"
+                }));
+                
+                toast.success(t("profile_updated_success"));
+                setIsSaved(true);
+                setIsEditing(false);
+            } else {
+                throw new Error("Invalid response");
+            }
+        } catch (error: any) {
+            console.error("Failed to update profile:", error);
+            const errMsg = error?.response?.data?.message || t("failed_to_update_profile") || "Cập nhật thất bại";
+            toast.error(errMsg);
+        } finally {
+            setIsSaving(false);
+        }
 
         setTimeout(() => {
             setIsSaved(false);

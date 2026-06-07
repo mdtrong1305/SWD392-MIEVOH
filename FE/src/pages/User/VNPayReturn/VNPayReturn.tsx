@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { verifyVNPayReturnApi } from "../../../axios/booking.tsx";
 import { toast } from "../../../components/Toast/Toast.tsx";
 import { useLanguage } from "../../../contextAPI/LanguageContext.tsx";
@@ -8,7 +8,6 @@ import { XCircle, Loader2, CheckCircle2 } from "lucide-react";
 export default function VNPayReturn() {
     const { t } = useLanguage();
     const location = useLocation();
-    const navigate = useNavigate();
 
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState<"success" | "failed" | "error">("failed");
@@ -230,10 +229,10 @@ export default function VNPayReturn() {
                                 Về Trang Chủ
                             </Link>
                             <Link
-                                to={`/movies/${bookingData.movieId}`}
+                                to="/profile?tab=tickets"
                                 className="block w-full py-3.5 px-4 bg-[#8E7EFE] hover:bg-[#7d6dfc] text-white font-extrabold text-sm rounded-2xl transition-all text-center shadow-lg shadow-violet-100 dark:shadow-none cursor-pointer"
                             >
-                                Chi Tiết Phim
+                                {t("ticket_history_title")}
                             </Link>
                         </div>
                     </div>
