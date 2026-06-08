@@ -270,3 +270,57 @@ export interface TheaterChain {
     website: string;
     branches: CinemaBranch[];
 }
+
+export interface Review {
+  reviewId: string;
+  movieId: string;
+  username: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  updatedAt: string;
+  User?: {
+    fullName: string | null;
+    avatar: string | null;
+  };
+}
+
+export interface PaginatedReviews {
+  reviews: Review[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface CreateReviewParams {
+  movieId: string;
+  rating: number;
+  comment?: string;
+}
+
+/**
+ * Lấy danh sách đánh giá của một bộ phim
+ * GET /api/reviews/movie/:movieId
+ */
+export const getReviewsByMovieApi = async (
+  movieId: string,
+  page?: number,
+  limit?: number
+): Promise<BaseResponse<PaginatedReviews>> => {
+  const params = { page, limit };
+  const response = await api.get<BaseResponse<PaginatedReviews>>(`/reviews/movie/${movieId}`, { params });
+  return response.data;
+};
+
+/**
+ * Tạo mới hoặc cập nhật đánh giá phim
+ * POST /api/reviews
+ */
+export const createReviewApi = async (
+  data: CreateReviewParams
+): Promise<BaseResponse<Review>> => {
+  const response = await api.post<BaseResponse<Review>>('/reviews', data);
+  return response.data;
+};
+

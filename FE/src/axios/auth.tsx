@@ -56,7 +56,7 @@ export const registerApi = async (payload: RegisterPayload): Promise<AuthRespons
  * Phương pháp này sẽ chuyển hướng trình duyệt của người dùng đến trang xác thực Google qua Backend.
  */
 export const redirectToGoogleApi = (): void => {
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3069/api';
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.mievoh.io.vn/api';
   window.location.href = `${apiBaseUrl}/auth/google`;
 };
 

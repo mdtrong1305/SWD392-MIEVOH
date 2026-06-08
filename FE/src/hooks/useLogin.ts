@@ -189,7 +189,15 @@ export default function useLogin(initialSliding: boolean) {
             toast.error(t("toast_password_required"));
             return;
         }
-        dispatch(loginUser(loginForm));
+        dispatch(loginUser(loginForm))
+            .unwrap()
+            .then(() => {
+                toast.success(t("toast_login_success"));
+            })
+            .catch((err: any) => {
+                const message = Array.isArray(err) ? err[0] : err;
+                toast.error(message || t("toast_login_failed"));
+            });
     };
 
     const handleSwitchToRegister = () => {
