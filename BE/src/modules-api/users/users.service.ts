@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../../modules-system/prisma/prisma.service';
-import { CreateStaffDto, UpdateStaffDto } from './dto/users.dto';
+import { CreateStaffDto, UpdateStaffDto, UpdateProfileDto } from './dto/users.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -107,6 +107,43 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  async updateProfile(username: string, updateProfileDto: UpdateProfileDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { username },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Không tìm thấy tài khoản');
+    }
+
+    let parsedDateOfBirth: Date | undefined;
+    if (updateProfileDto.dateOfBirth) {
+      parsedDateOfBirth = new Date(updateProfileDto.dateOfBirth);
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: { username },
+      data: {
+        ...updateProfileDto,
+        ...(parsedDateOfBirth ? { dateOfBirth: parsedDateOfBirth } : {}),
+      },
+      select: {
+        username: true,
+        fullName: true,
+        email: true,
+        phoneNumber: true,
+        avatar: true,
+        dateOfBirth: true,
+        address: true,
+        gender: true,
+        cccd: true,
+        updatedAt: true,
+      },
+    });
+
+    return updatedUser;
   }
 
   async createStaff(createStaffDto: CreateStaffDto) {

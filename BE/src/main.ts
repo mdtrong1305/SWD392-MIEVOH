@@ -46,6 +46,7 @@ async function bootstrap() {
     .addTag('Showtimes', 'Quản lý lịch chiếu')
     .addTag('Banners', 'Quản lý banner')
     .addTag('Foods', 'Quản lý đồ ăn')
+    .addTag('Reviews', 'Quản lý đánh giá phim')
     .addTag('Bookings', 'Quản lý đặt vé')
     .addTag('Users', 'Quản lý người dùng (Profile & Admin)')
     .addBearerAuth(
