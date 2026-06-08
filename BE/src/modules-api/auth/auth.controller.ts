@@ -1,10 +1,31 @@
-import { Controller, Post, Body, Get, UseGuards, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  UseGuards,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginAuthDto, RegisterAuthDto, VerifyEmailDto, ResetPasswordDto, ChangePasswordDto } from './dto/auth.dto';
+import {
+  LoginAuthDto,
+  RegisterAuthDto,
+  VerifyEmailDto,
+  ResetPasswordDto,
+  ChangePasswordDto,
+} from './dto/auth.dto';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request } from 'express';
 import { Public } from '../../common/decorators/public.decorator';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiExcludeEndpoint,
+} from '@nestjs/swagger';
+import { FRONTEND_URL } from '../../common/constant/app.constant';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -54,16 +75,17 @@ export class AuthController {
   @ApiOperation({ summary: 'Callback nhận dữ liệu từ Google trả về' })
   @ApiResponse({
     status: 302,
-    description: 'Xác thực Google thành công, chuyển hướng về Frontend với Token.',
+    description:
+      'Xác thực Google thành công, chuyển hướng về Frontend với Token.',
   })
   async googleAuthRedirect(@Req() req: Request, @Res() res: any) {
     const result = await this.authService.googleLogin(req);
     const token = result.token.accessToken;
     const user = result.user;
-    
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+    const frontendUrl = FRONTEND_URL || 'http://localhost:5173';
     const redirectUrl = `${frontendUrl}/login?token=${token}&username=${user.username}&fullName=${encodeURIComponent(user.fullName || '')}&email=${user.email || ''}&avatar=${user.avatar || ''}`;
-    
+
     return res.redirect(redirectUrl);
   }
 
@@ -89,8 +111,14 @@ export class AuthController {
   @Post('change-password')
   @ApiOperation({ summary: 'Thay đổi mật khẩu khi đang đăng nhập' })
   @ApiResponse({ status: 200, description: 'Đổi mật khẩu thành công.' })
-  @ApiResponse({ status: 400, description: 'Mật khẩu cũ không chính xác hoặc tài khoản là OAuth.' })
-  changePassword(@Req() req: Request, @Body() changePasswordDto: ChangePasswordDto) {
+  @ApiResponse({
+    status: 400,
+    description: 'Mật khẩu cũ không chính xác hoặc tài khoản là OAuth.',
+  })
+  changePassword(
+    @Req() req: Request,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
     const username = (req as any).user.username;
     return this.authService.changePassword(username, changePasswordDto);
   }
