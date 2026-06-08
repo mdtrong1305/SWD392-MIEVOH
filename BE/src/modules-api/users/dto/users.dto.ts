@@ -69,3 +69,40 @@ export class UpdateStaffDto {
   @IsOptional()
   isActive?: boolean;
 }
+
+export class UpdateProfileDto {
+  @ApiPropertyOptional({ description: 'Họ và tên', example: 'Nguyễn Văn C' })
+  @IsOptional()
+  @IsString()
+  fullName?: string;
+
+  @ApiPropertyOptional({ description: 'Số điện thoại', example: '0987654321' })
+  @IsOptional()
+  @IsString()
+  phoneNumber?: string;
+
+  @ApiPropertyOptional({ description: 'Ngày sinh (ISO 8601)', example: '1995-10-25T00:00:00Z' })
+  @IsOptional()
+  @IsString()
+  dateOfBirth?: string;
+
+  @ApiPropertyOptional({ description: 'Địa chỉ', example: '123 Đường ABC, Quận 1, TP.HCM' })
+  @IsOptional()
+  @IsString()
+  address?: string;
+
+  @ApiPropertyOptional({ description: 'Giới tính', example: 'Nam' })
+  @IsOptional()
+  @IsString()
+  gender?: string;
+
+  @ApiPropertyOptional({ description: 'Số CCCD/CMND', example: '012345678912' })
+  @IsOptional()
+  @IsString()
+  cccd?: string;
+
+  @ApiPropertyOptional({ description: 'Ảnh đại diện (URL)', example: 'https://example.com/avatar.jpg' })
+  @IsOptional()
+  @IsString()
+  avatar?: string;
+}

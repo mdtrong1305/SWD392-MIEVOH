@@ -14,7 +14,7 @@ import {
 import { UsersService } from './users.service';
 import { User } from '../../common/decorators/user.decorator';
 import type { User as PrismaUser } from '../../modules-system/prisma/generated/prisma/client';
-import { CreateStaffDto, UpdateStaffDto } from './dto/users.dto';
+import { CreateStaffDto, UpdateStaffDto, UpdateProfileDto } from './dto/users.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { RoleGuard } from '../../common/guards/role.guard';
 import { Roles } from '../../common/decorators/role.decorator';
@@ -32,6 +32,16 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Lấy thông tin thành công' })
   getProfile(@User() user: PrismaUser) {
     return this.usersService.getProfile(user.username);
+  }
+
+  @Put('profile')
+  @UseGuards(RoleGuard)
+  @Roles('admin', 'staff', 'user')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Cập nhật thông tin cá nhân' })
+  @ApiResponse({ status: 200, description: 'Cập nhật thành công' })
+  updateProfile(@User() user: PrismaUser, @Body() updateProfileDto: UpdateProfileDto) {
+    return this.usersService.updateProfile(user.username, updateProfileDto);
   }
 
   @Get()

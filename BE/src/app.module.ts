@@ -20,6 +20,7 @@ import KeyvRedis from '@keyv/redis';
 import { DATABASE_REDIS } from './common/constant/app.constant';
 import { UsersModule } from './modules-api/users/users.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ReviewsModule } from './modules-api/reviews/reviews.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     BookingsModule,
     PaymentsModule,
     UsersModule,
+    ReviewsModule,
   ],
   providers: [
     {
