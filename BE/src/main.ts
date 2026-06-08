@@ -2,8 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { join } from 'path';
+import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 import { AppModule } from './app.module';
-import { PORT } from './common/constant/app.constant';
+import { PORT, RABBIT_MQ_URL } from './common/constant/app.constant';
 import { ValidationPipe } from '@nestjs/common';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { ResponseSuccessInterceptor } from './common/interceptors/responese-success.interceptor';
@@ -49,6 +50,7 @@ async function bootstrap() {
     .addTag('Reviews', 'Quản lý đánh giá phim')
     .addTag('Bookings', 'Quản lý đặt vé')
     .addTag('Users', 'Quản lý người dùng (Profile & Admin)')
+    .addTag('Recommendations', 'Quản lý gợi ý phim')
     .addBearerAuth(
       {
         type: 'http',
@@ -65,6 +67,27 @@ async function bootstrap() {
   SwaggerModule.setup('api-docs', app, document);
 
   const port = PORT || 3069;
+
+  // Cấu hình lắng nghe RabbitMQ song song với HTTP (Hybrid Application)
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [RABBIT_MQ_URL!],
+      queue: 'main_queue', // Lắng nghe chung hàng đợi của mình hoặc queue riêng để nhận progress
+      queueOptions: {
+        durable: false,
+      },
+      socketOptions: {
+        connectionOptions: {
+          clientProperties: {
+            connection_name: 'main-listener',
+          },
+        },
+      },
+    },
+  });
+
+  await app.startAllMicroservices();
   await app.listen(port, () => {
     console.log(`[SERVER] Server online at: ${port}`);
     console.log(`[SERVER] Swagger API docs: http://localhost:${port}/api-docs`);

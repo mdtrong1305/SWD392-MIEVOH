@@ -84,6 +84,10 @@ export class ReviewsService {
           User: { select: { fullName: true, avatar: true } },
         },
       });
+      
+      // Tính toán lại điểm số trung bình của phim
+      await this.updateMovieRating(movieId);
+      
       return {
         message: 'Cập nhật đánh giá thành công',
         review: updatedReview,
@@ -101,6 +105,10 @@ export class ReviewsService {
           User: { select: { fullName: true, avatar: true } },
         },
       });
+      
+      // Tính toán lại điểm số trung bình của phim
+      await this.updateMovieRating(movieId);
+      
       return {
         message: 'Cảm ơn bạn đã để lại đánh giá',
         review: newReview,
@@ -120,6 +128,29 @@ export class ReviewsService {
       where: { reviewId },
     });
 
+    // Cập nhật lại điểm sau khi xóa đánh giá
+    await this.updateMovieRating(review.movieId);
+
     return { message: 'Đã xóa đánh giá thành công' };
+  }
+
+  // Hàm helper dùng để tính lại điểm Rating trung bình của phim
+  private async updateMovieRating(movieId: string) {
+    const aggregate = await this.prisma.review.aggregate({
+      where: { movieId },
+      _avg: { rating: true },
+      _count: { rating: true },
+    });
+
+    const averageRating = aggregate._avg.rating || 0;
+    const totalReviews = aggregate._count.rating || 0;
+
+    await this.prisma.movie.update({
+      where: { movieId },
+      data: {
+        averageRating: Number(averageRating.toFixed(1)),
+        totalReviews,
+      },
+    });
   }
 }

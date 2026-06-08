@@ -2,6 +2,7 @@ import { Inject, Module, OnModuleInit } from '@nestjs/common';
 import { PrismaModule } from './modules-system/prisma/prisma.module';
 import { TokenModule } from './modules-system/token/token.module';
 import { AuthModule } from './modules-api/auth/auth.module';
+import { SocketModule } from './modules-system/socket/socket.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './common/guards/protect.guard';
 import { RoleGuard } from './common/guards/role.guard';
@@ -19,12 +20,16 @@ import { Cache, CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
 import { DATABASE_REDIS } from './common/constant/app.constant';
 import { UsersModule } from './modules-api/users/users.module';
-import { ScheduleModule } from '@nestjs/schedule';
+import { BullSystemModule } from './modules-system/bull/bull.module';
 import { ReviewsModule } from './modules-api/reviews/reviews.module';
+import { RabbitMQModule } from './modules-system/rabbit-mq/rabbit-mq.module';
+import { RecommendationsModule } from './modules-api/recommendations/recommendations.module';
 
 @Module({
   imports: [
-    ScheduleModule.forRoot(),
+    RabbitMQModule,
+    SocketModule,
+    BullSystemModule,
     CacheModule.register({
       // cấu hình cache toàn cục sử dụng Redis
       isGlobal: true, // cho phép sử dụng cache ở mọi module
@@ -45,6 +50,7 @@ import { ReviewsModule } from './modules-api/reviews/reviews.module';
     PaymentsModule,
     UsersModule,
     ReviewsModule,
+    RecommendationsModule,
   ],
   providers: [
     {
