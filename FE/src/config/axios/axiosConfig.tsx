@@ -25,13 +25,16 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('auth_user');
-      localStorage.removeItem('auth_isAuthenticated');
-      localStorage.removeItem('lastActivity');
-      localStorage.removeItem('mievoh_user');
-      // Redirect to login page
-      window.location.href = '/login';
+      const isLoginRequest = error.config?.url?.includes('/auth/login');
+      if (!isLoginRequest) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('auth_user');
+        localStorage.removeItem('auth_isAuthenticated');
+        localStorage.removeItem('lastActivity');
+        localStorage.removeItem('mievoh_user');
+        // Redirect to login page
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

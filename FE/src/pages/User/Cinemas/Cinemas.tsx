@@ -3,7 +3,7 @@ import CinemaHero from "./CinemaHero/CinemaHero.tsx";
 import CinemaFilters from "./CinemaFilters/CinemaFilters.tsx";
 import CinemaBranches from "./CinemaBranches/CinemaBranches.tsx";
 import type { DisplayBranch } from "./CinemaBranches/CinemaBranches.tsx";
-import type { TheaterChain } from "../../../axios/cinemas.tsx";
+import type { TheaterChain, CinemaSystem, CinemaComplex } from "../../../axios/cinemas.tsx";
 import { getCinemaSystemsApi, getCinemaComplexesApi } from "../../../axios/cinemas.tsx";
 import { useLanguage } from "../../../contextAPI/LanguageContext.tsx";
 
@@ -25,11 +25,14 @@ export default function CinemasPage() {
                     getCinemaComplexesApi()
                 ]);
 
-                const systems = (systemsRes.data as any)?.data || [];
-                const complexes = (complexesRes.data as any)?.data || [];
+                const systemsRaw = systemsRes.data as unknown as { data?: CinemaSystem[] } & CinemaSystem[];
+                const systems = systemsRaw.data || (Array.isArray(systemsRaw) ? systemsRaw : []);
+
+                const complexesRaw = complexesRes.data as unknown as { data?: CinemaComplex[] } & CinemaComplex[];
+                const complexes = complexesRaw.data || (Array.isArray(complexesRaw) ? complexesRaw : []);
 
                 // Map complexes to their corresponding systems
-                const mappedChains = systems.map((sys: any) => {
+                const mappedChains = systems.map((sys: CinemaSystem) => {
                     const sysNameLower = sys.name?.toLowerCase() || "";
                     
                     // Determine some defaults based on chain name for premium visuals
@@ -60,9 +63,9 @@ export default function CinemasPage() {
                     }
 
                     // Filter complexes belonging to this system
-                    const systemComplexes = complexes.filter((comp: any) => comp.cinemaSystemId === sys.cinemaSystemId);
+                    const systemComplexes = complexes.filter((comp: CinemaComplex) => comp.cinemaSystemId === sys.cinemaSystemId);
 
-                    const branches = systemComplexes.map((comp: any, idx: number) => {
+                    const branches = systemComplexes.map((comp: CinemaComplex, idx: number) => {
                         const address = comp.address || "";
                         // Determine city from address
                         let city = "Ho Chi Minh City";
@@ -86,8 +89,8 @@ export default function CinemasPage() {
 
                         return {
                             id: comp.cinemaComplexId,
-                            name: comp.name,
-                            address: comp.address,
+                            name: comp.name || "",
+                            address: comp.address || "",
                             phone,
                             city,
                             rating: parseFloat((rating + (idx % 3) * 0.1 - 0.1).toFixed(1)), // Subtle variation
@@ -100,14 +103,14 @@ export default function CinemasPage() {
                     let logoUrl = sys.logo || "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=120&q=80";
                     if (sys.logo && !sys.logo.startsWith('http')) {
                         // Extract base domain from base url
-                        const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3069/api';
+                        const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://api.mievoh.io.vn/api';
                         const domain = apiBase.replace('/api', '');
                         logoUrl = `${domain}/cinema-system/${sys.logo}`;
                     }
 
                     return {
                         id: sys.cinemaSystemId,
-                        name: sys.name,
+                        name: sys.name || "",
                         logo: logoUrl,
                         description: `Hệ thống rạp ${sys.name} hiện đại, chất lượng âm thanh hình ảnh hàng đầu.`,
                         website: `www.${sysNameLower.replace(/\s+/g, '')}.vn`,
@@ -204,7 +207,7 @@ export default function CinemasPage() {
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20">
                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-650 mb-4"></div>
-                        <p className="text-gray-500 font-semibold">{t("loading" as any) || "Đang tải danh sách rạp..."}</p>
+                        <p className="text-gray-500 font-semibold">{t("loading") || "Đang tải danh sách rạp..."}</p>
                     </div>
                 ) : (
                     <CinemaBranches 

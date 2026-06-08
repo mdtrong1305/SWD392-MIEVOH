@@ -14,7 +14,11 @@ export default function HomeTemplate() {
     const txnRef = query.get("vnp_TxnRef"); // bookingId
 
     if (responseCode && txnRef) {
-      if (window.location.pathname.includes("/book/seats")) {
+      if (
+        window.location.pathname.includes("/book/seats") ||
+        window.location.pathname.includes("vnpay-return") ||
+        window.location.pathname.includes("ReturnUrl")
+      ) {
         return;
       }
       const pendingBookings = JSON.parse(localStorage.getItem("mievoh_pending_bookings") || "{}");

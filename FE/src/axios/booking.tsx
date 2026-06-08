@@ -77,6 +77,15 @@ export const verifyVNPayReturnApi = async (params: any): Promise<BaseResponse<{ 
 };
 
 /**
+ * Trigger IPN update on backend for local testing
+ * GET /api/payments/vnpay-ipn
+ */
+export const triggerVNPayIPNApi = async (params: any): Promise<any> => {
+  const response = await api.get('/payments/vnpay-ipn', { params });
+  return response.data;
+};
+
+/**
  * Lấy lịch sử đặt vé của user
  * GET /api/bookings/history
  * Wait! Let's check if there is an endpoint for booking history in backend.

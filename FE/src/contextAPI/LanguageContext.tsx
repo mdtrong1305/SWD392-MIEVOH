@@ -101,6 +101,8 @@ export const translations = {
     // Validation & Messages
     email_registered: "Email này đã được đăng ký",
     validation_required: "Trường này là bắt buộc",
+    loading: "Đang tải...",
+    no_showtimes: "Không có suất chiếu nào cho ngày này.",
 
     // Select Seat
     screen: "Màn hình",
@@ -147,6 +149,8 @@ export const translations = {
     toast_screenshot_captured: "Đã chụp màn hình! Vui lòng mở ứng dụng ngân hàng để quét QR.",
     toast_register_success: "Đăng ký tài khoản thành công!",
     toast_payment_initiated: "Đã khởi tạo giao dịch thanh toán!",
+    toast_login_success: "Đăng nhập thành công!",
+    toast_login_failed: "Đăng nhập thất bại!",
     toast_google_login_success: "Đăng nhập Google thành công!",
     toast_email_verified_success: "Xác minh email thành công!",
     toast_password_reset_success: "Đặt lại mật khẩu thành công!",
@@ -457,6 +461,8 @@ export const translations = {
     // Validation & Messages
     email_registered: "This email is already registered",
     validation_required: "This field is required",
+    loading: "Loading...",
+    no_showtimes: "No showtimes available for this date.",
 
     // Select Seat
     screen: "Screen",
@@ -503,6 +509,8 @@ export const translations = {
     toast_screenshot_captured: "Screenshot captured! Please open your banking app to scan.",
     toast_register_success: "Account registered successfully!",
     toast_payment_initiated: "Payment transaction initiated!",
+    toast_login_success: "Logged in successfully!",
+    toast_login_failed: "Login failed!",
     toast_google_login_success: "Logged in with Google successfully!",
     toast_email_verified_success: "Email verified successfully!",
     toast_password_reset_success: "Password reset successfully!",

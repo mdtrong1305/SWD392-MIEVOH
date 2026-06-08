@@ -243,6 +243,31 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
         };
     };
 
+    const validateField = (name: string, value: string) => {
+        let errorMsg: string | null = null;
+        if (name === "name") {
+            errorMsg = validateName(value);
+        } else if (name === "email") {
+            errorMsg = validateEmail(value);
+        } else if (name === "phone") {
+            errorMsg = validatePhone(value);
+        } else if (name === "cccd") {
+            errorMsg = validateCccd(value);
+        } else if (name === "dateOfBirth") {
+            errorMsg = validateDateOfBirth(value);
+        }
+
+        setErrors(prev => {
+            if (errorMsg) {
+                return { ...prev, [name]: errorMsg };
+            } else {
+                const copy = { ...prev };
+                delete copy[name];
+                return copy;
+            }
+        });
+    };
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         
@@ -256,13 +281,8 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
             ...prev,
             [name]: filteredValue
         }));
-        if (errors[name]) {
-            setErrors(prev => {
-                const copy = { ...prev };
-                delete copy[name];
-                return copy;
-            });
-        }
+
+        validateField(name, filteredValue);
     };
 
     const handleDobSelectChange = (part: "day" | "month" | "year", val: string) => {
@@ -289,13 +309,7 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
             return next;
         });
         
-        if (errors.dateOfBirth) {
-            setErrors(prev => {
-                const copy = { ...prev };
-                delete copy.dateOfBirth;
-                return copy;
-            });
-        }
+        validateField("dateOfBirth", combined);
     };
 
     const handleCancel = () => {
@@ -346,7 +360,6 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
         try {
             const updateData = {
                 fullName: formData.name,
-                email: formData.email,
                 phoneNumber: formData.phone,
                 gender: formData.gender,
                 dateOfBirth: formatDobForBackend(formData.dateOfBirth),
@@ -528,22 +541,18 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
                                 {errors.name && <span className="text-xs font-bold text-red-500 mt-1">{errors.name}</span>}
                             </div>
 
-                            {/* Email */}
-                            <div className={`p-4 px-5 rounded-2xl border transition-all duration-300 flex flex-col gap-1.5 min-h-[88px] justify-center ${
-                                errors.email 
-                                    ? "border-red-300 bg-red-50/10 focus-within:border-red-500" 
-                                    : "border-violet-100 bg-white/95 focus-within:border-violet-500 focus-within:shadow-md"
-                            }`}>
-                                <label className="text-[11px] font-black text-violet-400 dark:text-[#a599ff] uppercase tracking-widest select-none">{t("email_address")}</label>
+                            {/* Email (Read-only on profile update) */}
+                            <div className="p-4 px-5 rounded-2xl border border-gray-200 bg-gray-50 transition-all duration-300 flex flex-col gap-1.5 min-h-[88px] justify-center select-none opacity-60">
+                                <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest select-none">{t("email_address")}</label>
                                 <input
                                     type="email"
                                     name="email"
                                     value={formData.email}
-                                    onChange={handleInputChange}
+                                    readOnly
+                                    disabled
                                     placeholder={t("no_email_registered")}
-                                    className="w-full bg-transparent py-1 text-base text-gray-700 outline-none"
+                                    className="w-full bg-transparent py-1 text-base text-gray-500 outline-none cursor-not-allowed"
                                 />
-                                {errors.email && <span className="text-xs font-bold text-red-500 mt-1">{errors.email}</span>}
                             </div>
 
                             {/* Phone Number */}
