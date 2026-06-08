@@ -2,17 +2,40 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useLanguage } from "../../../contextAPI/LanguageContext.tsx";
 import DetailHero from "./DetailHero/DetailHero.tsx";
+import type { MovieDetailInfo } from "./DetailHero/DetailHero.tsx";
 import DetailReviews from "./DetailReviews/DetailReviews.tsx";
 import type { Review } from "./DetailReviews/DetailReviews.tsx";
 import ScrollReveal from "../../../components/ScrollReveal/ScrollReveal.tsx";
 import { ArrowLeft } from "lucide-react";
 import { getMovieDetailApi } from "../../../axios/movie.tsx";
+import { getReviewsByMovieApi, createReviewApi } from "../../../axios/cinemas.tsx";
+import type { Review as ApiReview } from "../../../axios/cinemas.tsx";
+import { toast } from "../../../components/Toast/Toast.tsx";
+
+interface ApiResponseMovie {
+    movieId: string;
+    title_vi?: string | null;
+    title_en?: string | null;
+    description_vi?: string | null;
+    description_en?: string | null;
+    imageUrl?: string | null;
+    averageRating?: number | null;
+    genres?: string | string[] | null;
+    status?: string | null;
+    releaseDate?: string | null;
+    duration?: number | string | null;
+    ageRestriction?: string | null;
+    language?: string | null;
+    director?: string | null;
+    cast?: string | string[] | null;
+    trailerUrl?: string | null;
+}
 
 export default function MovieDetail() {
     const { t, language } = useLanguage();
     const { id } = useParams<{ id: string }>();
 
-    const [movie, setMovie] = useState<any>(null);
+    const [movie, setMovie] = useState<MovieDetailInfo | null>(null);
     const [loading, setLoading] = useState(true);
     const [reviews, setReviews] = useState<Review[]>([]);
 
@@ -28,7 +51,13 @@ export default function MovieDetail() {
             try {
                 setLoading(true);
                 const res = await getMovieDetailApi(id);
-                const data = (res as any).data?.data || (res as any).data || res;
+                const responseData = res as unknown as {
+                    data?: {
+                        data?: ApiResponseMovie;
+                    } & ApiResponseMovie;
+                } & ApiResponseMovie;
+                const data = responseData.data?.data || responseData.data || responseData;
+
                 if (data) {
                     let genresArr: string[] = [];
                     if (Array.isArray(data.genres)) {
@@ -44,19 +73,19 @@ export default function MovieDetail() {
                         image = `${domain}/movies/${data.imageUrl}`;
                     }
 
-                    const mapped = {
+                    const mapped: MovieDetailInfo = {
                         id: data.movieId,
-                        title: language === "vi" ? (data.title_vi || data.title_en) : (data.title_en || data.title_vi),
-                        title_vi: data.title_vi,
-                        title_en: data.title_en,
-                        description: language === "vi" ? (data.description_vi || data.description_en) : (data.description_en || data.description_vi),
-                        description_vi: data.description_vi,
-                        description_en: data.description_en,
+                        title: language === "vi" ? (data.title_vi || data.title_en || "") : (data.title_en || data.title_vi || ""),
+                        title_vi: data.title_vi || undefined,
+                        title_en: data.title_en || undefined,
+                        description: language === "vi" ? (data.description_vi || data.description_en || "") : (data.description_en || data.description_vi || ""),
+                        description_vi: data.description_vi || undefined,
+                        description_en: data.description_en || undefined,
                         image,
                         backdrop: image,
                         rating: data.averageRating ?? 4.5,
                         genres: genresArr,
-                        status: data.status || "now_showing",
+                        status: (data.status === "coming_soon" ? "coming_soon" : "now_showing") as "now_showing" | "coming_soon",
                         releaseDate: data.releaseDate ? new Date(data.releaseDate).toLocaleDateString("vi-VN") : "10/06/2026",
                         duration: data.duration ? `${data.duration} mins` : "120 mins",
                         ageRating: data.ageRestriction || "P",
@@ -69,30 +98,41 @@ export default function MovieDetail() {
                     };
                     setMovie(mapped);
 
-                    const rawReviews = data.Reviews || [];
-                    let reviewsList = [];
-                    if (rawReviews.length > 0) {
-                        reviewsList = rawReviews.map((r: any) => ({
-                            id: r.reviewId || Date.now(),
-                            name: r.author || "User",
+                    // Fetch reviews from backend Reviews API
+                    try {
+                        const reviewsRes = await getReviewsByMovieApi(id);
+                        const rawReviews = reviewsRes as unknown as {
+                            data?: {
+                                data?: ApiReview[];
+                                reviews?: ApiReview[];
+                            } & {
+                                reviews?: ApiReview[];
+                            } & ApiReview[];
+                            reviews?: ApiReview[];
+                        } & ApiReview[];
+
+                        const reviewsListRaw = 
+                            rawReviews.data?.reviews || 
+                            rawReviews.data?.data || 
+                            rawReviews.reviews || 
+                            (Array.isArray(rawReviews.data) ? rawReviews.data : null) ||
+                            (Array.isArray(rawReviews) ? rawReviews : []);
+
+                        const reviewsList = reviewsListRaw.map((r: ApiReview) => ({
+                            id: r.reviewId || Date.now().toString(),
+                            name: r.User?.fullName || r.username || "User",
                             rating: r.rating || 5,
-                            comment: r.content || "",
+                            comment: r.comment || "",
                             date: r.createdAt ? new Date(r.createdAt).toLocaleDateString("vi-VN") : "06/06/2026"
                         }));
-                    } else {
-                        reviewsList = [
-                            { id: 1, name: "Minh Anh", rating: 5, comment: "Phim quá hay, kỹ xảo đỉnh cao và nội dung rất ý nghĩa!", date: "05/06/2026" },
-                            { id: 2, name: "John Doe", rating: 4, comment: "Great visuals and sound design. Highly recommended!", date: "04/06/2026" }
-                        ];
-                    }
-
-                    // Load saved custom reviews from localStorage
-                    const savedCustom = localStorage.getItem(`mievoh_custom_reviews_${id}`);
-                    if (savedCustom) {
-                        const customArray = JSON.parse(savedCustom);
-                        setReviews([...customArray, ...reviewsList]);
-                    } else {
                         setReviews(reviewsList);
+                    } catch (reviewErr) {
+                        console.error("Lỗi khi lấy đánh giá từ API:", reviewErr);
+                        // Fallback to placeholder if call fails or there are no reviews yet
+                        setReviews([
+                            { id: "1", name: "Minh Anh", rating: 5, comment: "Phim quá hay, kỹ xảo đỉnh cao và nội dung rất ý nghĩa!", date: "05/06/2026" },
+                            { id: "2", name: "John Doe", rating: 4, comment: "Great visuals and sound design. Highly recommended!", date: "04/06/2026" }
+                        ]);
                     }
                 } else {
                     setMovie(null);
@@ -108,30 +148,57 @@ export default function MovieDetail() {
         fetchDetail();
     }, [id, language]);
 
-    const handleAddReview = (newReview: Omit<Review, "id" | "date">) => {
-        const today = new Date();
-        const formattedDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
-        
-        const reviewWithMeta: Review = {
-            id: Date.now(),
-            ...newReview,
-            date: formattedDate
-        };
+    const handleAddReview = async (newReview: Omit<Review, "id" | "date">) => {
+        if (!id) return;
+        try {
+            const res = await createReviewApi({
+                movieId: id,
+                rating: newReview.rating,
+                comment: newReview.comment
+            });
+            
+            // Re-fetch reviews to get the latest list with updated stats from database
+            const reviewsRes = await getReviewsByMovieApi(id);
+            const rawReviews = reviewsRes as unknown as {
+                data?: {
+                    data?: ApiReview[];
+                    reviews?: ApiReview[];
+                } & {
+                    reviews?: ApiReview[];
+                } & ApiReview[];
+                reviews?: ApiReview[];
+            } & ApiReview[];
 
-        // Save custom review to localStorage
-        const savedCustom = localStorage.getItem(`mievoh_custom_reviews_${id}`);
-        const customArray = savedCustom ? JSON.parse(savedCustom) : [];
-        const updatedCustom = [reviewWithMeta, ...customArray];
-        localStorage.setItem(`mievoh_custom_reviews_${id}`, JSON.stringify(updatedCustom));
+            const reviewsListRaw = 
+                rawReviews.data?.reviews || 
+                rawReviews.data?.data || 
+                rawReviews.reviews || 
+                (Array.isArray(rawReviews.data) ? rawReviews.data : null) ||
+                (Array.isArray(rawReviews) ? rawReviews : []);
 
-        setReviews((prev) => [reviewWithMeta, ...prev]);
+            const reviewsList = reviewsListRaw.map((r: ApiReview) => ({
+                id: r.reviewId || Date.now().toString(),
+                name: r.User?.fullName || r.username || "User",
+                rating: r.rating || 5,
+                comment: r.comment || "",
+                date: r.createdAt ? new Date(r.createdAt).toLocaleDateString("vi-VN") : "06/06/2026"
+            }));
+            setReviews(reviewsList);
+            toast.success(res.message || t("reviews_success_toast") || "Đánh giá thành công!");
+        } catch (err) {
+            console.error("Lỗi khi đăng đánh giá:", err);
+            const errorObj = err as { response?: { data?: { message?: string } }; message?: string };
+            const errMsg = errorObj?.response?.data?.message || errorObj?.message || "Không thể gửi đánh giá";
+            toast.error(errMsg);
+            throw err; // throw to let component know it failed and not reset form
+        }
     };
 
     if (loading) {
         return (
             <div className="w-full bg-[#EFEBF4] py-20 flex flex-col items-center justify-center text-center px-4 min-h-[60vh]">
                 <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#6D28D9] mb-4"></div>
-                <p className="text-gray-500 font-semibold">{t("loading" as any) || "Đang tải thông tin phim..."}</p>
+                <p className="text-gray-500 font-semibold">{t("loading") || "Đang tải thông tin phim..."}</p>
             </div>
         );
     }

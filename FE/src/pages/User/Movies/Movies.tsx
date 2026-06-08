@@ -4,6 +4,19 @@ import MovieFilters from "./MovieFilters/MovieFilters.tsx";
 import MovieGrid from "./MovieGrid/MovieGrid.tsx";
 import { useLanguage } from "../../../contextAPI/LanguageContext.tsx";
 import { getNowShowingMoviesApi, getComingSoonMoviesApi } from "../../../axios/movie.tsx";
+import type { Movie } from "../../../axios/movie.tsx";
+
+interface MappedMovie {
+    id: string;
+    title: string;
+    title_vi: string;
+    title_en: string;
+    image: string;
+    rating: number;
+    genres: string[];
+    status: "now_showing" | "coming_soon";
+    releaseDate?: string;
+}
 
 export default function Movies() {
     const { language, t } = useLanguage();
@@ -12,7 +25,7 @@ export default function Movies() {
     const [selectedGenre, setSelectedGenre] = useState("");
     const [sortBy, setSortBy] = useState("rating-desc");
 
-    const [moviesList, setMoviesList] = useState<any[]>([]);
+    const [moviesList, setMoviesList] = useState<MappedMovie[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -24,15 +37,20 @@ export default function Movies() {
                     getComingSoonMoviesApi({ page: 1, pageSize: 50 })
                 ]);
 
-                const nowShowing = (nowShowingRes.data as any)?.data || [];
-                const comingSoon = (comingSoonRes.data as any)?.data || [];
+                const nowShowingRaw = nowShowingRes.data as unknown as { data?: Movie[]; movies?: Movie[] } & Movie[];
+                const nowShowing = nowShowingRaw.data || nowShowingRaw.movies || (Array.isArray(nowShowingRaw) ? nowShowingRaw : []);
 
-                const mapMovie = (m: any, status: "now_showing" | "coming_soon") => {
+                const comingSoonRaw = comingSoonRes.data as unknown as { data?: Movie[]; movies?: Movie[] } & Movie[];
+                const comingSoon = comingSoonRaw.data || comingSoonRaw.movies || (Array.isArray(comingSoonRaw) ? comingSoonRaw : []);
+
+                const mapMovie = (m: Movie, status: "now_showing" | "coming_soon"): MappedMovie => {
                     let genresArr: string[] = [];
                     if (Array.isArray(m.genres)) {
                         genresArr = m.genres;
                     } else if (typeof m.genres === 'string') {
                         genresArr = m.genres.split(',').map((g: string) => g.trim());
+                    } else if (m.genres) {
+                        genresArr = [m.genres];
                     }
 
                     // Build image URL
@@ -56,8 +74,8 @@ export default function Movies() {
                     };
                 };
 
-                const mappedNowShowing = nowShowing.map((m: any) => mapMovie(m, "now_showing"));
-                const mappedComingSoon = comingSoon.map((m: any) => mapMovie(m, "coming_soon"));
+                const mappedNowShowing = nowShowing.map((m) => mapMovie(m, "now_showing"));
+                const mappedComingSoon = comingSoon.map((m) => mapMovie(m, "coming_soon"));
 
                 const combined = [...mappedNowShowing, ...mappedComingSoon];
                 
@@ -140,7 +158,7 @@ export default function Movies() {
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20">
                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-650 mb-4"></div>
-                        <p className="text-gray-500 font-semibold">{t("loading" as any) || "Đang tải danh sách phim..."}</p>
+                        <p className="text-gray-500 font-semibold">{t("loading") || "Đang tải danh sách phim..."}</p>
                     </div>
                 ) : (
                     <div className="mt-8 animate__animated animate__fadeInUp [animation-delay:200ms]">

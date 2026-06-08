@@ -12,6 +12,43 @@ import Button from "../../../components/Button/Button.tsx";
 import { useLanguage } from "../../../contextAPI/LanguageContext.tsx";
 import { updateProfileApi } from "../../../axios/profile";
 
+const compressImage = (base64Str: string, maxWidth = 200, maxHeight = 200): Promise<string> => {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.src = base64Str;
+        img.onload = () => {
+            const canvas = document.createElement("canvas");
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                }
+            } else {
+                if (height > maxHeight) {
+                    width = Math.round((width * maxHeight) / height);
+                    height = maxHeight;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            if (ctx) {
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL("image/jpeg", 0.7));
+            } else {
+                resolve(base64Str);
+            }
+        };
+        img.onerror = () => {
+            resolve(base64Str);
+        };
+    });
+};
+
 export default function Profile() {
     const { t } = useLanguage();
     const dispatch = useDispatch();
@@ -44,22 +81,28 @@ export default function Profile() {
         const file = e.target.files?.[0];
         if (file) {
             const reader = new FileReader();
-            reader.onloadend = () => {
+            reader.onloadend = async () => {
                 const base64String = reader.result as string;
-                updateProfileApi({ avatar: base64String })
-                    .then((res) => {
-                        if (res && res.data) {
-                            dispatch(updateUser({
-                                ...user,
-                                avatar: res.data.avatar || base64String
-                            }));
-                            toast.success(t("avatar_updated_success"));
-                        }
-                    })
-                    .catch((err) => {
-                        console.error("Failed to update avatar:", err);
-                        toast.error("Không thể cập nhật ảnh đại diện");
-                    });
+                try {
+                    const compressedBase64 = await compressImage(base64String, 200, 200);
+                    updateProfileApi({ avatar: compressedBase64 })
+                        .then((res) => {
+                            if (res && res.data) {
+                                dispatch(updateUser({
+                                    ...user,
+                                    avatar: res.data.avatar || compressedBase64
+                                }));
+                                toast.success(t("avatar_updated_success"));
+                            }
+                        })
+                        .catch((err) => {
+                            console.error("Failed to update avatar:", err);
+                            toast.error("Không thể cập nhật ảnh đại diện");
+                        });
+                } catch (err) {
+                    console.error("Failed to compress avatar image:", err);
+                    toast.error("Không thể xử lý ảnh đại diện");
+                }
             };
             reader.readAsDataURL(file);
         }

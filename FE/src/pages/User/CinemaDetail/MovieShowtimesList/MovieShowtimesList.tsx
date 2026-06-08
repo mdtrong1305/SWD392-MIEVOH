@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
+import type { TranslationKeys } from "../../../../contextAPI/LanguageContext.tsx";
 import type { DateOption } from "../DateSelector/DateSelector.tsx";
 import { Clock, Film, User } from "lucide-react";
 import { getShowtimesByComplexApi } from "../../../../axios/cinemas.tsx";
@@ -9,6 +10,24 @@ interface MovieShowtimesListProps {
     complexId: string;
     selectedDate: DateOption | null;
     cinemaName: string;
+}
+
+interface ShowtimeItem {
+    showtimeId: string;
+    showDateTime: string;
+    format: string | null;
+}
+
+interface ShowtimeMovie {
+    movieId: string;
+    title_vi?: string | null;
+    title_en?: string | null;
+    imageUrl?: string | null;
+    duration?: number | null;
+    director?: string | null;
+    ageRestriction?: string | null;
+    genres?: string[];
+    showtimes: ShowtimeItem[];
 }
 
 const genreKeys: Record<string, string> = {
@@ -33,7 +52,7 @@ const genreKeys: Record<string, string> = {
 export default function MovieShowtimesList({ complexId, selectedDate, cinemaName }: MovieShowtimesListProps) {
     const navigate = useNavigate();
     const { t, language } = useLanguage();
-    const [movies, setMovies] = useState<any[]>([]);
+    const [movies, setMovies] = useState<ShowtimeMovie[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -48,7 +67,9 @@ export default function MovieShowtimesList({ complexId, selectedDate, cinemaName
                     dateParam = `${dd}/${mm}/${yyyy}`;
                 }
                 const res = await getShowtimesByComplexApi(complexId, dateParam);
-                setMovies(res.data || []);
+                const responseData = res as unknown as { data?: ShowtimeMovie[] } & ShowtimeMovie[];
+                const moviesList = responseData.data || (Array.isArray(responseData) ? responseData : []);
+                setMovies(moviesList);
             } catch (err) {
                 console.error("Lỗi khi lấy lịch chiếu:", err);
                 setMovies([]);
@@ -110,7 +131,7 @@ export default function MovieShowtimesList({ complexId, selectedDate, cinemaName
         return (
             <div className="flex flex-col items-center justify-center py-12">
                 <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#6C5CE7] mb-2"></div>
-                <p className="text-gray-500 font-semibold">{t("loading" as any) || "Đang tải lịch chiếu..."}</p>
+                <p className="text-gray-500 font-semibold">{t("loading") || "Đang tải lịch chiếu..."}</p>
             </div>
         );
     }
@@ -118,7 +139,7 @@ export default function MovieShowtimesList({ complexId, selectedDate, cinemaName
     if (movies.length === 0) {
         return (
             <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800 rounded-3xl p-12 text-center shadow-md">
-                <p className="text-gray-500 font-semibold">{t("no_showtimes" as any) || "Không có suất chiếu nào cho ngày này."}</p>
+                <p className="text-gray-500 font-semibold">{t("no_showtimes") || "Không có suất chiếu nào cho ngày này."}</p>
             </div>
         );
     }
@@ -126,13 +147,13 @@ export default function MovieShowtimesList({ complexId, selectedDate, cinemaName
     return (
         <div className="space-y-6 animate__animated animate__fadeIn">
             {movies.map(movie => {
-                const title = language === "vi" ? (movie.title_vi || movie.title_en) : (movie.title_en || movie.title_vi);
+                const title = (language === "vi" ? (movie.title_vi || movie.title_en) : (movie.title_en || movie.title_vi)) || "Phim";
                 const genresList = movie.genres || [];
                 const age = movie.ageRestriction || "P";
                 
                 // Group showtimes by format
-                const groupedShowtimes: Record<string, any[]> = {};
-                movie.showtimes.forEach((st: any) => {
+                const groupedShowtimes: Record<string, ShowtimeItem[]> = {};
+                movie.showtimes.forEach((st: ShowtimeItem) => {
                     let fmt = st.format || "2D Sub";
                     if (fmt.toLowerCase() === "2d-sub-en" || fmt.toLowerCase() === "2d-sub-vi") {
                         fmt = "2D Phụ Đề";
@@ -153,7 +174,7 @@ export default function MovieShowtimesList({ complexId, selectedDate, cinemaName
                         {/* Poster with hover scale and age tag */}
                         <div className="w-full md:w-32 aspect-[2/3] md:h-48 rounded-2xl overflow-hidden shrink-0 shadow-md relative group/poster border border-slate-100 dark:border-zinc-800">
                             <img
-                                src={movie.imageUrl || "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80"}
+                                src={movie.imageUrl ?? "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80"}
                                 alt={title}
                                 className="w-full h-full object-cover group-hover/poster:scale-105 transition-transform duration-500"
                             />
@@ -183,7 +204,7 @@ export default function MovieShowtimesList({ complexId, selectedDate, cinemaName
                                             <Film className="h-3.5 w-3.5 text-indigo-600" />
                                             {genresList.map((genre: string) => {
                                                 const key = genreKeys[genre];
-                                                return key ? t(key as any) : genre;
+                                                return key ? t(key as TranslationKeys) : genre;
                                             }).join(", ")}
                                         </span>
                                     )}
@@ -206,7 +227,7 @@ export default function MovieShowtimesList({ complexId, selectedDate, cinemaName
                                                 </h4>
                                             </div>
                                             <div className="flex flex-wrap gap-2.5">
-                                                {showtimes.map((st: any) => {
+                                                {showtimes.map((st: ShowtimeItem) => {
                                                     const time = formatTime(st.showDateTime);
                                                     const expired = isExpired(time);
                                                     return (

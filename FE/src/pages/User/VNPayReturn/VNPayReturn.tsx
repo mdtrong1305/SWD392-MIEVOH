@@ -1,9 +1,11 @@
 import { useEffect, useState, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { verifyVNPayReturnApi } from "../../../axios/booking.tsx";
+import { verifyVNPayReturnApi, triggerVNPayIPNApi } from "../../../axios/booking.tsx";
 import { toast } from "../../../components/Toast/Toast.tsx";
 import { useLanguage } from "../../../contextAPI/LanguageContext.tsx";
 import { XCircle, Loader2, CheckCircle2 } from "lucide-react";
+
+const processedTxnRefs = new Set<string>();
 
 export default function VNPayReturn() {
     const { t } = useLanguage();
@@ -29,6 +31,9 @@ export default function VNPayReturn() {
             setErrorMessage("Missing payment parameters.");
             return;
         }
+
+        if (processedTxnRefs.has(txnRef)) return;
+        processedTxnRefs.add(txnRef);
 
         const verifyPayment = async () => {
             setLoading(true);
@@ -59,6 +64,13 @@ export default function VNPayReturn() {
                     queryParams.forEach((val, key) => {
                         paramsObj[key] = val;
                     });
+
+                    // Trigger IPN locally so that the database is updated to Success
+                    try {
+                        await triggerVNPayIPNApi(paramsObj);
+                    } catch (ipnErr) {
+                        console.error("Local IPN trigger failed:", ipnErr);
+                    }
 
                     const res = await verifyVNPayReturnApi(paramsObj);
 

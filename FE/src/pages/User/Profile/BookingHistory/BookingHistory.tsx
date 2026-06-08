@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Ticket, Calendar, Clock, MapPin, Receipt, CheckCircle, Info } from "lucide-react";
+import { Ticket, Calendar, Clock, MapPin, Receipt, CheckCircle, Info, XCircle } from "lucide-react";
 import type { RootState } from "../../../../store/index.tsx";
 import { resetBooking } from "../../SelectSeat/slice.ts";
 import { toast } from "../../../../components/Toast/Toast.tsx";
@@ -86,7 +86,7 @@ const mapApiHistoryToRecord = (item: any): BookingRecord => {
 };
 
 export default function BookingHistory() {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const dispatch = useDispatch();
     const [history, setHistory] = useState<BookingRecord[]>([]);
     const [selectedRecordForModal, setSelectedRecordForModal] = useState<BookingRecord | null>(null);
@@ -193,10 +193,22 @@ export default function BookingHistory() {
                                         <h4 className="text-base font-black text-gray-900">
                                             {record.movieTitle}
                                         </h4>
-                                        <span className="inline-flex self-start items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
-                                            <CheckCircle className="h-3.5 w-3.5" />
-                                            {record.status === "Paid" ? t("paid_status") : record.status}
-                                        </span>
+                                        {record.status === "Paid" ? (
+                                            <span className="inline-flex self-start items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full whitespace-nowrap">
+                                                <CheckCircle className="h-3.5 w-3.5 shrink-0" />
+                                                {t("paid_status")}
+                                            </span>
+                                        ) : record.status === "Cancelled" ? (
+                                            <span className="inline-flex self-start items-center gap-1 text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full whitespace-nowrap">
+                                                <XCircle className="h-3.5 w-3.5 shrink-0" />
+                                                {language === "vi" ? "Đã hủy" : "Cancelled"}
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex self-start items-center gap-1 text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full whitespace-nowrap">
+                                                <Clock className="h-3.5 w-3.5 shrink-0" />
+                                                {language === "vi" ? "Chờ thanh toán" : "Pending"}
+                                            </span>
+                                        )}
                                     </div>
                                     
                                     {/* Info grid */}

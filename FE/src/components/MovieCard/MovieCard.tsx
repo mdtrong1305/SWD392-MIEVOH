@@ -7,7 +7,7 @@ import { useLanguage } from "../../contextAPI/LanguageContext.tsx";
 import CountUp from "react-countup";
 
 export interface Movie {
-    id: number;
+    id: number | string;
     title: string;
     title_vi?: string;
     title_en?: string;

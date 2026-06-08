@@ -6,7 +6,7 @@ import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 import { toast } from "../../../../components/Toast/Toast.tsx";
 
 export interface Review {
-    id: number;
+    id: string | number;
     name: string;
     rating: number;
     comment: string;
@@ -15,7 +15,7 @@ export interface Review {
 
 interface DetailReviewsProps {
     reviews: Review[];
-    onAddReview: (review: Omit<Review, "id" | "date">) => void;
+    onAddReview: (review: Omit<Review, "id" | "date">) => Promise<void>;
 }
 
 export default function DetailReviews({ reviews, onAddReview }: DetailReviewsProps) {
@@ -41,33 +41,31 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
 
     const totalVotes = reviews.length;
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        let reviewerName = "";
-        if (isAuthenticated && user) {
-            reviewerName = user.name || user.hoTen || "User";
-        } else {
-            if (!guestName.trim()) {
-                toast.error(t("reviews_enter_name_toast"));
-                return;
-            }
-            reviewerName = guestName.trim();
+        if (!isAuthenticated) {
+            toast.error("Vui lòng đăng nhập để đánh giá phim!");
+            return;
         }
+
+        let reviewerName = user?.name || user?.hoTen || "User";
 
         if (!comment.trim()) {
             toast.error(t("reviews_enter_comment_toast"));
             return;
         }
 
-        onAddReview({ name: reviewerName, rating, comment });
-        
-        // Reset form
-        setRating(5);
-        setComment("");
-        setGuestName("");
-        
-        toast.success(t("reviews_success_toast"));
+        try {
+            await onAddReview({ name: reviewerName, rating, comment });
+            
+            // Reset form only on success
+            setRating(5);
+            setComment("");
+            setGuestName("");
+        } catch (err) {
+            // Keep user comment if submission failed
+        }
     };
 
     return (
