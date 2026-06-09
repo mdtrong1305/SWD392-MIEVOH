@@ -18,6 +18,10 @@ import { CreateStaffDto, UpdateStaffDto, UpdateProfileDto } from './dto/users.dt
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { RoleGuard } from '../../common/guards/role.guard';
 import { Roles } from '../../common/decorators/role.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerUsersConfig } from '../../common/configs/multer.config';
+import { UploadedFile, UseInterceptors } from '@nestjs/common';
+import { ApiConsumes } from '@nestjs/swagger';
 
 @ApiTags('Users')
 @Controller('users')
@@ -38,10 +42,16 @@ export class UsersController {
   @UseGuards(RoleGuard)
   @Roles('admin', 'staff', 'user')
   @ApiBearerAuth('JWT-auth')
+  @UseInterceptors(FileInterceptor('avatar', multerUsersConfig))
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Cập nhật thông tin cá nhân' })
   @ApiResponse({ status: 200, description: 'Cập nhật thành công' })
-  updateProfile(@User() user: PrismaUser, @Body() updateProfileDto: UpdateProfileDto) {
-    return this.usersService.updateProfile(user.username, updateProfileDto);
+  updateProfile(
+    @User() user: PrismaUser,
+    @Body() updateProfileDto: UpdateProfileDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    return this.usersService.updateProfile(user.username, updateProfileDto, file?.filename);
   }
 
   @Get()

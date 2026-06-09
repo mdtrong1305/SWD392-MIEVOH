@@ -16,15 +16,18 @@ export class RecommendationsProcessor extends WorkerHost {
 
   async process(job: Job<any, any, string>): Promise<any> {
     if (job.name === 'send_emails') {
-      console.log(`[BullMQ] Bắt đầu quét database để gửi Email Marketing (Job ID: ${job.id})...`);
-      
+      const triggerType = job.data?.manual ? '[THỦ CÔNG]' : '[TỰ ĐỘNG]';
+      console.log(
+        `[BullMQ] ${triggerType} Bắt đầu quét database để gửi Email Marketing...`,
+      );
+
       const pendingRecs = await this.prisma.userRecommendation.findMany({
         where: { isEmailSent: false },
         include: {
           User: { select: { email: true, fullName: true } },
-          Movie: { select: { title_vi: true, imageUrl: true } }
+          Movie: { select: { title_vi: true, imageUrl: true } },
         },
-        take: 100 // Test nhẹ 100 record mỗi đợt
+        take: 100, // Test nhẹ 100 record mỗi đợt
       });
 
       if (pendingRecs.length === 0) {
@@ -38,17 +41,19 @@ export class RecommendationsProcessor extends WorkerHost {
       for (const rec of pendingRecs) {
         const email = rec.User?.email;
         if (!email) continue;
-        
+
         if (!groupedData[email]) {
           groupedData[email] = [];
         }
-        
+
         // Gửi chung cả 3 phim vào 1 Email theo yêu cầu test của Admin
-        
+
         groupedData[email].push({
           name: rec.Movie?.title_vi || 'Phim hay',
-          imageUrl: rec.Movie?.imageUrl || 'https://via.placeholder.com/150x220?text=No+Image',
-          matchScore: rec.matchScore
+          imageUrl:
+            rec.Movie?.imageUrl ||
+            'https://via.placeholder.com/150x220?text=No+Image',
+          matchScore: rec.matchScore,
         });
         idsToUpdate.push(rec.recommendationId);
       }
@@ -60,11 +65,13 @@ export class RecommendationsProcessor extends WorkerHost {
       if (idsToUpdate.length > 0) {
         await this.prisma.userRecommendation.updateMany({
           where: { recommendationId: { in: idsToUpdate } },
-          data: { isEmailSent: true }
+          data: { isEmailSent: true },
         });
       }
 
-      console.log(`[BullMQ] Đã đẩy ${Object.keys(groupedData).length} emails vào RabbitMQ.`);
+      console.log(
+        `[BullMQ] Đã đẩy ${Object.keys(groupedData).length} emails vào RabbitMQ.`,
+      );
     }
   }
 }
