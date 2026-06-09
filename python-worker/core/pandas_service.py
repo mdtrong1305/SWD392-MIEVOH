@@ -40,7 +40,7 @@ class PandasRecommendationService:
 
         self.rabbit.send_progress(30)
 
-        users = list(self.db["User"].find({"userType": "user"}, {"_id": 1}))
+        users = list(self.db["User"].find({"userType": {"$regex": "^user$", "$options": "i"}}, {"_id": 1}))
         new_recs = []
         
         # Xây dựng bảng Lịch sử xem phim (Join 3 bảng)
