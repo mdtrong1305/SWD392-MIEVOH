@@ -68,7 +68,7 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
   emitMarkAsRead(notificationId: string, username: string) {
     this.server
       .to(`ROOM_${username}`)
-      .emit('mark_as_read', { username, notificationId });
+      .emit('mark_as_read', { notificationId, username });
   }
 
   // 4. Thêm sự kiện khi TẤT CẢ thông báo được đánh dấu đã đọc
