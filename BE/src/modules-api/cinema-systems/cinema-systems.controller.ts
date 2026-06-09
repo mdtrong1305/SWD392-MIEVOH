@@ -17,8 +17,6 @@ import {
   ApiResponse,
   ApiBearerAuth,
   ApiConsumes,
-  ApiBody,
-  ApiExtraModels,
 } from '@nestjs/swagger';
 import { Public } from '../../common/decorators/public.decorator';
 import { Roles } from '../../common/decorators/role.decorator';
@@ -32,7 +30,6 @@ import {
 } from './dto/cinema-systems.dto';
 
 @ApiTags('Cinema Systems')
-@ApiExtraModels(CreateCinemaSystemDto, UpdateCinemaSystemDto)
 @Controller('cinema-systems')
 export class CinemaSystemsController {
   constructor(private readonly CinemaSystemsService: CinemaSystemsService) {}
@@ -44,21 +41,7 @@ export class CinemaSystemsController {
   @UseInterceptors(FileInterceptor('logo', multerHeThongRapConfig))
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Tạo hệ thống rạp mới (ADMIN)' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      required: ['name', 'logo'],
-      properties: {
-        name: {
-          type: 'string',
-          description: 'Tên hệ thống rạp',
-          example: 'CGV',
-        },
-        logo: { type: 'string', format: 'binary', description: 'File logo' },
-      },
-    },
-  })
-  @ApiResponse({ status: 201, description: 'Tạo hệ thống rạp thành công' })
+  @ApiResponse({ status: 201, description: 'Tạo hệ thống rạp thành công' })  
   @ApiResponse({
     status: 400,
     description: 'Dữ liệu không hợp lệ hoặc chỉ chấp nhận file ảnh',
@@ -96,30 +79,6 @@ export class CinemaSystemsController {
   @UseInterceptors(FileInterceptor('logo', multerHeThongRapConfig))
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Cập nhật hệ thống rạp (ADMIN)' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      required: ['cinemaSystemId'],
-      properties: {
-        cinemaSystemId: {
-          type: 'string',
-          description: 'Mã hệ thống rạp',
-          example: '60d5ecb8b392d700155b3f11',
-        },
-        name: {
-          type: 'string',
-          description: 'Tên hệ thống rạp',
-          example: 'CGV Cinemas',
-        },
-        logo: {
-          type: 'string',
-          format: 'binary',
-          description: 'File logo (optional)',
-          nullable: true,
-        },
-      },
-    },
-  })
   @ApiResponse({ status: 200, description: 'Cập nhật hệ thống rạp thành công' })
   @ApiResponse({
     status: 400,

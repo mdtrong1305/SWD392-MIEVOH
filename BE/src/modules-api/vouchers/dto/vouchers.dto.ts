@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBoolean,
-  IsDateString,
   IsEnum,
   IsInt,
   IsMongoId,
@@ -47,12 +46,12 @@ export class CreateVoucherDto {
   @Min(0)
   minPurchase?: number;
 
-  @ApiProperty({ description: 'Ngày bắt đầu có hiệu lực' })
-  @IsDateString()
+  @ApiProperty({ description: 'Ngày bắt đầu có hiệu lực (DD/MM/YYYY)', example: '08/06/2026' })
+  @IsString()
   startDate!: string;
 
-  @ApiProperty({ description: 'Ngày kết thúc' })
-  @IsDateString()
+  @ApiProperty({ description: 'Ngày kết thúc (DD/MM/YYYY)', example: '08/07/2026' })
+  @IsString()
   endDate!: string;
 
   @ApiProperty({ description: 'Tổng số lượt sử dụng tối đa', required: false })
@@ -98,14 +97,14 @@ export class UpdateVoucherDto {
   @Min(0)
   minPurchase?: number;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ description: 'Ngày bắt đầu mới (DD/MM/YYYY)', required: false, example: '08/06/2026' })
   @IsOptional()
-  @IsDateString()
+  @IsString()
   startDate?: string;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ description: 'Ngày kết thúc mới (DD/MM/YYYY)', required: false, example: '08/07/2026' })
   @IsOptional()
-  @IsDateString()
+  @IsString()
   endDate?: string;
 
   @ApiProperty({ required: false })

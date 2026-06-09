@@ -29,6 +29,15 @@ export class CreateFoodDto {
   @Type(() => Boolean)
   @IsBoolean()
   isActive?: boolean;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: false,
+    description: 'Ảnh món ăn (Tùy chọn)',
+  })
+  @IsOptional()
+  image?: any;
 }
 
 export class UpdateFoodDto {
@@ -58,4 +67,13 @@ export class UpdateFoodDto {
   @Type(() => Boolean)
   @IsBoolean()
   isActive?: boolean;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: false,
+    description: 'Ảnh món ăn mới (Tùy chọn, bỏ qua nếu không muốn đổi ảnh)',
+  })
+  @IsOptional()
+  image?: any;
 }

@@ -109,4 +109,13 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   cccd?: string;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: false,
+    description: 'Ảnh đại diện (Tùy chọn)',
+  })
+  @IsOptional()
+  avatar?: any;
 }
