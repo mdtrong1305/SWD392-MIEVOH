@@ -25,7 +25,7 @@ export const createMulterConfig = (subfolder: string) => ({
     },
   }),
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB - Validate TRƯỚC KHI lưu file
+    fileSize: 20 * 1024 * 1024, // 20MB - Validate TRƯỚC KHI lưu file
   },
   fileFilter: (req, file, cb) => {
     // chặn file không đúng format ngay từ cấu hình Multer
@@ -41,3 +41,4 @@ export const multerMoviesConfig = createMulterConfig('movies');
 export const multerBannersConfig = createMulterConfig('banners');
 export const multerHeThongRapConfig = createMulterConfig('cinema-system');
 export const multerFoodsConfig = createMulterConfig('foods');
+export const multerUsersConfig = createMulterConfig('users');

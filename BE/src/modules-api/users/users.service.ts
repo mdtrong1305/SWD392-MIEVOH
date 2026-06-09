@@ -4,8 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../../modules-system/prisma/prisma.service';
-import { CreateStaffDto, UpdateStaffDto, UpdateProfileDto } from './dto/users.dto';
+import {
+  CreateStaffDto,
+  UpdateStaffDto,
+  UpdateProfileDto,
+} from './dto/users.dto';
 import * as bcrypt from 'bcrypt';
+import { DOMAIN_SERVER } from '../../common/constant/app.constant';
+import { deleteFile } from '../../common/helper/delete-file.helper';
 
 @Injectable()
 export class UsersService {
@@ -109,7 +115,11 @@ export class UsersService {
     return user;
   }
 
-  async updateProfile(username: string, updateProfileDto: UpdateProfileDto) {
+  async updateProfile(
+    username: string,
+    updateProfileDto: UpdateProfileDto,
+    filename?: string,
+  ) {
     const user = await this.prisma.user.findUnique({
       where: { username },
     });
@@ -123,11 +133,22 @@ export class UsersService {
       parsedDateOfBirth = new Date(updateProfileDto.dateOfBirth);
     }
 
+    let avatarUrl = user.avatar;
+    if (filename) {
+      if (user.avatar) {
+        deleteFile(user.avatar);
+      }
+      avatarUrl = `${DOMAIN_SERVER}/users/${filename}`;
+    } else if (updateProfileDto.avatar) {
+      avatarUrl = updateProfileDto.avatar; // Phục vụ trường hợp gửi URL trực tiếp
+    }
+
     const updatedUser = await this.prisma.user.update({
       where: { username },
       data: {
         ...updateProfileDto,
         ...(parsedDateOfBirth ? { dateOfBirth: parsedDateOfBirth } : {}),
+        avatar: avatarUrl,
       },
       select: {
         username: true,
@@ -211,7 +232,9 @@ export class UsersService {
     }
 
     if (user.userType !== 'staff' && updateStaffDto.cinemaComplexId) {
-      throw new ConflictException('Tài khoản này không phải nhân viên (Staff), không thể đổi cụm rạp');
+      throw new ConflictException(
+        'Tài khoản này không phải nhân viên (Staff), không thể đổi cụm rạp',
+      );
     }
 
     // Nếu đổi email, check trùng
