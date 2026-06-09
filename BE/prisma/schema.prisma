@@ -126,7 +126,7 @@ model Review {
   updatedAt DateTime @updatedAt
 
   Movie Movie @relation(fields: [movieId], references: [movieId], onDelete: Cascade)
-  User  User  @relation(fields: [username], references: [username], onDelete: Cascade)
+  User  User?  @relation(fields: [username], references: [username], onDelete: Cascade)
 
   @@index([movieId])
   @@index([username])
