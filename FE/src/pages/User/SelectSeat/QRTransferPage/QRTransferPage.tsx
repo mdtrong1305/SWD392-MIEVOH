@@ -119,7 +119,6 @@ export default function QRTransferPage({
                                     setTimeout(() => {
                                         setIsVerifying(false);
                                         setShowQRTransfer(false);
-                                        toast.success(t("toast_payment_success"));
                                         navigate(`/payments/vnpay-return?vnp_ResponseCode=00&vnp_TxnRef=${bookingCode}`);
                                     }, 2200);
                                 }}
