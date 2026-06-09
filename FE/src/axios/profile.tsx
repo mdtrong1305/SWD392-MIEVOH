@@ -33,7 +33,7 @@ export interface UpdateProfileParams {
   dateOfBirth?: string;
   address?: string;
   cccd?: string;
-  avatar?: string;
+  avatar?: string | File | Blob;
 }
 
 /**
@@ -50,6 +50,32 @@ export const getProfileApi = async (): Promise<BaseResponse<UserProfile>> => {
  * PUT /api/users/profile
  */
 export const updateProfileApi = async (data: UpdateProfileParams): Promise<BaseResponse<UserProfile>> => {
+  const hasFile = data.avatar instanceof File || data.avatar instanceof Blob;
+
+  if (hasFile) {
+    const formData = new FormData();
+    if (data.fullName !== undefined) formData.append('fullName', data.fullName);
+    if (data.email !== undefined) formData.append('email', data.email);
+    if (data.phoneNumber !== undefined) formData.append('phoneNumber', data.phoneNumber);
+    if (data.gender !== undefined) formData.append('gender', data.gender);
+    if (data.dateOfBirth !== undefined) formData.append('dateOfBirth', data.dateOfBirth);
+    if (data.address !== undefined) formData.append('address', data.address);
+    if (data.cccd !== undefined) formData.append('cccd', data.cccd);
+
+    if (data.avatar instanceof File) {
+      formData.append('avatar', data.avatar);
+    } else if (data.avatar instanceof Blob) {
+      formData.append('avatar', data.avatar, 'avatar.jpg');
+    }
+
+    const response = await api.put<BaseResponse<UserProfile>>('/users/profile', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  }
+
   const response = await api.put<BaseResponse<UserProfile>>('/users/profile', data);
   return response.data;
 };
@@ -110,5 +136,30 @@ export interface BookingHistoryItem {
  */
 export const getBookingHistoryApi = async (): Promise<BaseResponse<BookingHistoryItem[]>> => {
   const response = await api.get<BaseResponse<BookingHistoryItem[]>>('/bookings/my-history');
+  return response.data;
+};
+
+export interface RecommendedMovie {
+  recommendationId: string;
+  username: string;
+  movieId: string;
+  matchScore: number;
+  isEmailSent: boolean;
+  createdAt: string;
+  Movie: {
+    title_vi: string;
+    title_en?: string;
+    imageUrl: string;
+    averagerating?: number;
+    averageRating?: number;
+  };
+}
+
+/**
+ * Lấy danh sách phim được đề xuất cho người dùng hiện tại
+ * GET /api/recommendations/my-movies
+ */
+export const getRecommendedMoviesApi = async (): Promise<BaseResponse<{ data: RecommendedMovie[] }>> => {
+  const response = await api.get<BaseResponse<{ data: RecommendedMovie[] }>>('/recommendations/my-movies');
   return response.data;
 };

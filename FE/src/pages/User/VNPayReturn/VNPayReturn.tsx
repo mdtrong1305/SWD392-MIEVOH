@@ -8,7 +8,7 @@ import { XCircle, Loader2, CheckCircle2 } from "lucide-react";
 const processedTxnRefs = new Set<string>();
 
 export default function VNPayReturn() {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const location = useLocation();
 
     const [loading, setLoading] = useState(true);
@@ -28,7 +28,7 @@ export default function VNPayReturn() {
         if (!responseCode || !txnRef) {
             setLoading(false);
             setStatus("error");
-            setErrorMessage("Missing payment parameters.");
+            setErrorMessage(language === "vi" ? "Thiếu tham số thanh toán." : "Missing payment parameters.");
             return;
         }
 
@@ -55,7 +55,7 @@ export default function VNPayReturn() {
                 if (!pending) {
                     setLoading(false);
                     setStatus("error");
-                    setErrorMessage("Could not find pending booking details. Please check your Booking History.");
+                    setErrorMessage(language === "vi" ? "Không tìm thấy thông tin đặt vé đang chờ xử lý. Vui lòng kiểm tra Lịch sử đặt vé." : "Could not find pending booking details. Please check your Booking History.");
                     return;
                 }
 
@@ -92,15 +92,15 @@ export default function VNPayReturn() {
 
                         setBookingData(paidBooking);
                         setStatus("success");
-                        toast.success("Payment successful! Your ticket has been booked.");
+                        toast.success(t("toast_payment_success"));
                     } else {
                         setStatus("failed");
-                        setErrorMessage(res.data?.message || "Payment verification failed.");
+                        setErrorMessage(res.data?.message || (language === "vi" ? "Xác minh thanh toán thất bại." : "Payment verification failed."));
                     }
                 } catch (err: any) {
                     console.error("Payment verification failed:", err);
                     setStatus("error");
-                    setErrorMessage(err?.response?.data?.message || "An error occurred while verifying your payment.");
+                    setErrorMessage(err?.response?.data?.message || (language === "vi" ? "Đã xảy ra lỗi trong quá trình xác minh thanh toán." : "An error occurred while verifying your payment."));
                 } finally {
                     setLoading(false);
                 }
@@ -113,7 +113,7 @@ export default function VNPayReturn() {
         };
 
         verifyPayment();
-    }, [location.search, responseCode, txnRef, queryParams]);
+    }, [location.search, responseCode, txnRef, queryParams, language]);
 
     if (loading) {
         return (

@@ -364,8 +364,7 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
                 gender: formData.gender,
                 dateOfBirth: formatDobForBackend(formData.dateOfBirth),
                 address: formData.address,
-                cccd: formData.cccd,
-                avatar: formData.avatar
+                cccd: formData.cccd
             };
 
             const response = await updateProfileApi(updateData);

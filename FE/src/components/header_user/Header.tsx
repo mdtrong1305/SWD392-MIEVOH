@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { User, Menu, X, Ticket, LogOut, Lock, Sun, Moon, Globe } from "lucide-react";
+import { User, Menu, X, Ticket, LogOut, Lock, Sun, Moon, Globe, Bell } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "../../store/index.tsx";
 import { logout } from "../../pages/User/Login/slice.ts";
@@ -19,6 +19,50 @@ type HeaderProps = {
     navItems?: NavItem[];
 };
 
+type NotificationItem = {
+    id: string;
+    title: string;
+    titleEn: string;
+    description: string;
+    descriptionEn: string;
+    time: string;
+    timeEn: string;
+    isRead: boolean;
+};
+
+const initialNotifications: NotificationItem[] = [
+    {
+        id: "1",
+        title: "Chào mừng thành viên mới! 🎉",
+        titleEn: "Welcome new member! 🎉",
+        description: "Chào mừng bạn đến với hệ thống rạp mievoh. Chúc bạn có những phút giây xem phim tuyệt vời!",
+        descriptionEn: "Welcome to mievoh cinema system. Have a great movie experience!",
+        time: "Vừa xong",
+        timeEn: "Just now",
+        isRead: false
+    },
+    {
+        id: "2",
+        title: "Ưu đãi Chủ Nhật Gia Đình 🍿",
+        titleEn: "Family Sunday Offer 🍿",
+        description: "Đừng bỏ lỡ: Giảm 20% gói combo gia đình khi đặt vé xem phim vào ngày Chủ Nhật.",
+        descriptionEn: "Don't miss out: 20% off family combo package when booking tickets on Sunday.",
+        time: "2 giờ trước",
+        timeEn: "2 hours ago",
+        isRead: false
+    },
+    {
+        id: "3",
+        title: "Phim bom tấn sắp chiếu 🎬",
+        titleEn: "Upcoming blockbuster 🎬",
+        description: "Rất nhiều siêu phẩm điện ảnh sắp đổ bộ mievoh tuần này. Đặt lịch hẹn giờ ngay!",
+        descriptionEn: "Many blockbusters are landing on mievoh this week. Set your schedule now!",
+        time: "1 ngày trước",
+        timeEn: "1 day ago",
+        isRead: true
+    }
+];
+
 export default function Header({
     navItems = [
         { label: "Movies", href: "/movies" },
@@ -28,6 +72,7 @@ export default function Header({
 }: HeaderProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const [notiMenuOpen, setNotiMenuOpen] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
     const { isAuthenticated, user } = useSelector((state: any) => state.login || { isAuthenticated: false, user: null });
     const location = useLocation();
@@ -35,13 +80,33 @@ export default function Header({
     const { language, setLanguage, t } = useLanguage();
 
     const menuRef = useRef<HTMLDivElement>(null);
+    const notiRef = useRef<HTMLDivElement>(null);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
     const mobileButtonRef = useRef<HTMLButtonElement>(null);
+
+    const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
+        const stored = localStorage.getItem("mievoh_notifications");
+        if (stored) {
+            try {
+                return JSON.parse(stored);
+            } catch (e) {
+                return initialNotifications;
+            }
+        }
+        return initialNotifications;
+    });
+
+    useEffect(() => {
+        localStorage.setItem("mievoh_notifications", JSON.stringify(notifications));
+    }, [notifications]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
                 setUserMenuOpen(false);
+            }
+            if (notiRef.current && !notiRef.current.contains(event.target as Node)) {
+                setNotiMenuOpen(false);
             }
             if (
                 isOpen &&
@@ -54,14 +119,14 @@ export default function Header({
             }
         };
 
-        if (userMenuOpen || isOpen) {
+        if (userMenuOpen || isOpen || notiMenuOpen) {
             document.addEventListener("mousedown", handleClickOutside);
         }
 
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [userMenuOpen, isOpen]);
+    }, [userMenuOpen, isOpen, notiMenuOpen]);
 
     // Search States & Logic
     const [searchQuery, setSearchQuery] = useState("");
@@ -452,6 +517,80 @@ export default function Header({
                             )}
                         </button>
 
+                        {/* Notifications Icon Button */}
+                        {isAuthenticated && (
+                            <div className="relative animate__animated animate__fadeIn animate__faster" ref={notiRef}>
+                                <button
+                                    onClick={() => setNotiMenuOpen((v) => !v)}
+                                    className="flex items-center justify-center h-9 w-9 rounded-full bg-[#F1F3F5] dark:bg-zinc-800 hover:bg-[#E9ECEF] dark:hover:bg-zinc-700 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer outline-none border-none shrink-0 relative"
+                                    aria-label="Notifications"
+                                >
+                                    <Bell className="h-4.5 w-4.5 text-violet-800 dark:text-violet-400" />
+                                    {notifications.some(n => !n.isRead) && (
+                                        <span className="absolute top-1 right-1 flex h-2 w-2">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                        </span>
+                                    )}
+                                </button>
+                                {notiMenuOpen && (
+                                    <div className="absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl border border-violet-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-3 shadow-2xl z-50 animate__animated animate__fadeIn animate__faster">
+                                        <div className="flex items-center justify-between px-2 pb-2 border-b border-violet-50/60 dark:border-zinc-800 mb-2">
+                                            <span className="text-sm font-bold text-gray-800 dark:text-zinc-200">
+                                                {t("notifications")}
+                                            </span>
+                                            {notifications.some(n => !n.isRead) && (
+                                                <button
+                                                    onClick={() => {
+                                                        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+                                                    }}
+                                                    className="text-xs font-bold text-violet-600 dark:text-violet-400 hover:underline cursor-pointer border-none bg-transparent outline-none"
+                                                >
+                                                    {language === "vi" ? "Đánh dấu đã đọc" : "Mark all as read"}
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col gap-1.5 max-h-72 overflow-y-auto custom-search-scrollbar">
+                                            {notifications.length === 0 ? (
+                                                <div className="text-center py-6 text-sm text-gray-400 dark:text-zinc-500 font-medium">
+                                                    {t("no_notifications")}
+                                                </div>
+                                            ) : (
+                                                notifications.map(n => (
+                                                    <div
+                                                        key={n.id}
+                                                        onClick={() => {
+                                                            setNotifications(prev => prev.map(item => item.id === n.id ? { ...item, isRead: true } : item));
+                                                        }}
+                                                        className={`flex flex-col gap-1 p-2.5 rounded-xl cursor-pointer transition-colors text-left ${
+                                                            n.isRead 
+                                                                ? "hover:bg-slate-50 dark:hover:bg-zinc-800/40" 
+                                                                : "bg-violet-50/40 dark:bg-violet-950/20 hover:bg-violet-50/60 dark:hover:bg-violet-955/30"
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-start justify-between gap-2">
+                                                            <span className={`text-xs font-bold ${n.isRead ? "text-gray-700 dark:text-zinc-300" : "text-violet-900 dark:text-violet-300"}`}>
+                                                                {language === "vi" ? n.title : n.titleEn}
+                                                            </span>
+                                                            {!n.isRead && (
+                                                                <span className="h-1.5 w-1.5 rounded-full bg-violet-600 dark:bg-violet-400 shrink-0 mt-1" />
+                                                            )}
+                                                        </div>
+                                                        <p className="text-[11px] text-gray-500 dark:text-zinc-400 leading-relaxed font-medium">
+                                                            {language === "vi" ? n.description : n.descriptionEn}
+                                                        </p>
+                                                        <span className="text-[9px] text-gray-400 dark:text-zinc-500 font-semibold self-end">
+                                                            {language === "vi" ? n.time : n.timeEn}
+                                                        </span>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         {isAuthenticated ? (
                             <div className="relative" ref={menuRef}>
                                 <button
@@ -643,6 +782,55 @@ export default function Header({
                                               <div className="text-sm font-bold text-gray-800 dark:text-zinc-200 truncate">{user?.name}</div>
                                               <div className="text-xs text-gray-400 dark:text-zinc-400 truncate">{user?.email}</div>
                                           </div>
+                                      </div>
+                                      <div className="relative">
+                                          <button
+                                              onClick={() => setNotiMenuOpen(v => !v)}
+                                              className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 dark:text-zinc-300 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-400 transition-colors cursor-pointer border-none bg-transparent outline-none"
+                                          >
+                                              <div className="flex items-center gap-3">
+                                                  <Bell className="h-4 w-4 text-violet-500" />
+                                                  <span>{t("notifications")}</span>
+                                              </div>
+                                              {notifications.some(n => !n.isRead) && (
+                                                  <span className="flex h-2 w-2 rounded-full bg-red-500"></span>
+                                              )}
+                                          </button>
+                                          {notiMenuOpen && (
+                                              <div className="mt-2 flex flex-col gap-1.5 max-h-48 overflow-y-auto custom-search-scrollbar border border-violet-100 dark:border-zinc-800 rounded-xl p-2 bg-slate-50 dark:bg-zinc-950">
+                                                  {notifications.length === 0 ? (
+                                                      <div className="text-center py-4 text-xs text-gray-400 dark:text-zinc-500">
+                                                          {t("no_notifications")}
+                                                      </div>
+                                                  ) : (
+                                                      notifications.map(n => (
+                                                          <div
+                                                              key={n.id}
+                                                              onClick={() => {
+                                                                  setNotifications(prev => prev.map(item => item.id === n.id ? { ...item, isRead: true } : item));
+                                                              }}
+                                                              className={`flex flex-col gap-1 p-2 rounded-lg cursor-pointer transition-colors text-left ${
+                                                                  n.isRead 
+                                                                      ? "hover:bg-slate-100 dark:hover:bg-zinc-900" 
+                                                                      : "bg-violet-100/30 dark:bg-violet-900/10 hover:bg-violet-100/50 dark:hover:bg-violet-900/20"
+                                                              }`}
+                                                          >
+                                                              <div className="flex items-start justify-between gap-2">
+                                                                  <span className="text-[11px] font-bold text-gray-800 dark:text-zinc-300">
+                                                                      {language === "vi" ? n.title : n.titleEn}
+                                                                  </span>
+                                                                  {!n.isRead && (
+                                                                      <span className="h-1.5 w-1.5 rounded-full bg-violet-600 dark:bg-violet-400 shrink-0 mt-1" />
+                                                                  )}
+                                                              </div>
+                                                              <p className="text-[10px] text-gray-550 dark:text-zinc-400 leading-normal">
+                                                                  {language === "vi" ? n.description : n.descriptionEn}
+                                                              </p>
+                                                          </div>
+                                                      ))
+                                                  )}
+                                              </div>
+                                          )}
                                       </div>
                                       <Link
                                           to="/profile?tab=info"

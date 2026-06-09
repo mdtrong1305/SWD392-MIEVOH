@@ -27,7 +27,7 @@ export default function MovieGrid({ movies }: MovieGridProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 animate__animated animate__fadeIn">
             {movies.map((movie) => (
                 <div key={movie.id} className="h-full">
-                    <MovieCard movie={movie} />
+                    <MovieCard movie={movie} useCountUp={true} />
                 </div>
             ))}
         </div>

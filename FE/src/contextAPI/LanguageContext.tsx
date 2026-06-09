@@ -16,6 +16,8 @@ export const translations = {
     logout: "Đăng xuất",
     theme_light: "Giao diện sáng",
     theme_dark: "Giao diện tối",
+    notifications: "Thông báo",
+    no_notifications: "Không có thông báo mới",
 
     // Home / Hero
     explore_now: "Khám Phá Ngay",
@@ -226,6 +228,7 @@ export const translations = {
     no_cinemas_available: "Không có rạp khả dụng",
     no_cinemas_available_desc: "Vui lòng thay đổi bộ lọc khu vực hoặc chọn ngày chiếu khác.",
     trending_movies: "Phim Hot Đang Chiếu",
+    recommended_movies: "Phim được đề xuất với bạn",
     quick_book: "Đặt vé nhanh",
     featured_cinemas: "Hệ thống rạp",
     see_all_cinemas: "Xem tất cả",
@@ -235,6 +238,7 @@ export const translations = {
     session_expired: "Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.",
     login_now_btn: "Đăng nhập ngay",
     click_star_avatar: "Nhấp vào ngôi sao để chọn và cập nhật ảnh đại diện",
+    avatar_url_label: "Ảnh đại diện (URL)",
     change_password_title: "Đổi mật khẩu",
     ticket_history_title: "Lịch sử đặt vé",
     avatar_updated_success: "Cập nhật ảnh đại diện thành công!",
@@ -376,6 +380,8 @@ export const translations = {
     logout: "Logout",
     theme_light: "Light Theme",
     theme_dark: "Dark Theme",
+    notifications: "Notifications",
+    no_notifications: "No new notifications",
 
     // Home / Hero
     explore_now: "Explore Now",
@@ -586,6 +592,7 @@ export const translations = {
     no_cinemas_available: "No cinemas available",
     no_cinemas_available_desc: "Please change your location filter or select another showtime date.",
     trending_movies: "Trending Movies",
+    recommended_movies: "Recommended for you",
     quick_book: "Quick Book",
     featured_cinemas: "Featured Cinemas",
     see_all_cinemas: "See All",
@@ -595,6 +602,7 @@ export const translations = {
     session_expired: "Session expired. Please log in again.",
     login_now_btn: "Log In Now",
     click_star_avatar: "Click the star to select and update your avatar",
+    avatar_url_label: "Avatar (URL)",
     change_password_title: "Change Password",
     ticket_history_title: "Ticket History",
     avatar_updated_success: "Avatar updated successfully!",

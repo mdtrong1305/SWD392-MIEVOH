@@ -184,7 +184,33 @@ export default function MovieDetail() {
                 date: r.createdAt ? new Date(r.createdAt).toLocaleDateString("vi-VN") : "06/06/2026"
             }));
             setReviews(reviewsList);
+
+            // Cập nhật rating trung bình của phim ở trên ngay lập tức trên UI
+            const newAverageRating = reviewsList.length > 0
+                ? reviewsList.reduce((sum: number, r: any) => sum + r.rating, 0) / reviewsList.length
+                : 5.0;
+            
+            setMovie(prev => prev ? {
+                ...prev,
+                rating: newAverageRating
+            } : null);
+
             toast.success(res.message || t("reviews_success_toast") || "Đánh giá thành công!");
+
+            // Đồng bộ lại dữ liệu chi tiết phim từ database trong background
+            try {
+                const movieRes = await getMovieDetailApi(id);
+                const responseData = movieRes as any;
+                const data = responseData.data?.data || responseData.data || responseData;
+                if (data && typeof data.averageRating === "number") {
+                    setMovie(prev => prev ? {
+                        ...prev,
+                        rating: data.averageRating
+                    } : null);
+                }
+            } catch (syncErr) {
+                console.error("Lỗi đồng bộ chi tiết phim sau khi đánh giá:", syncErr);
+            }
         } catch (err) {
             console.error("Lỗi khi đăng đánh giá:", err);
             const errorObj = err as { response?: { data?: { message?: string } }; message?: string };

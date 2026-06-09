@@ -37,7 +37,7 @@ export default function HotMovies() {
         const fetchHotMovies = async () => {
             try {
                 setLoading(true);
-                const res = await getNowShowingMoviesApi({ page: 1, pageSize: 20 });
+                const res = await getNowShowingMoviesApi({ page: 1, pageSize: 100 });
                 const list = (res.data as any)?.data || [];
                 
                 const mapped = list.map((m: any) => {
@@ -59,7 +59,7 @@ export default function HotMovies() {
                         id: m.movieId,
                         title: language === "vi" ? (m.title_vi || m.title_en || "Phim") : (m.title_en || m.title_vi || "Movie"),
                         image,
-                        rating: m.averageRating ?? 4.5,
+                        rating: m.averageRating ?? 0,
                         genres: genresArr,
                         status: "now_showing",
                     };
