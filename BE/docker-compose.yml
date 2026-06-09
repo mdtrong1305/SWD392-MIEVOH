@@ -18,6 +18,8 @@ services:
       - redis-cache
     networks:
       - sdn-network
+    volumes:
+      - ./public:/app/public
 
   # Container chạy Redis Cache độc lập
   redis-cache:
