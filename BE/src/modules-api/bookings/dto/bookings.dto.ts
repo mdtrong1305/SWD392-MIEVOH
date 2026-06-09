@@ -44,4 +44,9 @@ export class CreateBookingDto {
   @ValidateNested({ each: true })
   @Type(() => FoodItemDto)
   foods?: FoodItemDto[];
+
+  @ApiProperty({ description: 'Mã giảm giá (Nếu có)', required: false })
+  @IsOptional()
+  @IsString()
+  voucherCode?: string;
 }

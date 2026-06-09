@@ -62,7 +62,7 @@ export class NotificationsService {
     });
   }
 
-  async broadcastNotification(dto: BroadcastNotificationDto) {
+  async broadcastNotification(dto: BroadcastNotificationDto, createdBy?: string) {
     // 1. Lấy tất cả user đang active
     const activeUsers = await this.prisma.user.findMany({
       where: { isActive: true },
@@ -78,6 +78,7 @@ export class NotificationsService {
         title: dto.title,
         message: dto.message,
         link: dto.link || null,
+        createdBy: createdBy || 'system',
       },
     });
 

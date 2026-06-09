@@ -70,7 +70,8 @@ export class PaymentsService {
     const createDate = formatVN(date);
     const expireDate = formatVN(new Date(date.getTime() + 15 * 60 * 1000)); // cho phép thời gian thanh toán tối đa là 15 phút
 
-    const amount = booking.totalPrice * 100;
+    const finalPrice = booking.totalPrice - booking.discountAmount;
+    const amount = finalPrice > 0 ? finalPrice * 100 : 10000; // VNPay không nhận số tiền <= 0
     const bankCode = 'NCB'; // mặc định dùng thẻ test NCB của vnpay
 
     let vnp_Params: any = {};
@@ -154,7 +155,8 @@ export class PaymentsService {
         return { RspCode: '01', Message: 'Hóa đơn không tồn tại' };
       }
 
-      if (booking.totalPrice !== amount) {
+      const expectedAmount = booking.totalPrice - booking.discountAmount;
+      if (expectedAmount !== amount) {
         return { RspCode: '04', Message: 'Số tiền không khớp' };
       }
 
@@ -178,6 +180,21 @@ export class PaymentsService {
             ticketCode,
           },
         });
+
+        // Đánh dấu đã sử dụng Voucher nếu có
+        if (booking.voucherId) {
+          await this.prisma.voucherUsage.create({
+            data: {
+              voucherId: booking.voucherId,
+              username: booking.username,
+              bookingId: booking.bookingId,
+            },
+          });
+          await this.prisma.voucher.update({
+            where: { voucherId: booking.voucherId },
+            data: { usedCount: { increment: 1 } },
+          });
+        }
 
         // giao dịch hoàn tất, tiến hành xóa khóa ghế trong redis để chính thức chuyển sang trạng thái đã bán
         for (const detail of booking.BookingDetails) {
