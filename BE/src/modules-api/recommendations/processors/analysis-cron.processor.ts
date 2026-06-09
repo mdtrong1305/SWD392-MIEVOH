@@ -16,7 +16,7 @@ export class AnalysisProcessor extends WorkerHost {
     console.log(`[BullMQ] [${job.name}] Bắt đầu tự động kích hoạt thuật toán AI phân tích (Job ID: ${job.id})...`);
     
     // Bắn sự kiện sang RabbitMQ để Python Worker xử lý
-    this.recommendationClient.emit('TRIGGER_ANALYSIS', { timestamp: new Date() });
+    this.recommendationClient.emit('TRIGGER_ANALYSIS', { timestamp: new Date(), userId: 'system' });
     
     console.log(`[BullMQ] [${job.name}] Đã gửi tín hiệu TRIGGER_ANALYSIS sang RabbitMQ thành công.`);
   }

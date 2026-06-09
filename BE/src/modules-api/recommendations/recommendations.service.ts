@@ -63,9 +63,10 @@ export class RecommendationsService implements OnModuleInit {
     return { data: recs };
   }
 
-  async triggerAnalysis() {
+  async triggerAnalysis(userId: string) {
     this.recommendationClient.emit('TRIGGER_ANALYSIS', {
       timestamp: new Date(),
+      userId: userId,
     });
     return true;
   }

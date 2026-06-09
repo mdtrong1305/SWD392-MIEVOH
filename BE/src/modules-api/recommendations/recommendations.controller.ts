@@ -38,8 +38,8 @@ export class RecommendationsController {
   @ApiOperation({
     summary: 'Force Run - Ép Worker tính toán recommend system (ADMIN)',
   })
-  triggerAnalysis() {
-    return this.recommendationsService.triggerAnalysis();
+  triggerAnalysis(@User() user: PrismaUser) {
+    return this.recommendationsService.triggerAnalysis(user.username);
   }
 
   @Post('trigger-email')
@@ -103,10 +103,10 @@ export class RecommendationsController {
 
   // bắt sự kiện UPDATE_PROGRESS từ RabbitMQ do Python gửi
   @EventPattern('UPDATE_PROGRESS')
-  handleProgressUpdate(@Payload() data: { progress: number }) {
+  handleProgressUpdate(@Payload() data: { progress: number; userId: string }) {
     console.log(
-      `[+] Nhận được tiến độ phân tích AI từ Python: ${data.progress}%`,
+      `[+] Nhận được tiến độ phân tích AI từ Python: ${data.progress}% (Admin: ${data.userId})`,
     );
-    this.socketService.emitAnalysisProgress(data.progress);
+    this.socketService.emitAnalysisProgress(data.userId, data.progress);
   }
 }

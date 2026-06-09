@@ -9,9 +9,9 @@ class PandasRecommendationService:
         self.db = db_manager.db
         self.rabbit = rabbit_client
 
-    def process_logic(self):
+    def process_logic(self, user_id="system"):
         print("\n[Pandas] Bắt đầu chạy thuật toán phân tích dữ liệu...")
-        self.rabbit.send_progress(10)
+        self.rabbit.send_progress(10, user_id)
         
         # 1. Tải Data từ MongoDB
         print("[Pandas] Đang tải dữ liệu từ Database...")
@@ -38,7 +38,7 @@ class PandasRecommendationService:
         df_active_movies = pd.DataFrame(movies)
         df_reviews = pd.DataFrame(reviews)
 
-        self.rabbit.send_progress(30)
+        self.rabbit.send_progress(30, user_id)
 
         users = list(self.db["User"].find({"userType": {"$regex": "^user$", "$options": "i"}}, {"_id": 1}))
         new_recs = []
@@ -55,7 +55,7 @@ class PandasRecommendationService:
         else:
             df_history = pd.DataFrame()
 
-        self.rabbit.send_progress(50)
+        self.rabbit.send_progress(50, user_id)
         print("[Pandas] Đang tính toán điểm trọng số cho từng User...")
         
         # Chạy thuật toán cho từng user
@@ -146,7 +146,7 @@ class PandasRecommendationService:
                     "createdAt": datetime.utcnow()
                 })
 
-        self.rabbit.send_progress(80)
+        self.rabbit.send_progress(80, user_id)
 
         # Xóa dữ liệu gợi ý cũ và ghi dữ liệu mới
         print(f"[Pandas] Đang ghi {len(new_recs)} kết quả phân tích xuống Database...")
@@ -154,5 +154,5 @@ class PandasRecommendationService:
         if new_recs:
             self.db["UserRecommendation"].insert_many(new_recs)
 
-        self.rabbit.send_progress(100)
+        self.rabbit.send_progress(100, user_id)
         print("[Pandas] Hoàn tất quá trình phân tích và lưu DB!\n")

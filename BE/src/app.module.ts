@@ -24,6 +24,7 @@ import { BullSystemModule } from './modules-system/bull/bull.module';
 import { ReviewsModule } from './modules-api/reviews/reviews.module';
 import { RabbitMQModule } from './modules-system/rabbit-mq/rabbit-mq.module';
 import { RecommendationsModule } from './modules-api/recommendations/recommendations.module';
+import { NotificationsModule } from './modules-api/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { RecommendationsModule } from './modules-api/recommendations/recommendat
     UsersModule,
     ReviewsModule,
     RecommendationsModule,
+    NotificationsModule,
   ],
   providers: [
     {
@@ -66,9 +68,9 @@ export class AppModule implements OnModuleInit {
   async onModuleInit() {
     try {
       await this.cacheManager.get('healthcheck');
-      console.log('Redis cache is connected');
+      console.log('[REDIS] Redis cache is connected');
     } catch (error) {
-      console.error('Redis cache connection error:', error);
+      console.error('[REDIS] Redis cache connection error:', error);
     }
   }
 }

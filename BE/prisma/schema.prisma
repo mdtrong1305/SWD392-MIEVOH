@@ -47,6 +47,35 @@ model User {
   Bookings        Booking[]
   Reviews         Review[]
   Recommendations UserRecommendation[]
+  Notifications   Notification[]
+}
+
+model Notification {
+  notificationId String   @id @default(auto()) @map("_id") @db.ObjectId
+  username       String
+  title          String
+  message        String
+  link           String?
+  isRead         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  broadcastId    String?  @db.ObjectId
+
+  User User @relation(fields: [username], references: [username], onDelete: Cascade)
+  Broadcast Broadcast? @relation(fields: [broadcastId], references: [broadcastId], onDelete: Cascade)
+
+  @@index([username])
+  @@index([broadcastId])
+}
+
+model Broadcast {
+  broadcastId String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  message     String
+  link        String?
+  createdAt   DateTime @default(now())
+
+  Notifications Notification[]
 }
 
 model UserRecommendation {
@@ -126,7 +155,7 @@ model Review {
   updatedAt DateTime @updatedAt
 
   Movie Movie @relation(fields: [movieId], references: [movieId], onDelete: Cascade)
-  User  User?  @relation(fields: [username], references: [username], onDelete: Cascade)
+  User  User? @relation(fields: [username], references: [username], onDelete: Cascade)
 
   @@index([movieId])
   @@index([username])
