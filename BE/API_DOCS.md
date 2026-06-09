@@ -408,22 +408,31 @@ Xóa ghế.
 
 ## 8. 🗓️ Showtimes – Lịch chiếu
 
-### `GET /showtimes` [PUBLIC]
+### `GET /showtimes/movie/:movieId` [PUBLIC]
 
-Lấy danh sách suất chiếu. Hỗ trợ lọc theo phim và rạp.
+Lấy lịch chiếu của 1 bộ phim, **gom nhóm theo Hệ thống rạp**. Dùng cho trang chi tiết phim.
 
 **Query Params:**
 | Tham số | Kiểu | Mô tả |
 |---------|------|-------|
-| `movieId` | string | Lọc theo ID phim |
-| `cinemaId` | string | Lọc theo ID phòng chiếu |
 | `date` | string (DD/MM/YYYY) | Lọc theo ngày chiếu. Ví dụ: `09/06/2026` |
 
 ---
 
-### `GET /showtimes/:id` [PUBLIC]
+### `GET /showtimes/complex/:complexId` [PUBLIC]
 
-Lấy chi tiết suất chiếu kèm trạng thái ghế còn trống / đã đặt.
+Lấy lịch chiếu của 1 cụm rạp, **gom nhóm theo Phim**. Dùng cho trang chi tiết cụm rạp.
+
+**Query Params:**
+| Tham số | Kiểu | Mô tả |
+|---------|------|-------|
+| `date` | string (DD/MM/YYYY) | Lọc theo ngày chiếu. Ví dụ: `09/06/2026` |
+
+---
+
+### `GET /showtimes/:showtimeId` [PUBLIC]
+
+Lấy thông tin tóm tắt 1 suất chiếu (dùng cho header màn hình chọn ghế).
 
 ---
 
@@ -478,7 +487,7 @@ Lấy menu đồ ăn. Có thể lọc theo cụm rạp.
 
 ### `POST /foods` [ADMIN, STAFF]
 
-Thêm sản phẩm đồ ăn mới.
+Thêm sản phẩm đồ ăn mới. Form-data (multipart/form-data).
 
 **Request Body:**
 | Trường | Kiểu | Bắt buộc | Mô tả |
@@ -487,8 +496,8 @@ Thêm sản phẩm đồ ăn mới.
 | `price` | number | ✅ | Giá (VNĐ) |
 | `cinemaComplexId` | string (ObjectId) | ✅ | Thuộc cụm rạp nào |
 | `description` | string | ❌ | Mô tả |
-| `imageUrl` | string | ❌ | URL ảnh sản phẩm |
 | `isActive` | boolean | ❌ | Đang bán? (mặc định: true) |
+| `image` | file (binary) | ❌ | Ảnh sản phẩm |
 
 ### `PUT /foods/:id` [ADMIN, STAFF]
 
@@ -619,27 +628,9 @@ Tạo đặt vé mới và sinh URL thanh toán VNPay.
 
 ---
 
-### `GET /bookings/my-bookings` [AUTH]
+### `GET /bookings/my-history` [AUTH]
 
-Lấy lịch sử đặt vé của người dùng hiện tại (có phân trang).
-
-**Query Params:**
-| Tham số | Kiểu | Mô tả |
-|---------|------|-------|
-| `page` | number | Số trang (mặc định: 1) |
-| `pageSize` | number | Số bản ghi / trang (mặc định: 10) |
-
----
-
-### `GET /bookings/:id` [AUTH]
-
-Lấy chi tiết 1 booking (kèm thông tin ghế, đồ ăn, mã vé QR).
-
----
-
-### `GET /bookings` [ADMIN, STAFF]
-
-Xem tất cả booking của hệ thống (Admin xem toàn bộ, Staff chỉ xem rạp của mình). Không có Query Params - trả toàn bộ.
+Lấy lịch sử đặt vé của người dùng hiện tại. Không có Query Params - trả toàn bộ.
 
 ---
 
@@ -656,9 +647,25 @@ Khi VNPay trả về `rspCode = 00` (Thành công), hệ thống tự động:
 
 ---
 
-### `GET /payments/vnpay-return` [PUBLIC – Chỉ VNPay gọi]
+### `GET /payments/vnpay-return` [PUBLIC – Để FE gọi lên]
 
-URL Redirect sau khi người dùng thanh toán xong trên trang VNPay.
+ENDPOINT để FE gọi sau khi VNPay redirect về. FE nhận URL redirect từ VNPay kèm các query params, sau đó forward toàn bộ params lên endpoint này để **xác thực chữ ký điện tử** và biết kết quả giao dịch.
+
+> **Lưu ý:** Endpoint này **KHÔNG cập nhật trạng thái DB**. Việc cập nhật DB (Booking → `Success`/`Failed`, giải phóng ghế, gửi notification) được thực hiện bởi `vnpay-ipn` (VNPay server tự gọi server-to-server). FE chỉ dùng response của endpoint này để hiển thị UI thành công/thất bại.
+
+**Query Params:**
+| Tham số | Kiểu | Mô tả |
+|---------|------|-------|
+| `vnp_Amount` | number | Số tiền thanh toán |
+| `vnp_BankCode` | string | Mã ngân hàng |
+| `vnp_BankTranNo` | string | Mã giao dịch ngân hàng |
+| `vnp_CardType` | string | Loại thẻ |
+| `vnp_OrderInfo` | string | Thông tin đơn hàng |
+| `vnp_PayDate` | string | Ngày thanh toán |
+| `vnp_ResponseCode` | string | Mã phản hồi |
+| `vnp_TmnCode` | string | Mã terminal |
+| `vnp_TransactionNo` | string | Mã giao dịch |
+| `vnp_SecureHash` | string | Mã hash để xác thực |
 
 ---
 
@@ -764,17 +771,90 @@ Gửi thông báo thủ công tới toàn bộ hệ thống (Dành riêng Admin)
 
 ---
 
-## 16. 🤖 Recommendations – Gợi ý phim AI
+### `GET /notifications/broadcasts` [ADMIN]
 
-### `POST /recommendations/trigger-analysis` [ADMIN]
+Lấy danh sách các broadcast đã phát (có phân trang).
 
-Kích hoạt thủ công quá trình phân tích hành vi người dùng. Hệ thống sẽ đẩy job vào hàng đợi (BullMQ), chạy ngầm bằng Python, và gửi Email gợi ý tự động.
+**Query Params:**
+| Tham số | Kiểu | Mô tả |
+|---------|------|-------|
+| `page` | number | Số trang (mặc định: 1) |
+| `pageSize` | number | Số bản ghi / trang (mặc định: 10) |
 
 ---
 
-### `GET /recommendations/my-recommendations` [AUTH]
+### `PUT /notifications/broadcasts/:id` [ADMIN]
 
-Lấy danh sách phim được AI gợi ý riêng cho người dùng hiện tại.
+Cập nhật nội dung một broadcast đã phát.
+
+**Request Body:**
+| Trường | Kiểu | Bắt buộc | Mô tả |
+|--------|------|----------|-------|
+| `title` | string | ❌ | Tiêu đề mới |
+| `message` | string | ❌ | Nội dung mới |
+| `link` | string | ❌ | URL đính kèm mới |
+
+---
+
+### `DELETE /notifications/broadcasts/:id` [ADMIN]
+
+Xóa một broadcast.
+
+---
+
+## 16. 🤖 Recommendations – Gợi ý phim AI
+
+### `GET /recommendations/my-movies` [AUTH]
+
+Lấy top 3 bộ phim được AI gợi ý riêng cho người dùng hiện tại (dựa trên lịch sử xem).
+
+---
+
+### `POST /recommendations/trigger-analysis` [ADMIN]
+
+Kích hoạt thủ công quá trình phân tích hành vi người dùng. Hệ thống đẩy job vào hàng đợi (BullMQ), Worker Python xử lý ngầm và cập nhật kết quả gợi ý.
+
+---
+
+### `POST /recommendations/trigger-email` [ADMIN]
+
+Kích hoạt thủ công việc quét và gửi **Email Marketing** ngay lập tức (không chờ cron).
+
+---
+
+### `POST /recommendations/config-cron` [ADMIN]
+
+Thêm mới / cập nhật lịch hẹn giờ (Cronjob) cho Email Marketing hoặc phân tích AI.
+
+**Request Body:**
+| Trường | Kiểu | Bắt buộc | Mô tả |
+|--------|------|----------|-------|
+| `type` | string | ✅ | Loại job: `email` hoặc `analysis` |
+| `cronExpression` | string | ✅ | Biểu thức cron Linux. VD: `0 8 * * *` = 8h sáng mỗi ngày |
+| `name` | string | ❌ | Tên định danh cho cronjob (dễ quản lý). Nếu bỏ trống dùng tên mặc định |
+
+---
+
+### `GET /recommendations/crons` [ADMIN]
+
+Lấy danh sách tất cả các Cronjob đang hoạt động.
+
+---
+
+### `DELETE /recommendations/cron` [ADMIN]
+
+Xóa một Cronjob đang hoạt động.
+
+**Request Body:**
+| Trường | Kiểu | Bắt buộc | Mô tả |
+|--------|------|----------|-------|
+| `repeatKey` | string | ✅ | Khóa định danh của cronjob (lấy từ `GET /recommendations/crons`) |
+
+---
+
+### `GET /recommendations/campaign-stats` [ADMIN]
+
+Xem thống kê chiến dịch Email Marketing (số email đã gửi, tỉ lệ mở, v.v.).
 
 ---
 
