@@ -13,13 +13,11 @@ export class AnalysisProcessor extends WorkerHost {
   }
 
   async process(job: Job<any, any, string>): Promise<any> {
-    if (job.name === 'run_analysis') {
-      console.log(`[BullMQ] Bắt đầu tự động kích hoạt thuật toán AI phân tích (Job ID: ${job.id})...`);
-      
-      // Bắn sự kiện sang RabbitMQ để Python Worker xử lý
-      this.recommendationClient.emit('TRIGGER_ANALYSIS', { timestamp: new Date() });
-      
-      console.log(`[BullMQ] Đã gửi tín hiệu TRIGGER_ANALYSIS sang RabbitMQ thành công.`);
-    }
+    console.log(`[BullMQ] [${job.name}] Bắt đầu tự động kích hoạt thuật toán AI phân tích (Job ID: ${job.id})...`);
+    
+    // Bắn sự kiện sang RabbitMQ để Python Worker xử lý
+    this.recommendationClient.emit('TRIGGER_ANALYSIS', { timestamp: new Date() });
+    
+    console.log(`[BullMQ] [${job.name}] Đã gửi tín hiệu TRIGGER_ANALYSIS sang RabbitMQ thành công.`);
   }
 }

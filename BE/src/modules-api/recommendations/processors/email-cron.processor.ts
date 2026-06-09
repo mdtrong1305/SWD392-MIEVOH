@@ -15,11 +15,10 @@ export class RecommendationsProcessor extends WorkerHost {
   }
 
   async process(job: Job<any, any, string>): Promise<any> {
-    if (job.name === 'send_emails') {
-      const triggerType = job.data?.manual ? '[THỦ CÔNG]' : '[TỰ ĐỘNG]';
-      console.log(
-        `[BullMQ] ${triggerType} Bắt đầu quét database để gửi Email Marketing...`,
-      );
+    const triggerType = job.data?.manual ? '[THỦ CÔNG]' : '[TỰ ĐỘNG]';
+    console.log(
+      `[BullMQ] ${triggerType} [${job.name}] Bắt đầu quét database để gửi Email Marketing...`,
+    );
 
       const pendingRecs = await this.prisma.userRecommendation.findMany({
         where: { isEmailSent: false },
@@ -69,9 +68,8 @@ export class RecommendationsProcessor extends WorkerHost {
         });
       }
 
-      console.log(
-        `[BullMQ] Đã đẩy ${Object.keys(groupedData).length} emails vào RabbitMQ.`,
-      );
-    }
+    console.log(
+      `[BullMQ] [${job.name}] Đã đẩy ${Object.keys(groupedData).length} emails vào RabbitMQ.`,
+    );
   }
 }

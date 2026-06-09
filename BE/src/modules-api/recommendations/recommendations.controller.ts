@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Delete } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { RecommendationsService } from './recommendations.service';
-import { ConfigCronDto } from './dto/recommendations.dto';
+import { ConfigCronDto, DeleteCronDto } from './dto/recommendations.dto';
 import {
   ApiTags,
   ApiOperation,
@@ -60,11 +60,23 @@ export class RecommendationsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary:
-      'Cấu hình cronjob cho maketing email và phân tích recommend system (ADMIN)',
+      'Thêm mới cấu hình cronjob cho maketing email và phân tích recommend system (ADMIN)',
   })
   @ApiBody({ type: ConfigCronDto })
   configCron(@Body() configDto: ConfigCronDto) {
     return this.recommendationsService.configCron(configDto);
+  }
+
+  @Delete('cron')
+  @UseGuards(RoleGuard)
+  @Roles('admin')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Xóa một Cronjob đang hoạt động (ADMIN)',
+  })
+  @ApiBody({ type: DeleteCronDto })
+  deleteCron(@Body() dto: DeleteCronDto) {
+    return this.recommendationsService.deleteCron(dto.type, dto.repeatKey);
   }
 
   @Get('crons')

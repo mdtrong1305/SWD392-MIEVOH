@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsEnum } from 'class-validator';
+import { IsNotEmpty, IsString, IsEnum, IsOptional } from 'class-validator';
 
 export enum CronJobType {
   EMAIL = 'email',
@@ -33,4 +33,24 @@ export class ConfigCronDto {
   @IsString({ message: 'Biểu thức Cron phải là chuỗi' })
   @IsNotEmpty({ message: 'Biểu thức Cron không được để trống' })
   cronExpression!: string;
+
+  @ApiProperty({
+    example: 'chien_dich_mua_he',
+    required: false,
+    description: 'Tên định danh cho Cronjob (giúp dễ quản lý và xóa sau này). Nếu không điền sẽ dùng tên mặc định.',
+  })
+  @IsString()
+  name?: string;
+}
+
+export class DeleteCronDto {
+  @ApiProperty({ example: CronJobType.EMAIL, enum: CronJobType })
+  @IsEnum(CronJobType)
+  @IsNotEmpty()
+  type!: CronJobType;
+
+  @ApiProperty({ description: 'Khóa (key) của cronjob cần xóa (Lấy từ API getListCronJobs)' })
+  @IsString()
+  @IsNotEmpty()
+  repeatKey!: string;
 }

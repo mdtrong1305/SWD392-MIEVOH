@@ -19,14 +19,12 @@ export class RecommendationsService implements OnModuleInit {
   async onModuleInit() {
     // Kéo toàn bộ cấu hình Cron đang lưu trong Redis ra
     const existingEmailJobs = await this.emailCronQueue.getRepeatableJobs();
-    const hasEmailCron = existingEmailJobs.some(
-      (job) => job.name === 'send_emails',
-    );
+    const hasEmailCron = existingEmailJobs.length > 0;
 
     // Chỉ nạp lịch mặc định (8h sáng) nếu trong Redis chưa hề có
     if (!hasEmailCron) {
       await this.emailCronQueue.add(
-        'send_emails',
+        'DEFAULT Email 08h00 Mỗi Ngày',
         {},
         {
           jobId: 'default-email-cron',
@@ -35,15 +33,14 @@ export class RecommendationsService implements OnModuleInit {
       );
     }
 
-    const existingAnalysisJobs = await this.analysisCronQueue.getRepeatableJobs();
-    const hasAnalysisCron = existingAnalysisJobs.some(
-      (job) => job.name === 'run_analysis',
-    );
+    const existingAnalysisJobs =
+      await this.analysisCronQueue.getRepeatableJobs();
+    const hasAnalysisCron = existingAnalysisJobs.length > 0;
 
     // Chỉ nạp lịch mặc định (2h sáng CN) nếu trong Redis chưa hề có
     if (!hasAnalysisCron) {
       await this.analysisCronQueue.add(
-        'run_analysis',
+        'DEFAULT Analysis 02h00 Chủ Nhật',
         {},
         {
           jobId: 'default-analysis-cron',
@@ -84,27 +81,18 @@ export class RecommendationsService implements OnModuleInit {
       configDto.type === CronJobType.EMAIL
         ? this.emailCronQueue
         : this.analysisCronQueue;
-    const jobId =
-      configDto.type === CronJobType.EMAIL
-        ? 'default-email-cron'
-        : 'default-analysis-cron';
+
+    // Nếu Client có gửi name (tên tự đặt) thì xài, không thì dùng mặc định
     const jobName =
-      configDto.type === CronJobType.EMAIL ? 'send_emails' : 'run_analysis';
-
-    // Xóa job cũ dựa trên tên công việc (chắc chắn nhất)
-    const existingJobs = await queue.getRepeatableJobs();
-    for (const job of existingJobs) {
-      if (job.name === jobName) {
-        await queue.removeRepeatableByKey(job.key);
-      }
-    }
-
+      configDto.name ||
+      (configDto.type === CronJobType.EMAIL ? 'send_emails' : 'run_analysis');
+    // Không xóa job cũ nữa, cho phép lưu nhiều lịch cùng lúc
     // Thêm job mới
     await queue.add(
       jobName,
       {},
       {
-        jobId: jobId,
+        jobId: jobName + '-' + Date.now(), // Đảm bảo ID duy nhất cho mỗi job lặp
         repeat: {
           pattern: configDto.cronExpression,
           tz: 'Asia/Ho_Chi_Minh',
@@ -113,9 +101,16 @@ export class RecommendationsService implements OnModuleInit {
     );
 
     return {
-      message: `Cập nhật Cron Job [${configDto.type}] thành công!`,
+      message: `Thêm Cron Job [${jobName}] thành công!`,
       cronExpression: configDto.cronExpression,
     };
+  }
+
+  async deleteCron(type: CronJobType, repeatKey: string) {
+    const queue =
+      type === CronJobType.EMAIL ? this.emailCronQueue : this.analysisCronQueue;
+    await queue.removeRepeatableByKey(repeatKey);
+    return { message: 'Đã xóa Cron Job thành công' };
   }
 
   async getCampaignStats() {
@@ -131,18 +126,18 @@ export class RecommendationsService implements OnModuleInit {
   async getListCronJobs() {
     const emailJobs = await this.emailCronQueue.getRepeatableJobs();
     const analysisJobs = await this.analysisCronQueue.getRepeatableJobs();
-    
+
     return {
-      emailCron: emailJobs.map(job => ({
-        id: job.id,
+      emailCron: emailJobs.map((job) => ({
+        key: job.key, // Thêm key để làm mã định danh khi gọi API xóa
         name: job.name,
-        pattern: job.pattern,
+        pattern: (job as any).cron || (job as any).pattern || null,
         nextExecution: job.next ? new Date(job.next) : null,
       })),
-      analysisCron: analysisJobs.map(job => ({
-        id: job.id,
+      analysisCron: analysisJobs.map((job) => ({
+        key: job.key,
         name: job.name,
-        pattern: job.pattern,
+        pattern: (job as any).cron || (job as any).pattern || null,
         nextExecution: job.next ? new Date(job.next) : null,
       })),
     };
