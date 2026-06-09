@@ -142,10 +142,18 @@ export class UsersService {
       avatarUrl = `${DOMAIN_SERVER}/users/${filename}`;
     }
 
+    // Tách dateOfBirth ra khỏi spread để tránh truyền string rỗng vào Prisma
+    const { dateOfBirth: _dateOfBirth, ...restDto } = updateProfileDto;
+
+    // Lọc các trường string rỗng để không ghi đè dữ liệu cũ
+    const cleanDto = Object.fromEntries(
+      Object.entries(restDto).filter(([, v]) => v !== '' && v !== null && v !== undefined),
+    );
+
     const updatedUser = await this.prisma.user.update({
       where: { username },
       data: {
-        ...updateProfileDto,
+        ...cleanDto,
         ...(parsedDateOfBirth ? { dateOfBirth: parsedDateOfBirth } : {}),
         avatar: avatarUrl,
       },

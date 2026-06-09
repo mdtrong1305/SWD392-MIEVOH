@@ -10,21 +10,20 @@ import {
   Query,
   ParseIntPipe,
   DefaultValuePipe,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from '../../common/decorators/user.decorator';
 import type { User as PrismaUser } from '../../modules-system/prisma/generated/prisma/client';
 import { CreateStaffDto, UpdateStaffDto, UpdateProfileDto } from './dto/users.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiConsumes } from '@nestjs/swagger';
 import { RoleGuard } from '../../common/guards/role.guard';
 import { Roles } from '../../common/decorators/role.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerUsersConfig } from '../../common/configs/multer.config';
-import { UploadedFile, UseInterceptors } from '@nestjs/common';
-import { ApiConsumes, ApiBody, getSchemaPath, ApiExtraModels } from '@nestjs/swagger';
 
 @ApiTags('Users')
-@ApiExtraModels(UpdateProfileDto)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -46,22 +45,6 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('avatar', multerUsersConfig))
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Cập nhật thông tin cá nhân' })
-  @ApiBody({
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(UpdateProfileDto) },
-        {
-          properties: {
-            avatar: {
-              type: 'string',
-              format: 'binary',
-              description: 'File ảnh đại diện (Tùy chọn)',
-            },
-          },
-        },
-      ],
-    },
-  })
   @ApiResponse({ status: 200, description: 'Cập nhật thành công' })
   updateProfile(
     @User() user: PrismaUser,

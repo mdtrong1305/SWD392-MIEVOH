@@ -17,8 +17,6 @@ import {
   ApiResponse,
   ApiBearerAuth,
   ApiConsumes,
-  ApiBody,
-  ApiExtraModels,
 } from '@nestjs/swagger';
 import { Public } from '../../common/decorators/public.decorator';
 import { Roles } from '../../common/decorators/role.decorator';
@@ -28,7 +26,6 @@ import { UploadBannerImageDto } from './dto/banner.dto';
 import { RoleGuard } from '../../common/guards/role.guard';
 
 @ApiTags('Banners')
-@ApiExtraModels(UploadBannerImageDto)
 @Controller('banners')
 export class BannerController {
   constructor(private readonly bannerService: BannerService) {}
@@ -51,24 +48,6 @@ export class BannerController {
   @UseInterceptors(FileInterceptor('image', multerBannersConfig))
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Upload ảnh banner (ADMIN, STAFF)' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      required: ['movieId', 'image'],
-      properties: {
-        movieId: {
-          type: 'string',
-          description: 'Mã phim',
-          example: '60d5ecb8b392d700155b3f11',
-        },
-        image: {
-          type: 'string',
-          format: 'binary',
-          description: 'File ảnh',
-        },
-      },
-    },
-  })
   @ApiResponse({ status: 200, description: 'Upload ảnh banner thành công' })
   @ApiResponse({ status: 400, description: 'Chỉ chấp nhận file ảnh' })
   @ApiResponse({ status: 401, description: 'Chưa đăng nhập' })

@@ -13,6 +13,15 @@ import {
 } from './dto/vouchers.dto';
 import { User as PrismaUser } from '../../modules-system/prisma/generated/prisma/client';
 
+// Helper parse date DD/MM/YYYY hoặc ISO sang Date object
+function parseVnDate(dateStr: string): Date {
+  if (dateStr.includes('/')) {
+    const [day, month, year] = dateStr.split('/');
+    return new Date(`${year}-${month}-${day}T00:00:00Z`);
+  }
+  return new Date(dateStr);
+}
+
 @Injectable()
 export class VouchersService {
   constructor(
@@ -43,7 +52,7 @@ export class VouchersService {
       throw new BadRequestException('Mã giảm giá này đã tồn tại!');
     }
 
-    if (new Date(dto.startDate) >= new Date(dto.endDate)) {
+    if (parseVnDate(dto.startDate) >= parseVnDate(dto.endDate)) {
       throw new BadRequestException('Ngày kết thúc phải sau ngày bắt đầu!');
     }
 
@@ -55,8 +64,8 @@ export class VouchersService {
         discountValue: dto.discountValue,
         maxDiscount: dto.maxDiscount || null,
         minPurchase: dto.minPurchase || null,
-        startDate: new Date(dto.startDate),
-        endDate: new Date(dto.endDate),
+        startDate: parseVnDate(dto.startDate),
+        endDate: parseVnDate(dto.endDate),
         usageLimit: dto.usageLimit || null,
         cinemaComplexId: targetCinemaComplexId,
         createdBy: user.username,
@@ -150,8 +159,8 @@ export class VouchersService {
         discountValue: dto.discountValue,
         maxDiscount: dto.maxDiscount,
         minPurchase: dto.minPurchase,
-        startDate: dto.startDate ? new Date(dto.startDate) : undefined,
-        endDate: dto.endDate ? new Date(dto.endDate) : undefined,
+        startDate: dto.startDate ? parseVnDate(dto.startDate) : undefined,
+        endDate: dto.endDate ? parseVnDate(dto.endDate) : undefined,
         usageLimit: dto.usageLimit,
         isActive: dto.isActive,
       },

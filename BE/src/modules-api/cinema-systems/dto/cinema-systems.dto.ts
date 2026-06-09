@@ -6,6 +6,14 @@ export class CreateCinemaSystemDto {
   @IsNotEmpty({ message: 'Tên hệ thống rạp không được để trống' })
   @IsString({ message: 'Tên hệ thống rạp phải là chuỗi' })
   name!: string;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: 'File logo hệ thống rạp',
+  })
+  @IsOptional()
+  logo?: any;
 }
 
 export class UpdateCinemaSystemDto {
@@ -27,11 +35,11 @@ export class UpdateCinemaSystemDto {
   name?: string;
 
   @ApiProperty({
-    example: 'https://example.com/logo.png',
-    description: 'Logo hệ thống rạp',
+    type: 'string',
+    format: 'binary',
     required: false,
+    description: 'File logo mới (Tùy chọn)',
   })
   @IsOptional()
-  @IsString({ message: 'Logo phải là chuỗi' })
-  logo?: string;
+  logo?: any;
 }
