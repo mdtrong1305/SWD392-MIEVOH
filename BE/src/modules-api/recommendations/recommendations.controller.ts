@@ -26,7 +26,7 @@ export class RecommendationsController {
   @UseGuards(RoleGuard)
   @Roles('admin', 'staff', 'user')
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Lấy danh sách phim cá nhân hóa' })
+  @ApiOperation({ summary: 'Lấy ra top 3 phim được recommend' })
   getMyMovies(@User() user: PrismaUser) {
     return this.recommendationsService.getMyMovies(user.username);
   }
@@ -60,7 +60,7 @@ export class RecommendationsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary:
-      'Cấu hình cronjob cho maketing email và phân tích dữ liệu người dùng (ADMIN)',
+      'Cấu hình cronjob cho maketing email và phân tích recommend system (ADMIN)',
   })
   @ApiBody({ type: ConfigCronDto })
   configCron(@Body() configDto: ConfigCronDto) {
