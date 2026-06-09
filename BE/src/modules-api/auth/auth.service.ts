@@ -85,7 +85,7 @@ export class AuthService {
         phoneNumber: registerDto.phoneNumber,
         password: bcrypt.hashSync(registerDto.password, 10),
         authProvider: 'local',
-        userType: 'USER',
+        userType: 'user',
       },
     });
 
