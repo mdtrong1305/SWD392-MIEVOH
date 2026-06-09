@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Star, Clock, Calendar, Globe, Play, User, Users, Shield } from "lucide-react";
 import Button from "../../../../components/Button/Button.tsx";
 import TrailerModal from "../TrailerModal/TrailerModal.tsx";
+import CountUp from "react-countup";
 
 export interface MovieDetailInfo {
     id: string | number;
@@ -98,6 +99,8 @@ export default function DetailHero({ movie }: DetailHeroProps) {
         }, 400);
     };
 
+    const CountUpComponent = (CountUp as any).default || CountUp;
+
     return (
         <div className="relative w-full min-h-[400px] md:min-h-[500px] bg-black overflow-hidden flex items-end">
             {/* Backdrop Image with blurred and dark mask overlay */}
@@ -144,7 +147,9 @@ export default function DetailHero({ movie }: DetailHeroProps) {
                         <div className="flex items-center justify-center md:justify-start gap-2">
                             <div className="flex items-center gap-1 text-yellow-400">
                                 <Star className="h-5 w-5 fill-yellow-400" />
-                                <span className="text-lg font-black">{movie.rating.toFixed(1)}</span>
+                                <span className="text-lg font-black">
+                                    <CountUpComponent end={movie.rating} decimals={1} duration={1.5} enableScrollSpy scrollSpyOnce />
+                                </span>
                             </div>
                             <span className="text-xs text-gray-400 font-bold border-l border-white/20 pl-2">
                                 (5.0 / 5 based on reviews)

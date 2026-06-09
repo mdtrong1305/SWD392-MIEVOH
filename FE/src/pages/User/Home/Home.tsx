@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Hero from "./Hero/Hero.tsx";
+import RecommendedMovies from "./RecommendedMovies/RecommendedMovies.tsx";
 import HotMovies from "./HotMovies/HotMovies.tsx";
 import Promotions from "./Promotions/Promotions.tsx";
 import Cinemas from "./Cinemas/Cinemas.tsx";
@@ -15,6 +16,7 @@ export default function HomePage() {
     return (
         <div className="w-full bg-[#EFEBF4] pb-16">
             <Hero />
+            <RecommendedMovies />
             <ScrollReveal animationClass="animate__fadeInUp">
                 <HotMovies />
             </ScrollReveal>
