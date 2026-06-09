@@ -67,7 +67,7 @@ export default function Movies() {
                         title_vi: m.title_vi || "",
                         title_en: m.title_en || "",
                         image,
-                        rating: m.averageRating ?? 4.5,
+                        rating: m.averageRating ?? 0,
                         genres: genresArr,
                         status,
                         releaseDate: m.releaseDate ? new Date(m.releaseDate).toLocaleDateString() : undefined

@@ -140,7 +140,9 @@ export default function CinemaCard({
                 {/* Rating badge */}
                 <div className="absolute top-4 right-4 bg-violet-600 text-white font-extrabold text-xs px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md">
                     <Star className="h-3.5 w-3.5 fill-white text-white" />
-                    <span>{cinema.rating}</span>
+                    <span>
+                        <CountUpComponent end={cinema.rating} decimals={1} duration={1.5} enableScrollSpy scrollSpyOnce />
+                    </span>
                 </div>
             </div>
 

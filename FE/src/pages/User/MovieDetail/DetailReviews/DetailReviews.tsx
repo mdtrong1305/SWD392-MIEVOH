@@ -4,6 +4,7 @@ import { Star, MessageSquarePlus } from "lucide-react";
 import Button from "../../../../components/Button/Button.tsx";
 import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 import { toast } from "../../../../components/Toast/Toast.tsx";
+import CountUp from "react-countup";
 
 export interface Review {
     id: string | number;
@@ -68,6 +69,8 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
         }
     };
 
+    const CountUpComponent = (CountUp as any).default || CountUp;
+
     return (
         <div className="w-full bg-white dark:bg-zinc-900/40 rounded-2xl border border-[#EAE6F0] dark:border-zinc-800/80 p-6 sm:p-8 shadow-sm flex flex-col gap-8 animate__animated animate__fadeIn">
             {/* Header / Title */}
@@ -82,7 +85,7 @@ export default function DetailReviews({ reviews, onAddReview }: DetailReviewsPro
                 {/* Average rating summary */}
                 <div className="text-center flex flex-col items-center">
                     <span className="text-5xl font-black text-[#6D28D9] dark:text-violet-400 mb-2">
-                        {averageRating.toFixed(1)}
+                        <CountUpComponent end={averageRating} decimals={1} duration={1.5} enableScrollSpy scrollSpyOnce />
                     </span>
                     <div className="flex gap-0.5 text-yellow-400 mb-1">
                         {[1, 2, 3, 4, 5].map((s) => (
