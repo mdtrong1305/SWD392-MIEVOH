@@ -20,7 +20,7 @@ export class RecommendationsService implements OnModuleInit {
     // Kéo toàn bộ cấu hình Cron đang lưu trong Redis ra
     const existingEmailJobs = await this.emailCronQueue.getRepeatableJobs();
     const hasEmailCron = existingEmailJobs.some(
-      (job) => job.id === 'default-email-cron',
+      (job) => job.name === 'send_emails',
     );
 
     // Chỉ nạp lịch mặc định (8h sáng) nếu trong Redis chưa hề có
@@ -35,10 +35,9 @@ export class RecommendationsService implements OnModuleInit {
       );
     }
 
-    const existingAnalysisJobs =
-      await this.analysisCronQueue.getRepeatableJobs();
+    const existingAnalysisJobs = await this.analysisCronQueue.getRepeatableJobs();
     const hasAnalysisCron = existingAnalysisJobs.some(
-      (job) => job.id === 'default-analysis-cron',
+      (job) => job.name === 'run_analysis',
     );
 
     // Chỉ nạp lịch mặc định (2h sáng CN) nếu trong Redis chưa hề có
@@ -92,10 +91,10 @@ export class RecommendationsService implements OnModuleInit {
     const jobName =
       configDto.type === CronJobType.EMAIL ? 'send_emails' : 'run_analysis';
 
-    // Xóa job cũ
+    // Xóa job cũ dựa trên tên công việc (chắc chắn nhất)
     const existingJobs = await queue.getRepeatableJobs();
     for (const job of existingJobs) {
-      if (job.id === jobId) {
+      if (job.name === jobName) {
         await queue.removeRepeatableByKey(job.key);
       }
     }
