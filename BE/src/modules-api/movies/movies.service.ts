@@ -13,8 +13,8 @@ import { CreateMovieDto, UpdateMovieDto } from './dto/movies.dto';
 export class MoviesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: CreateMovieDto, filename?: string) {
-    const { genres, ...rest } = data;
+  async create(data: CreateMovieDto = {}, filename?: string) {
+    const { genres, releaseDate, duration, ...rest } = data;
 
     // xử lý lưu trữ hình ảnh nếu có upload
     let imageUrl: string | null = null;
@@ -31,10 +31,16 @@ export class MoviesService {
         .filter((g) => g);
     }
 
+    // Lọc releaseDate và duration không hợp lệ
+    const safeReleaseDate = releaseDate instanceof Date && !isNaN(releaseDate.getTime()) ? releaseDate : undefined;
+    const safeDuration = duration !== undefined && !isNaN(Number(duration)) ? duration : undefined;
+
     // tạo dữ liệu phim mới
     const movie = await this.prisma.movie.create({
       data: {
         ...rest,
+        ...(safeReleaseDate ? { releaseDate: safeReleaseDate } : {}),
+        ...(safeDuration !== undefined ? { duration: safeDuration } : {}),
         genres: parsedGenres,
         imageUrl,
       },
@@ -111,11 +117,11 @@ export class MoviesService {
     return movie;
   }
 
-  async update(movieId: string, data: UpdateMovieDto, filename?: string) {
+  async update(movieId: string, data: UpdateMovieDto = {}, filename?: string) {
     // kiểm tra phim có tồn tại không
     const existingMovie = await this.findById(movieId);
 
-    const { genres, ...rest } = data;
+    const { genres, releaseDate, duration, ...rest } = data;
 
     let imageUrl = existingMovie.imageUrl;
     // nếu có upload ảnh mới thì xóa ảnh cũ trong ổ cứng và lưu ảnh mới
@@ -135,11 +141,17 @@ export class MoviesService {
         .filter((g) => g);
     }
 
+    // Lọc releaseDate và duration không hợp lệ
+    const safeReleaseDate = releaseDate instanceof Date && !isNaN(releaseDate.getTime()) ? releaseDate : undefined;
+    const safeDuration = duration !== undefined && !isNaN(Number(duration)) ? duration : undefined;
+
     // cập nhật dữ liệu vào db
     const movie = await this.prisma.movie.update({
       where: { movieId },
       data: {
         ...rest,
+        ...(safeReleaseDate ? { releaseDate: safeReleaseDate } : {}),
+        ...(safeDuration !== undefined ? { duration: safeDuration } : {}),
         genres: parsedGenres,
         imageUrl,
       },
