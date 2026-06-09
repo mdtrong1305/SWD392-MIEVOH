@@ -49,20 +49,33 @@ export class NotificationsService {
       throw new NotFoundException('Không có quyền truy cập thông báo này');
     }
 
-    return this.prisma.notification.update({
+    const updated = await this.prisma.notification.update({
       where: { notificationId },
       data: { isRead: true },
     });
+
+    // Phát tín hiệu qua Socket để Frontend update UI realtime
+    this.socketService.emitMarkAsRead(notificationId, username);
+
+    return updated;
   }
 
   async markAllAsRead(username: string) {
-    return this.prisma.notification.updateMany({
+    const updated = await this.prisma.notification.updateMany({
       where: { username, isRead: false },
       data: { isRead: true },
     });
+
+    // Phát tín hiệu qua Socket
+    this.socketService.emitMarkAllAsRead(username);
+
+    return updated;
   }
 
-  async broadcastNotification(dto: BroadcastNotificationDto, createdBy?: string) {
+  async broadcastNotification(
+    dto: BroadcastNotificationDto,
+    createdBy?: string,
+  ) {
     // 1. Lấy tất cả user đang active
     const activeUsers = await this.prisma.user.findMany({
       where: { isActive: true },
