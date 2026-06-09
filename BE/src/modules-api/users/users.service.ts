@@ -135,12 +135,11 @@ export class UsersService {
 
     let avatarUrl = user.avatar;
     if (filename) {
+      // nếu có file avatar up lên sẽ xóa ảnh cũ
       if (user.avatar) {
         deleteFile(user.avatar);
       }
       avatarUrl = `${DOMAIN_SERVER}/users/${filename}`;
-    } else if (updateProfileDto.avatar) {
-      avatarUrl = updateProfileDto.avatar; // Phục vụ trường hợp gửi URL trực tiếp
     }
 
     const updatedUser = await this.prisma.user.update({
