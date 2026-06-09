@@ -157,7 +157,7 @@ export default function CinemasPage() {
                 });
             });
         });
-        return branchesList;
+        return branchesList.sort((a, b) => b.rating - a.rating);
     }, [filteredChains]);
 
     // Active branches to display in the main grid
@@ -171,7 +171,7 @@ export default function CinemasPage() {
             ...b,
             chainName: chain.name,
             chainLogo: chain.logo
-        }));
+        })).sort((a, b) => b.rating - a.rating);
     }, [selectedChainId, allMatchingBranches, filteredChains]);
 
     const handleResetFilters = () => {

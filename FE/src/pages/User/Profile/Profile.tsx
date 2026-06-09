@@ -89,6 +89,11 @@ export default function Profile() {
         }
     }, [queryTab]);
 
+    // Scroll to top when tab changes or page mounts
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "instant" as any });
+    }, [activeTab]);
+
     const handleTabChange = (tab: "info" | "tickets" | "password") => {
         setActiveTab(tab);
         setSearchParams({ tab });

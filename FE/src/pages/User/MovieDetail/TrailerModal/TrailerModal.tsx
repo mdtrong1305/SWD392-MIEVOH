@@ -16,6 +16,33 @@ export default function TrailerModal({
     movieTitle 
 }: TrailerModalProps) {
     
+    // Parse any YouTube URL format to get the correct embed URL
+    const getEmbedUrl = (url: string | null) => {
+        if (!url) return "";
+        let videoId = "";
+        if (url.includes("youtube.com/watch")) {
+            try {
+                const urlParams = new URLSearchParams(new URL(url).search);
+                videoId = urlParams.get("v") || "";
+            } catch (e) {
+                const match = url.match(/[?&]v=([^&#]*)/);
+                videoId = match ? match[1] : "";
+            }
+        } else if (url.includes("youtu.be/")) {
+            videoId = url.split("youtu.be/")[1]?.split("?")[0] || "";
+        } else if (url.includes("youtube.com/embed/")) {
+            const urlWithoutParams = url.split("?")[0];
+            return urlWithoutParams.replace("youtube.com/embed/", "youtube-nocookie.com/embed/");
+        }
+        
+        if (videoId) {
+            return `https://www.youtube-nocookie.com/embed/${videoId}`;
+        }
+        return url;
+    };
+
+    const finalTrailerUrl = getEmbedUrl(trailerUrl);
+
     // Prevent background scrolling and handle ESC key
     useEffect(() => {
         if (!isOpen) return;
@@ -52,7 +79,7 @@ export default function TrailerModal({
             >
                 {/* Video iframe */}
                 <iframe
-                    src={`${trailerUrl}?autoplay=1&rel=0`}
+                    src={`${finalTrailerUrl}?autoplay=1&rel=0`}
                     title={`${movieTitle} - Official Trailer`}
                     className="w-full h-full border-none"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
