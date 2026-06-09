@@ -1,14 +1,35 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { User, Menu, X, Ticket, LogOut, Lock, Sun, Moon, Globe, Bell } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch } from "../../store/index.tsx";
+import type { AppDispatch, RootState } from "../../store/index.tsx";
 import { logout } from "../../pages/User/Login/slice.ts";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import Button from "../Button/Button";
 import { useTheme } from "../../contextAPI/ThemeContext.tsx";
 import { useLanguage } from "../../contextAPI/LanguageContext.tsx";
 import SearchInput from "../SearchInput/SearchInput";
 import { getNowShowingMoviesApi, getComingSoonMoviesApi, getCinemaComplexesApi } from "../../axios/cinemas.tsx";
+import type { Movie, CinemaComplex } from "../../axios/cinemas.tsx";
+import { useAppSocket, emitMarkAsRead, emitMarkAllAsRead } from "../Notifications/Notifications.tsx";
+import { getMyNotificationsApi, markAsReadApi, markAllAsReadApi } from "../../axios/notifications.tsx";
+import type { Notification as ApiNotification } from "../../axios/notifications.tsx";
+
+const formatRelativeTime = (dateStr: string, lang: string) => {
+    try {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        if (diffMins < 1) return lang === "vi" ? "Vừa xong" : "Just now";
+        if (diffMins < 60) return lang === "vi" ? `${diffMins} phút trước` : `${diffMins}m ago`;
+        const diffHours = Math.floor(diffMins / 60);
+        if (diffHours < 24) return lang === "vi" ? `${diffHours} giờ trước` : `${diffHours}h ago`;
+        const diffDays = Math.floor(diffHours / 24);
+        return lang === "vi" ? `${diffDays} ngày trước` : `${diffDays}d ago`;
+    } catch {
+        return "";
+    }
+};
 
 type NavItem = {
     label: string;
@@ -28,40 +49,9 @@ type NotificationItem = {
     time: string;
     timeEn: string;
     isRead: boolean;
+    link?: string | null;
 };
 
-const initialNotifications: NotificationItem[] = [
-    {
-        id: "1",
-        title: "Chào mừng thành viên mới! 🎉",
-        titleEn: "Welcome new member! 🎉",
-        description: "Chào mừng bạn đến với hệ thống rạp mievoh. Chúc bạn có những phút giây xem phim tuyệt vời!",
-        descriptionEn: "Welcome to mievoh cinema system. Have a great movie experience!",
-        time: "Vừa xong",
-        timeEn: "Just now",
-        isRead: false
-    },
-    {
-        id: "2",
-        title: "Ưu đãi Chủ Nhật Gia Đình 🍿",
-        titleEn: "Family Sunday Offer 🍿",
-        description: "Đừng bỏ lỡ: Giảm 20% gói combo gia đình khi đặt vé xem phim vào ngày Chủ Nhật.",
-        descriptionEn: "Don't miss out: 20% off family combo package when booking tickets on Sunday.",
-        time: "2 giờ trước",
-        timeEn: "2 hours ago",
-        isRead: false
-    },
-    {
-        id: "3",
-        title: "Phim bom tấn sắp chiếu 🎬",
-        titleEn: "Upcoming blockbuster 🎬",
-        description: "Rất nhiều siêu phẩm điện ảnh sắp đổ bộ mievoh tuần này. Đặt lịch hẹn giờ ngay!",
-        descriptionEn: "Many blockbusters are landing on mievoh this week. Set your schedule now!",
-        time: "1 ngày trước",
-        timeEn: "1 day ago",
-        isRead: true
-    }
-];
 
 export default function Header({
     navItems = [
@@ -74,8 +64,9 @@ export default function Header({
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [notiMenuOpen, setNotiMenuOpen] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
-    const { isAuthenticated, user } = useSelector((state: any) => state.login || { isAuthenticated: false, user: null });
+    const { isAuthenticated, user } = useSelector((state: RootState) => state.login || { isAuthenticated: false, user: null });
     const location = useLocation();
+    const navigate = useNavigate();
     const { theme, toggleTheme } = useTheme();
     const { language, setLanguage, t } = useLanguage();
 
@@ -84,21 +75,62 @@ export default function Header({
     const mobileMenuRef = useRef<HTMLDivElement>(null);
     const mobileButtonRef = useRef<HTMLButtonElement>(null);
 
-    const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
-        const stored = localStorage.getItem("mievoh_notifications");
-        if (stored) {
-            try {
-                return JSON.parse(stored);
-            } catch (e) {
-                return initialNotifications;
-            }
+    // Connect and listen to real-time notifications via socket
+    useAppSocket(user?.username || "");
+
+    const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+    const unreadCount = useMemo(() => notifications.filter(n => !n.isRead).length, [notifications]);
+    const [showAllNotifications, setShowAllNotifications] = useState(false);
+
+    const fetchNotifications = useCallback(async () => {
+        if (!isAuthenticated || !user?.username) return;
+        try {
+            const res = await getMyNotificationsApi({ page: 1, pageSize: 20 });
+            // Safe extraction of the notifications list:
+            const list = (res && res.data && Array.isArray(res.data.data) ? res.data.data : []) as ApiNotification[];
+            
+            const mapped: NotificationItem[] = list.map((n) => {
+                let targetLink = n.link;
+                if (n.title?.includes("Gợi ý phim") || n.title?.includes("Gợi ý") || n.title?.toLowerCase().includes("recommend")) {
+                    targetLink = "/#recommended-movies";
+                }
+                return {
+                    id: n.notificationId,
+                    title: n.title,
+                    titleEn: n.title,
+                    description: n.message,
+                    descriptionEn: n.message,
+                    time: formatRelativeTime(n.createdAt, language),
+                    timeEn: formatRelativeTime(n.createdAt, "en"),
+                    isRead: n.isRead,
+                    link: targetLink,
+                };
+            });
+            console.log("FE notifications fetched:", mapped);
+            setNotifications(mapped);
+        } catch (e) {
+            console.error("Failed to fetch notifications:", e);
         }
-        return initialNotifications;
-    });
+    }, [isAuthenticated, user?.username, language]);
 
     useEffect(() => {
-        localStorage.setItem("mievoh_notifications", JSON.stringify(notifications));
-    }, [notifications]);
+        if (isAuthenticated && user?.username) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            fetchNotifications();
+        } else {
+            setNotifications([]);
+        }
+    }, [isAuthenticated, user?.username, fetchNotifications]);
+
+    useEffect(() => {
+        const handleSync = () => {
+            fetchNotifications();
+        };
+        window.addEventListener('sync-notifications', handleSync);
+        return () => {
+            window.removeEventListener('sync-notifications', handleSync);
+        };
+    }, [fetchNotifications]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -107,6 +139,7 @@ export default function Header({
             }
             if (notiRef.current && !notiRef.current.contains(event.target as Node)) {
                 setNotiMenuOpen(false);
+                setShowAllNotifications(false);
             }
             if (
                 isOpen &&
@@ -128,10 +161,17 @@ export default function Header({
         };
     }, [userMenuOpen, isOpen, notiMenuOpen]);
 
+    // Reset notification expand state when menu closes
+    useEffect(() => {
+        if (!notiMenuOpen) {
+            setShowAllNotifications(false);
+        }
+    }, [notiMenuOpen]);
+
     // Search States & Logic
     const [searchQuery, setSearchQuery] = useState("");
-    const [allMovies, setAllMovies] = useState<any[]>([]);
-    const [allComplexes, setAllComplexes] = useState<any[]>([]);
+    const [allMovies, setAllMovies] = useState<Movie[]>([]);
+    const [allComplexes, setAllComplexes] = useState<CinemaComplex[]>([]);
     const [hasLoadedData, setHasLoadedData] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     const [searchDropdownOpen, setSearchDropdownOpen] = useState(false);
@@ -151,33 +191,33 @@ export default function Header({
             ]);
             
             // Safely parse nowShowing movies
-            let nowShowing = [];
-            const nowData = nowShowingRes.data as any;
+            let nowShowing: Movie[] = [];
+            const nowData = nowShowingRes.data;
             if (nowData) {
                 if (Array.isArray(nowData)) {
                     nowShowing = nowData;
                 } else if (Array.isArray(nowData.movies)) {
                     nowShowing = nowData.movies;
-                } else if (Array.isArray(nowData.data)) {
-                    nowShowing = nowData.data;
+                } else if (Array.isArray((nowData as unknown as { data: Movie[] }).data)) {
+                    nowShowing = (nowData as unknown as { data: Movie[] }).data;
                 }
             }
 
             // Safely parse comingSoon movies
-            let comingSoon = [];
-            const comingData = comingSoonRes.data as any;
+            let comingSoon: Movie[] = [];
+            const comingData = comingSoonRes.data;
             if (comingData) {
                 if (Array.isArray(comingData)) {
                     comingSoon = comingData;
                 } else if (Array.isArray(comingData.movies)) {
                     comingSoon = comingData.movies;
-                } else if (Array.isArray(comingData.data)) {
-                    comingSoon = comingData.data;
+                } else if (Array.isArray((comingData as unknown as { data: Movie[] }).data)) {
+                    comingSoon = (comingData as unknown as { data: Movie[] }).data;
                 }
             }
 
             // Combine and de-duplicate movies
-            const movieMap = new Map();
+            const movieMap = new Map<string, Movie>();
             [...nowShowing, ...comingSoon].forEach(movie => {
                 if (movie?.movieId) {
                     movieMap.set(movie.movieId, movie);
@@ -185,15 +225,15 @@ export default function Header({
             });
 
             // Safely parse complexes
-            let complexes = [];
-            const complexesData = complexesRes.data as any;
+            let complexes: CinemaComplex[] = [];
+            const complexesData = complexesRes.data;
             if (complexesData) {
                 if (Array.isArray(complexesData)) {
                     complexes = complexesData;
-                } else if (Array.isArray(complexesData.data)) {
-                    complexes = complexesData.data;
-                } else if (Array.isArray(complexesData.cinemaComplexes)) {
-                    complexes = complexesData.cinemaComplexes;
+                } else if (Array.isArray((complexesData as unknown as { data: CinemaComplex[] }).data)) {
+                    complexes = (complexesData as unknown as { data: CinemaComplex[] }).data;
+                } else if (Array.isArray((complexesData as unknown as { cinemaComplexes: CinemaComplex[] }).cinemaComplexes)) {
+                    complexes = (complexesData as unknown as { cinemaComplexes: CinemaComplex[] }).cinemaComplexes;
                 }
             }
 
@@ -236,7 +276,7 @@ export default function Header({
             const titleEn = (movie.title_en || "").toLowerCase();
             const genres = Array.isArray(movie.genres) 
                 ? movie.genres.join(" ").toLowerCase() 
-                : (movie.genres || "").toLowerCase();
+                : (typeof movie.genres === "string" ? movie.genres : "").toLowerCase();
             return titleVi.includes(q) || titleEn.includes(q) || genres.includes(q);
         });
     }, [searchQuery, allMovies]);
@@ -251,7 +291,7 @@ export default function Header({
         });
     }, [searchQuery, allComplexes]);
 
-    const getMovieImage = (movie: any) => {
+    const getMovieImage = (movie: Movie) => {
         let image = movie.imageUrl || "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80";
         if (movie.imageUrl && !movie.imageUrl.startsWith('http')) {
             const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://api.mievoh.io.vn/api';
@@ -261,7 +301,7 @@ export default function Header({
         return image;
     };
 
-    const getComplexLogo = (complex: any) => {
+    const getComplexLogo = (complex: CinemaComplex) => {
         const system = complex.CinemaSystem;
         if (!system) return "🍿";
         let logo = system.logo || "🍿";
@@ -494,26 +534,25 @@ export default function Header({
 
                     {/* Auth Actions (desktop only) */}
                     <div className="hidden items-center gap-2.5 lg:gap-4 md:flex">
-                        {/* Language Toggle Button */}
                         <button
                             onClick={() => setLanguage(language === "vi" ? "en" : "vi")}
-                            className="flex items-center justify-center gap-1.5 h-9 px-3 rounded-full bg-[#F1F3F5] dark:bg-zinc-800 hover:bg-[#E9ECEF] dark:hover:bg-zinc-700 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer outline-none border-none text-xs font-extrabold text-violet-800 dark:text-violet-400 shrink-0 select-none"
+                            className="flex items-center justify-center gap-2 h-10 px-4 rounded-full bg-transparent hover:bg-slate-100 dark:hover:bg-zinc-800 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer outline-none border-none text-sm font-extrabold text-violet-800 dark:text-violet-400 shrink-0 select-none"
                             aria-label="Toggle language"
                         >
-                            <Globe className="h-4 w-4" />
+                            <Globe className="h-5 w-5" />
                             <span>{language.toUpperCase()}</span>
                         </button>
 
                         {/* Light/Dark Toggle Icon Button */}
                         <button
                             onClick={toggleTheme}
-                            className="flex items-center justify-center h-9 w-9 rounded-full bg-[#F1F3F5] dark:bg-zinc-800 hover:bg-[#E9ECEF] dark:hover:bg-zinc-700 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer outline-none border-none shrink-0"
+                            className="flex items-center justify-center h-10 w-10 rounded-full bg-transparent hover:bg-slate-100 dark:hover:bg-zinc-800 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer outline-none border-none shrink-0"
                             aria-label="Toggle theme"
                         >
                             {theme === "light" ? (
-                                <Moon className="h-4.5 w-4.5 text-[#343A40] fill-[#343A40]" />
+                                <Moon className="h-5 w-5 text-[#343A40] fill-[#343A40]" />
                             ) : (
-                                <Sun className="h-4.5 w-4.5 text-amber-500 fill-amber-500" />
+                                <Sun className="h-5 w-5 text-amber-500 fill-amber-500" />
                             )}
                         </button>
 
@@ -521,71 +560,123 @@ export default function Header({
                         {isAuthenticated && (
                             <div className="relative animate__animated animate__fadeIn animate__faster" ref={notiRef}>
                                 <button
-                                    onClick={() => setNotiMenuOpen((v) => !v)}
-                                    className="flex items-center justify-center h-9 w-9 rounded-full bg-[#F1F3F5] dark:bg-zinc-800 hover:bg-[#E9ECEF] dark:hover:bg-zinc-700 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer outline-none border-none shrink-0 relative"
+                                    onClick={() => {
+                                        setNotiMenuOpen((v) => !v);
+                                        if (notiMenuOpen) setShowAllNotifications(false);
+                                    }}
+                                    className="flex items-center justify-center h-10 w-10 rounded-full bg-transparent hover:bg-slate-100 dark:hover:bg-zinc-800 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer outline-none border-none shrink-0 relative"
                                     aria-label="Notifications"
                                 >
-                                    <Bell className="h-4.5 w-4.5 text-violet-800 dark:text-violet-400" />
-                                    {notifications.some(n => !n.isRead) && (
-                                        <span className="absolute top-1 right-1 flex h-2 w-2">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                    <Bell className="h-5 w-5 text-violet-800 dark:text-violet-400" />
+                                    {unreadCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-violet-600 px-1 text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-zinc-900 animate__animated animate__bounceIn">
+                                            {unreadCount > 99 ? "99+" : unreadCount}
                                         </span>
                                     )}
                                 </button>
                                 {notiMenuOpen && (
-                                    <div className="absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl border border-violet-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-3 shadow-2xl z-50 animate__animated animate__fadeIn animate__faster">
-                                        <div className="flex items-center justify-between px-2 pb-2 border-b border-violet-50/60 dark:border-zinc-800 mb-2">
-                                            <span className="text-sm font-bold text-gray-800 dark:text-zinc-200">
+                                    <div className="absolute right-0 mt-3 w-80 sm:w-96 rounded-3xl border border-violet-100/60 dark:border-zinc-800/80 bg-white dark:bg-zinc-900 p-4 shadow-[0_12px_40px_rgba(124,58,237,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.6)] z-50 animate__animated animate__fadeIn animate__faster">
+                                        <div className="flex items-center justify-between px-1 pb-3 border-b border-violet-50/80 dark:border-zinc-800/80 mb-3">
+                                            <span className="text-[19px] sm:text-[21px] font-extrabold text-gray-900 dark:text-zinc-100 flex items-center gap-1.5">
                                                 {t("notifications")}
                                             </span>
-                                            {notifications.some(n => !n.isRead) && (
+                                            {unreadCount > 0 && (
                                                 <button
-                                                    onClick={() => {
-                                                        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+                                                    onClick={async () => {
+                                                        try {
+                                                            setNotifications(prev => prev.map(item => ({ ...item, isRead: true })));
+                                                            await markAllAsReadApi();
+                                                            if (user?.username) {
+                                                                emitMarkAllAsRead(user.username);
+                                                            }
+                                                        } catch (e) {
+                                                            console.error("Failed to mark all as read:", e);
+                                                        }
                                                     }}
-                                                    className="text-xs font-bold text-violet-600 dark:text-violet-400 hover:underline cursor-pointer border-none bg-transparent outline-none"
+                                                    className="text-[14px] sm:text-[15px] font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors duration-250 cursor-pointer border-none bg-transparent outline-none select-none hover:underline"
                                                 >
                                                     {language === "vi" ? "Đánh dấu đã đọc" : "Mark all as read"}
                                                 </button>
                                             )}
                                         </div>
-                                        <div className="flex flex-col gap-1.5 max-h-72 overflow-y-auto custom-search-scrollbar">
+                                        <div className="flex flex-col gap-2.5 max-h-[45rem] overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-violet-100/80 dark:[&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-violet-200">
                                             {notifications.length === 0 ? (
-                                                <div className="text-center py-6 text-sm text-gray-400 dark:text-zinc-500 font-medium">
+                                                <div className="text-center py-8 text-sm text-gray-400 dark:text-zinc-500 font-medium">
                                                     {t("no_notifications")}
                                                 </div>
                                             ) : (
-                                                notifications.map(n => (
+                                                (showAllNotifications ? notifications : notifications.slice(0, 5)).map(n => (
                                                     <div
                                                         key={n.id}
-                                                        onClick={() => {
-                                                            setNotifications(prev => prev.map(item => item.id === n.id ? { ...item, isRead: true } : item));
+                                                        onClick={async () => {
+                                                            try {
+                                                                setNotifications(prev => prev.map(item => item.id === n.id ? { ...item, isRead: true } : item));
+                                                                await markAsReadApi(n.id);
+                                                                if (user?.username) {
+                                                                    emitMarkAsRead(n.id, user.username);
+                                                                }
+                                                                setNotiMenuOpen(false);
+                                                                if (n.link) {
+                                                                    navigate(n.link);
+                                                                }
+                                                            } catch (e) {
+                                                                console.error("Failed to mark notification as read:", e);
+                                                            }
                                                         }}
-                                                        className={`flex flex-col gap-1 p-2.5 rounded-xl cursor-pointer transition-colors text-left ${
+                                                        className={`flex gap-3.5 p-3.5 rounded-2xl cursor-pointer transition-all duration-300 text-left border ${
                                                             n.isRead 
-                                                                ? "hover:bg-slate-50 dark:hover:bg-zinc-800/40" 
-                                                                : "bg-violet-50/40 dark:bg-violet-950/20 hover:bg-violet-50/60 dark:hover:bg-violet-955/30"
+                                                                ? "bg-transparent hover:bg-slate-50/60 dark:hover:bg-zinc-800/30 border-transparent hover:border-slate-100/80 dark:hover:border-zinc-800/50" 
+                                                                : "bg-violet-50/35 dark:bg-violet-950/10 hover:bg-violet-50/55 dark:hover:bg-violet-955/20 border-violet-100/30 dark:border-violet-900/10 hover:border-violet-100 dark:hover:border-violet-900/20 shadow-[0_2px_8px_rgba(124,58,237,0.02)]"
                                                         }`}
                                                     >
-                                                        <div className="flex items-start justify-between gap-2">
-                                                            <span className={`text-xs font-bold ${n.isRead ? "text-gray-700 dark:text-zinc-300" : "text-violet-900 dark:text-violet-300"}`}>
-                                                                {language === "vi" ? n.title : n.titleEn}
-                                                            </span>
+                                                        {/* Left Icon with unread indicator dot */}
+                                                        <div className="relative shrink-0 self-start mt-0.5">
+                                                            <div className={`flex items-center justify-center h-10 w-10 rounded-2xl transition-colors duration-300 ${
+                                                                n.isRead 
+                                                                    ? "bg-slate-100/80 dark:bg-zinc-800/80 text-slate-400 dark:text-zinc-500" 
+                                                                    : "bg-violet-100/80 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400"
+                                                            }`}>
+                                                                <Bell className="h-5 w-5" />
+                                                            </div>
                                                             {!n.isRead && (
-                                                                <span className="h-1.5 w-1.5 rounded-full bg-violet-600 dark:bg-violet-400 shrink-0 mt-1" />
+                                                                <span className="absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-violet-600 dark:bg-violet-400 ring-2 ring-white dark:ring-zinc-900 shrink-0" />
                                                             )}
                                                         </div>
-                                                        <p className="text-[11px] text-gray-500 dark:text-zinc-400 leading-relaxed font-medium">
-                                                            {language === "vi" ? n.description : n.descriptionEn}
-                                                        </p>
-                                                        <span className="text-[9px] text-gray-400 dark:text-zinc-500 font-semibold self-end">
-                                                            {language === "vi" ? n.time : n.timeEn}
-                                                        </span>
+
+                                                        {/* Right Content */}
+                                                        <div className="flex-1 min-w-0 flex flex-col gap-1">
+                                                            <span className={`text-[13px] leading-snug font-bold ${
+                                                                n.isRead 
+                                                                    ? "text-gray-700 dark:text-zinc-300" 
+                                                                    : "text-gray-900 dark:text-zinc-100"
+                                                            }`}>
+                                                                {language === "vi" ? n.title : n.titleEn}
+                                                            </span>
+                                                            <p className="text-[11px] text-gray-500 dark:text-zinc-400 leading-normal font-medium break-words">
+                                                                {language === "vi" ? n.description : n.descriptionEn}
+                                                            </p>
+                                                            <span className="text-[9px] text-gray-400 dark:text-zinc-500 font-semibold mt-1 self-start">
+                                                                {language === "vi" ? n.time : n.timeEn}
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 ))
                                             )}
                                         </div>
+                                        {notifications.length > 5 && (
+                                            <div className="flex justify-center mt-3 pt-3 border-t border-violet-50/60 dark:border-zinc-800/60">
+                                                <Button 
+                                                    variant="secondary" 
+                                                    size="sm" 
+                                                    onClick={() => setShowAllNotifications(prev => !prev)}
+                                                    className="w-full text-[13px] py-2 font-bold"
+                                                >
+                                                    {showAllNotifications 
+                                                        ? (language === "vi" ? "Thu gọn" : "Show less") 
+                                                        : (language === "vi" ? "Xem tất cả" : "View all")}
+                                                </Button>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -595,12 +686,12 @@ export default function Header({
                             <div className="relative" ref={menuRef}>
                                 <button
                                     onClick={() => setUserMenuOpen((v) => !v)}
-                                    className="flex items-center gap-2 px-3 py-1.5 text-sm font-extrabold bg-white dark:bg-zinc-800 border border-violet-200/80 dark:border-zinc-700 hover:border-violet-300 text-violet-800 dark:!text-violet-400 hover:bg-violet-50/50 dark:hover:bg-zinc-700/50 shadow-sm rounded-full transition-all duration-300 hover:scale-[1.04] active:scale-[0.96] select-none cursor-pointer outline-none shrink-0 w-fit min-w-fit"
+                                    className="flex items-center gap-2.5 h-10 px-4 text-sm sm:text-[15px] font-extrabold bg-white dark:bg-zinc-800 border border-violet-200/85 dark:border-zinc-700 hover:border-violet-300 text-violet-800 dark:!text-violet-400 hover:bg-violet-50/50 dark:hover:bg-zinc-700/50 shadow-sm rounded-full transition-all duration-300 hover:scale-[1.04] active:scale-[0.96] select-none cursor-pointer outline-none shrink-0 w-fit min-w-fit"
                                 >
                                     <img
                                         src={user?.avatar || "/images/avatar.jpg"}
                                         alt={user?.name || "avatar"}
-                                        className="h-6 w-6 rounded-full object-cover border border-violet-100 dark:border-zinc-700 shrink-0"
+                                        className="h-7.5 w-7.5 rounded-full object-cover border border-violet-100 dark:border-zinc-700 shrink-0"
                                     />
                                     <span className="font-extrabold text-violet-800 dark:!text-violet-400 whitespace-nowrap">{user?.name || t("profile")}</span>
                                 </button>
@@ -792,8 +883,8 @@ export default function Header({
                                                   <Bell className="h-4 w-4 text-violet-500" />
                                                   <span>{t("notifications")}</span>
                                               </div>
-                                              {notifications.some(n => !n.isRead) && (
-                                                  <span className="flex h-2 w-2 rounded-full bg-red-500"></span>
+                                              {unreadCount > 0 && (
+                                                  <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-violet-600 px-1 text-[10px] font-bold text-white shadow-sm">{unreadCount > 99 ? "99+" : unreadCount}</span>
                                               )}
                                           </button>
                                           {notiMenuOpen && (
@@ -806,8 +897,16 @@ export default function Header({
                                                       notifications.map(n => (
                                                           <div
                                                               key={n.id}
-                                                              onClick={() => {
-                                                                  setNotifications(prev => prev.map(item => item.id === n.id ? { ...item, isRead: true } : item));
+                                                              onClick={async () => {
+                                                                  try {
+                                                                      setNotifications(prev => prev.map(item => item.id === n.id ? { ...item, isRead: true } : item));
+                                                                      await markAsReadApi(n.id);
+                                                                      if (user?.username) {
+                                                                          emitMarkAsRead(n.id, user.username);
+                                                                      }
+                                                                  } catch (e) {
+                                                                      console.error("Failed to mark notification as read:", e);
+                                                                  }
                                                               }}
                                                               className={`flex flex-col gap-1 p-2 rounded-lg cursor-pointer transition-colors text-left ${
                                                                   n.isRead 

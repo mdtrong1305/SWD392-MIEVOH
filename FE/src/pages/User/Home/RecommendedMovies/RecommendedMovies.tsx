@@ -5,11 +5,13 @@ import { useLanguage } from "../../../../contextAPI/LanguageContext.tsx";
 import { useTheme } from "../../../../contextAPI/ThemeContext.tsx";
 import { getRecommendedMoviesApi, type RecommendedMovie } from "../../../../axios/profile.tsx";
 import MovieCard from "../../../../components/MovieCard/MovieCard.tsx";
+import { useLocation } from "react-router-dom";
 import ScrollReveal from "../../../../components/ScrollReveal/ScrollReveal.tsx";
 
 export default function RecommendedMovies() {
     const { t, language } = useLanguage();
     const { theme } = useTheme();
+    const location = useLocation();
     const [mounted, setMounted] = useState(false);
     const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1200);
     const [movies, setMovies] = useState<any[]>([]);
@@ -82,6 +84,18 @@ export default function RecommendedMovies() {
         }
     }, [language]);
 
+    useEffect(() => {
+        if (!loading && movies.length > 0 && location.hash === "#recommended-movies") {
+            const timer = setTimeout(() => {
+                const el = document.getElementById("recommended-movies");
+                if (el) {
+                    el.scrollIntoView({ behavior: "smooth", block: "center" });
+                }
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [loading, movies, location.hash]);
+
     if (loading) {
         return null; // Don't show loading spinner on home page for recommended section, keep it seamless
     }
@@ -107,7 +121,7 @@ export default function RecommendedMovies() {
 
     return (
         <ScrollReveal animationClass="animate__fadeInUp">
-            <section className={`mx-auto max-w-[85%] px-4 py-8 sm:py-10 font-sans transition-colors duration-200 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            <section id="recommended-movies" className={`mx-auto max-w-[85%] px-4 py-8 sm:py-10 font-sans transition-colors duration-200 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 {/* Header section with heading */}
                 <div className="mb-8">
                     <h2 className="text-2xl font-extrabold tracking-tight">

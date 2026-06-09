@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { verifyVNPayReturnApi, triggerVNPayIPNApi } from "../../../axios/booking.tsx";
-import { toast } from "../../../components/Toast/Toast.tsx";
 import { useLanguage } from "../../../contextAPI/LanguageContext.tsx";
 import { XCircle, Loader2, CheckCircle2 } from "lucide-react";
 
@@ -92,7 +91,6 @@ export default function VNPayReturn() {
 
                         setBookingData(paidBooking);
                         setStatus("success");
-                        toast.success(t("toast_payment_success"));
                     } else {
                         setStatus("failed");
                         setErrorMessage(res.data?.message || (language === "vi" ? "Xác minh thanh toán thất bại." : "Payment verification failed."));
