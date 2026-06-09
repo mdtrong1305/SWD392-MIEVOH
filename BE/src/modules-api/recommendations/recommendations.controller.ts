@@ -76,7 +76,7 @@ export class RecommendationsController {
   })
   @ApiBody({ type: DeleteCronDto })
   deleteCron(@Body() dto: DeleteCronDto) {
-    return this.recommendationsService.deleteCron(dto.type, dto.repeatKey);
+    return this.recommendationsService.deleteCron(dto.repeatKey);
   }
 
   @Get('crons')

@@ -1,4 +1,4 @@
-import { Injectable, Inject, OnModuleInit } from '@nestjs/common';
+import { Injectable, Inject, OnModuleInit, NotFoundException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { PrismaService } from '../../modules-system/prisma/prisma.service';
 import { ConfigCronDto, CronJobType } from './dto/recommendations.dto';
@@ -106,10 +106,18 @@ export class RecommendationsService implements OnModuleInit {
     };
   }
 
-  async deleteCron(type: CronJobType, repeatKey: string) {
-    const queue =
-      type === CronJobType.EMAIL ? this.emailCronQueue : this.analysisCronQueue;
-    await queue.removeRepeatableByKey(repeatKey);
+  async deleteCron(repeatKey: string) {
+    // Không cần truyền type, hệ thống tự động tìm và xóa ở cả 2 hàng đợi
+    // Vì repeatKey là Unique nên chỉ có 1 hàng đợi xóa thành công
+    const [emailRemoved, analysisRemoved] = await Promise.all([
+      this.emailCronQueue.removeRepeatableByKey(repeatKey).catch(() => false),
+      this.analysisCronQueue.removeRepeatableByKey(repeatKey).catch(() => false)
+    ]);
+
+    if (!emailRemoved && !analysisRemoved) {
+      throw new NotFoundException('Không tìm thấy Cron Job với Key này hoặc đã bị xóa trước đó.');
+    }
+
     return { message: 'Đã xóa Cron Job thành công' };
   }
 

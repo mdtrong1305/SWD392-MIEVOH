@@ -44,11 +44,6 @@ export class ConfigCronDto {
 }
 
 export class DeleteCronDto {
-  @ApiProperty({ example: CronJobType.EMAIL, enum: CronJobType })
-  @IsEnum(CronJobType)
-  @IsNotEmpty()
-  type!: CronJobType;
-
   @ApiProperty({ description: 'Khóa (key) của cronjob cần xóa (Lấy từ API getListCronJobs)' })
   @IsString()
   @IsNotEmpty()
