@@ -78,6 +78,7 @@ export class BookingsService {
   ) {
     const showtime = await this.prisma.showtime.findUnique({
       where: { showtimeId: data.showtimeId },
+      include: { Cinema: true },
     });
     if (!showtime) throw new NotFoundException('Không tìm thấy suất chiếu');
 
@@ -138,6 +139,55 @@ export class BookingsService {
       );
     }
 
+    let discountAmount = 0;
+    let voucherId: string | null = null;
+
+    if (data.voucherCode) {
+      const code = data.voucherCode.toUpperCase().replace(/\s+/g, '');
+      const voucher = await this.prisma.voucher.findUnique({ where: { code } });
+      
+      if (!voucher) throw new NotFoundException('Mã giảm giá không tồn tại!');
+      if (!voucher.isActive) throw new BadRequestException('Mã giảm giá đã bị khóa!');
+
+      const now = new Date();
+      if (now < voucher.startDate) throw new BadRequestException('Mã giảm giá chưa đến ngày sử dụng!');
+      if (now > voucher.endDate) throw new BadRequestException('Mã giảm giá đã hết hạn!');
+
+      if (voucher.cinemaComplexId && voucher.cinemaComplexId !== showtime.Cinema?.cinemaComplexId) {
+        throw new BadRequestException('Mã giảm giá không áp dụng cho cụm rạp này!');
+      }
+
+      if (voucher.usageLimit && voucher.usedCount >= voucher.usageLimit) {
+        throw new BadRequestException('Mã giảm giá đã hết lượt sử dụng!');
+      }
+
+      const alreadyUsed = await this.prisma.voucherUsage.findFirst({
+        where: { voucherId: voucher.voucherId, username },
+      });
+      if (alreadyUsed) {
+        throw new BadRequestException('Bạn đã sử dụng mã giảm giá này rồi!');
+      }
+
+      if (voucher.minPurchase && totalPrice < voucher.minPurchase) {
+        throw new BadRequestException(`Đơn hàng tối thiểu phải từ ${voucher.minPurchase.toLocaleString()}đ!`);
+      }
+
+      if (voucher.discountType === 'FIXED') {
+        discountAmount = voucher.discountValue;
+      } else if (voucher.discountType === 'PERCENTAGE') {
+        discountAmount = Math.floor((totalPrice * voucher.discountValue) / 100);
+        if (voucher.maxDiscount && discountAmount > voucher.maxDiscount) {
+          discountAmount = voucher.maxDiscount;
+        }
+      }
+
+      if (discountAmount > totalPrice) {
+        discountAmount = totalPrice;
+      }
+      
+      voucherId = voucher.voucherId;
+    }
+
     // khởi tạo hóa đơn vào cơ sở dữ liệu với trạng thái chờ thanh toán
     const tempTicketCode = `PENDING-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
     const booking = await this.prisma.booking.create({
@@ -147,6 +197,8 @@ export class BookingsService {
         totalPrice,
         paymentStatus: 'Pending',
         ticketCode: tempTicketCode,
+        voucherId,
+        discountAmount,
         BookingDetails: {
           create: data.seats.map((seatId) => ({
             seatId,

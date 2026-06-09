@@ -48,6 +48,7 @@ model User {
   Reviews         Review[]
   Recommendations UserRecommendation[]
   Notifications   Notification[]
+  VoucherUsages   VoucherUsage[]
 }
 
 model Notification {
@@ -73,6 +74,7 @@ model Broadcast {
   title       String
   message     String
   link        String?
+  createdBy   String? // Lưu lại người đã tạo Broadcast này (Username)
   createdAt   DateTime @default(now())
 
   Notifications Notification[]
@@ -246,10 +248,13 @@ model Booking {
   showtimeId  String   @db.ObjectId
   bookingDate DateTime @default(now())
 
-  totalPrice    Int     @default(0)
-  paymentStatus String  @default("Pending") // Pending, Success, Failed
-  paymentMethod String? // VNPay, MoMo, Cash
-  ticketCode    String? @unique // Mã vé quét QR
+  totalPrice     Int     @default(0)
+  paymentStatus  String  @default("Pending") // Pending, Success, Failed
+  paymentMethod  String? // VNPay, MoMo, Cash
+  ticketCode     String? @unique // Mã vé quét QR
+
+  voucherId      String? @db.ObjectId
+  discountAmount Int     @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -310,4 +315,50 @@ model BookingFood {
 
   @@index([bookingId])
   @@index([foodId])
+}
+
+// ==========================================
+// 6. MÃ GIẢM GIÁ (VOUCHERS)
+// ==========================================
+
+model Voucher {
+  voucherId       String   @id @default(auto()) @map("_id") @db.ObjectId
+  code            String   @unique // Mã giảm giá, tự động viết hoa toàn bộ
+  discountType    String   // "PERCENTAGE" hoặc "FIXED"
+  discountValue   Int      // Nếu PERCENTAGE: 1-100, Nếu FIXED: Số tiền mặt
+  maxDiscount     Int?     // Số tiền giảm tối đa (Áp dụng cho PERCENTAGE)
+  minPurchase     Int?     // Đơn hàng tối thiểu để được giảm
+  
+  startDate       DateTime
+  endDate         DateTime
+  
+  usageLimit      Int?     // Tổng số lượt dùng mã này
+  usedCount       Int      @default(0)
+  
+  isActive        Boolean  @default(true)
+  
+  cinemaComplexId String?  @db.ObjectId // Nếu null -> Dùng toàn quốc, Nếu có -> Chỉ dùng ở rạp này
+  createdBy       String   // Ai là người tạo mã này (Username)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  VoucherUsages   VoucherUsage[]
+  
+  @@index([cinemaComplexId])
+}
+
+model VoucherUsage {
+  usageId   String   @id @default(auto()) @map("_id") @db.ObjectId
+  voucherId String   @db.ObjectId
+  username  String
+  bookingId String   @unique @db.ObjectId // 1 đơn hàng chỉ xài 1 voucher
+  
+  createdAt DateTime @default(now())
+
+  Voucher   Voucher  @relation(fields: [voucherId], references: [voucherId], onDelete: Cascade)
+  User      User     @relation(fields: [username], references: [username], onDelete: Cascade)
+  
+  @@index([voucherId])
+  @@index([username])
 }

@@ -6,6 +6,7 @@ import { TokenModule } from '../../modules-system/token/token.module';
 @Module({
   imports: [TokenModule],
   controllers: [NotificationsController],
-  providers: [NotificationsService]
+  providers: [NotificationsService],
+  exports: [NotificationsService]
 })
 export class NotificationsModule {}

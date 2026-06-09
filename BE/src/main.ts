@@ -39,22 +39,23 @@ async function bootstrap() {
     .addServer('https://api.mievoh.io.vn', 'Production Server')
     .addServer('http://localhost:3069', 'Local Environment')
     .addTag('Authentication', 'Xác thực và đăng ký')
+    .addTag('Users', 'Quản lý người dùng (Profile & Admin)')
     .addTag('Cinema Systems', 'Quản lý hệ thống rạp')
     .addTag('Cinema Complexes', 'Quản lý cụm rạp')
     .addTag('Cinemas', 'Quản lý rạp')
     .addTag('Seats', 'Quản lý ghế ngồi')
     .addTag('Movies', 'Quản lý phim')
     .addTag('Showtimes', 'Quản lý lịch chiếu')
-    .addTag('Banners', 'Quản lý banner')
     .addTag('Foods', 'Quản lý đồ ăn')
-    .addTag('Reviews', 'Quản lý đánh giá phim')
+    .addTag('Vouchers', 'Quản lý mã giảm giá')
     .addTag('Bookings', 'Quản lý đặt vé')
-    .addTag('Users', 'Quản lý người dùng (Profile & Admin)')
+    .addTag('Reviews', 'Quản lý đánh giá phim')
+    .addTag('Banners', 'Quản lý banner')
+    .addTag('Notifications', 'Quản lý thông báo')
     .addTag(
       'Recommendations',
       'Quản lý hệ thống Recommend System & Email Maketing',
     )
-    .addTag('Notifications', 'Quản lý thông báo')
     .addBearerAuth(
       {
         type: 'http',

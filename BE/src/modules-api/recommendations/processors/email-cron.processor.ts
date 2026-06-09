@@ -1,6 +1,6 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../../modules-system/prisma/prisma.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { SocketService } from '../../../modules-system/socket/socket.service';
@@ -8,6 +8,8 @@ import { SocketService } from '../../../modules-system/socket/socket.service';
 @Processor('email_cron_queue')
 @Injectable()
 export class RecommendationsProcessor extends WorkerHost {
+  private readonly logger = new Logger(RecommendationsProcessor.name);
+
   constructor(
     private readonly prisma: PrismaService,
     @Inject('EMAIL_SERVICE') private readonly emailClient: ClientProxy,
@@ -18,7 +20,7 @@ export class RecommendationsProcessor extends WorkerHost {
 
   async process(job: Job<any, any, string>): Promise<any> {
     const triggerType = job.data?.manual ? '[THỦ CÔNG]' : '[TỰ ĐỘNG]';
-    console.log(
+    this.logger.log(
       `[BullMQ] ${triggerType} [${job.name}] Bắt đầu quét database để gửi Email Marketing...`,
     );
 
@@ -26,13 +28,13 @@ export class RecommendationsProcessor extends WorkerHost {
       where: { isEmailSent: false },
       include: {
         User: { select: { email: true, fullName: true } },
-        Movie: { select: { title_vi: true, imageUrl: true } },
+        Movie: { select: { movieId: true, title_vi: true, imageUrl: true } },
       },
       take: 100, // Test nhẹ 100 record mỗi đợt
     });
 
     if (pendingRecs.length === 0) {
-      console.log('[BullMQ] Không có email nào cần gửi.');
+      this.logger.log('[BullMQ] Không có email nào cần gửi.');
       return;
     }
 
@@ -50,6 +52,7 @@ export class RecommendationsProcessor extends WorkerHost {
 
       // Gửi chung cả 3 phim vào 1 Email theo yêu cầu test của Admin
       groupedData[email].movies.push({
+        movieId: rec.movieId,
         name: rec.Movie?.title_vi || 'Phim hay',
         imageUrl:
           rec.Movie?.imageUrl ||
@@ -67,8 +70,9 @@ export class RecommendationsProcessor extends WorkerHost {
         movies: payload.movies,
       });
 
-      const title = 'Phim Hợp Gu';
-      const message = 'Chúng tôi vừa tìm thấy 3 bộ phim cực kỳ hợp gu của bạn!';
+      const title = 'Ting ting! Gợi ý phim nóng hổi!';
+      const message =
+        'MieVoh vừa "bói" ra 3 siêu phẩm cực kỳ hợp gu của bạn. Nhấn vào xem ngay đi nàooo! 🍿🔥';
       const link = '/'; // redirect về home
 
       notificationsToInsert.push({
@@ -99,7 +103,7 @@ export class RecommendationsProcessor extends WorkerHost {
       });
     }
 
-    console.log(
+    this.logger.log(
       `[BullMQ] [${job.name}] Đã đẩy ${Object.keys(groupedData).length} emails vào RabbitMQ.`,
     );
   }

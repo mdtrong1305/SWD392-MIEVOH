@@ -9,18 +9,16 @@ export class EmailController {
   @EventPattern('SEND_CAMPAIGN_EMAIL')
   async handleSendCampaignEmail(
     @Payload() data: { email: string; movies: any[] },
-    @Ctx() context: RmqContext
+    @Ctx() context: RmqContext,
   ) {
     const channel = context.getChannelRef();
     const originalMsg = context.getMessage();
 
     try {
-      console.log(`[+] Nhận được yêu cầu gửi Email cho: ${data.email}`);
       await this.emailService.sendRecommendationEmail(data);
       // Xác nhận tin nhắn đã xử lý thành công
       channel.ack(originalMsg);
     } catch (error) {
-      console.error(`[-] Lỗi khi xử lý gửi Email cho: ${data.email}`, error);
       // Báo lỗi để RabbitMQ xử lý lại (hoặc đẩy vào Dead Letter Queue)
       channel.nack(originalMsg, false, false);
     }

@@ -77,8 +77,11 @@ export class NotificationsController {
   @UseGuards(RoleGuard)
   @Roles('admin')
   @ApiOperation({ summary: 'Gửi thông báo toàn hệ thống (ADMIN)' })
-  broadcastNotification(@Body() dto: BroadcastNotificationDto) {
-    return this.notificationsService.broadcastNotification(dto);
+  broadcastNotification(
+    @Body() dto: BroadcastNotificationDto,
+    @User() user: PrismaUser,
+  ) {
+    return this.notificationsService.broadcastNotification(dto, user.username);
   }
 
   // =====================================
