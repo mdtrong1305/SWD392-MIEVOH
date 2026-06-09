@@ -50,7 +50,11 @@ async function bootstrap() {
     .addTag('Reviews', 'Quản lý đánh giá phim')
     .addTag('Bookings', 'Quản lý đặt vé')
     .addTag('Users', 'Quản lý người dùng (Profile & Admin)')
-    .addTag('Recommendations', 'Quản lý gợi ý phim')
+    .addTag(
+      'Recommendations',
+      'Quản lý hệ thống Recommend System & Email Maketing',
+    )
+    .addTag('Notifications', 'Quản lý thông báo')
     .addBearerAuth(
       {
         type: 'http',

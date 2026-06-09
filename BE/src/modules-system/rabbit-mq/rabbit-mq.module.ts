@@ -61,9 +61,9 @@ export class RabbitMQModule implements OnModuleInit {
     try {
       await this.recommendationClient.connect();
       await this.emailClient.connect();
-      console.log('Connected to RabbitMQ');
+      console.log('[RABBITMQ] Connected to RabbitMQ');
     } catch (error) {
-      console.error('Failed to connect to RabbitMQ:', error);
+      console.error('[RABBITMQ] Failed to connect to RabbitMQ:', error);
     }
   }
 }

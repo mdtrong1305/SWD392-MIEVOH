@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../modules-system/prisma/prisma.service';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { SocketService } from '../../modules-system/socket/socket.service';
 import * as crypto from 'crypto';
 import * as qs from 'qs';
 import moment from 'moment';
@@ -22,6 +23,7 @@ export class PaymentsService {
   constructor(
     private readonly prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly socketService: SocketService,
   ) {}
 
   async createPaymentUrl(bookingId: string, ipAddr: string) {
@@ -183,6 +185,23 @@ export class PaymentsService {
             `hold:${booking.showtimeId}:${detail.seatId}`,
           );
         }
+
+        // Lưu thông báo vào DB
+        const notif = await this.prisma.notification.create({
+          data: {
+            username: booking.username,
+            title: 'Thanh toán thành công',
+            message: `Hóa đơn mua vé xem phim của bạn đã được thanh toán. Mã vé: ${ticketCode}`,
+            link: `/profile?tab=tickets`, // redirect về trang lịch sử mua vé
+          },
+        });
+
+        // Bắn Socket Realtime cho user ngay tức khắc
+        this.socketService.emitNotification(booking.username, {
+          title: notif.title,
+          message: notif.message,
+          link: notif.link,
+        });
 
         return { RspCode: '00', Message: 'Thành công' };
       } else {

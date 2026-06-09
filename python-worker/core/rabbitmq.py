@@ -24,13 +24,13 @@ class RabbitMQClient:
         self.channel.queue_declare(queue=self.progress_queue, durable=False)
         print("[RabbitMQ] Kết nối thành công!")
 
-    def send_progress(self, progress_percent: int):
+    def send_progress(self, progress_percent: int, user_id: str = "system"):
         if not self.channel:
             return
             
         message = {
             "pattern": "UPDATE_PROGRESS",
-            "data": { "progress": progress_percent }
+            "data": { "progress": progress_percent, "userId": user_id }
         }
         self.channel.basic_publish(
             exchange='',

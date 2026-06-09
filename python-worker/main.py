@@ -25,8 +25,10 @@ class WorkerApp:
             pattern = msg.get("pattern")
             
             if pattern == "TRIGGER_ANALYSIS":
-                print("\n[x] Nhận lệnh TRIGGER_ANALYSIS từ Admin!")
-                self.pandas_service.process_logic()
+                data = msg.get("data", {})
+                user_id = data.get("userId", "system")
+                print(f"\n[x] Nhận lệnh TRIGGER_ANALYSIS từ Admin: {user_id}")
+                self.pandas_service.process_logic(user_id)
                 
         except Exception as e:
             print(f"[-] Lỗi xử lý tin nhắn: {e}")
