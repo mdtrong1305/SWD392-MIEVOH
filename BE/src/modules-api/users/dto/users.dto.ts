@@ -12,17 +12,17 @@ export class CreateStaffDto {
   @ApiProperty({ description: 'Tên đăng nhập', example: 'staff_cgv' })
   @IsNotEmpty({ message: 'Vui lòng nhập tên đăng nhập' })
   @IsString()
-  username: string;
+  username!: string;
 
   @ApiProperty({ description: 'Họ và tên', example: 'Nguyễn Văn A' })
   @IsNotEmpty({ message: 'Vui lòng nhập họ tên' })
   @IsString()
-  fullName: string;
+  fullName!: string;
 
   @ApiProperty({ description: 'Email liên hệ', example: 'staff@cgv.vn' })
   @IsNotEmpty({ message: 'Vui lòng nhập email' })
   @IsEmail({}, { message: 'Email không hợp lệ' })
-  email: string;
+  email!: string;
 
   @ApiProperty({
     description: 'Mật khẩu khởi tạo (tuỳ chọn, mặc định: 123456)',
@@ -40,7 +40,7 @@ export class CreateStaffDto {
   })
   @IsNotEmpty({ message: 'Vui lòng chọn cụm rạp' })
   @IsString()
-  cinemaComplexId: string;
+  cinemaComplexId!: string;
 }
 
 export class UpdateStaffDto {
@@ -49,7 +49,10 @@ export class UpdateStaffDto {
   @IsString()
   fullName?: string;
 
-  @ApiPropertyOptional({ description: 'Email liên hệ', example: 'staff2@cgv.vn' })
+  @ApiPropertyOptional({
+    description: 'Email liên hệ',
+    example: 'staff2@cgv.vn',
+  })
   @IsOptional()
   @IsEmail({}, { message: 'Email không hợp lệ' })
   email?: string;
@@ -81,12 +84,18 @@ export class UpdateProfileDto {
   @IsString()
   phoneNumber?: string;
 
-  @ApiPropertyOptional({ description: 'Ngày sinh (ISO 8601)', example: '1995-10-25T00:00:00Z' })
+  @ApiPropertyOptional({
+    description: 'Ngày sinh (ISO 8601)',
+    example: '1995-10-25T00:00:00Z',
+  })
   @IsOptional()
   @IsString()
   dateOfBirth?: string;
 
-  @ApiPropertyOptional({ description: 'Địa chỉ', example: '123 Đường ABC, Quận 1, TP.HCM' })
+  @ApiPropertyOptional({
+    description: 'Địa chỉ',
+    example: '123 Đường ABC, Quận 1, TP.HCM',
+  })
   @IsOptional()
   @IsString()
   address?: string;
@@ -100,9 +109,4 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   cccd?: string;
-
-  @ApiPropertyOptional({ description: 'Ảnh đại diện (URL)', example: 'https://example.com/avatar.jpg' })
-  @IsOptional()
-  @IsString()
-  avatar?: string;
 }
