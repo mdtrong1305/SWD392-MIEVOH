@@ -53,7 +53,7 @@ export class MoviesController {
     name: 'filters',
     required: false,
     type: String,
-    description: 'Chuỗi JSON bộ lọc (VD: {"title": "Avatar"})',
+    description: 'Chuỗi JSON bộ lọc (VD: {"title_vi": "Avatar"})',
   })
   @ApiResponse({ status: 200, description: 'Lấy danh sách thành công' })
   findNowShowing(@Query() query: any) {
@@ -79,7 +79,7 @@ export class MoviesController {
     name: 'filters',
     required: false,
     type: String,
-    description: 'Chuỗi JSON bộ lọc (VD: {"title": "Avatar"})',
+    description: 'Chuỗi JSON bộ lọc (VD: {"title_vi": "Avatar"})',
   })
   @ApiResponse({ status: 200, description: 'Lấy danh sách thành công' })
   findComingSoon(@Query() query: any) {

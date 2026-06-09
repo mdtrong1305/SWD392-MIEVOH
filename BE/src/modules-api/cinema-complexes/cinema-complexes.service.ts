@@ -88,10 +88,10 @@ export class CinemaComplexesService {
             cinemaSystemId: true,
             name: true,
             logo: true,
-          }
+          },
         },
         Cinemas: true,
-      }
+      },
     });
 
     if (!data) {
