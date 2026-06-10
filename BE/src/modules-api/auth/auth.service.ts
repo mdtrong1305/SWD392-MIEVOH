@@ -152,6 +152,66 @@ export class AuthService {
     };
   }
 
+  async googleLoginMobile(idToken: string) {
+    if (!idToken) {
+      throw new BadRequestException('Vui lòng cung cấp idToken từ Google');
+    }
+
+    try {
+      const { OAuth2Client } = require('google-auth-library');
+      const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+      
+      const ticket = await client.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID, // Chỉ chấp nhận token sinh ra cho app của mình
+      });
+      
+      const payload = ticket.getPayload();
+      if (!payload) {
+        throw new UnauthorizedException('Token Google không hợp lệ');
+      }
+
+      const { sub: googleId, email, name: fullName, picture: avatar } = payload;
+
+      let user = await this.prisma.user.findFirst({
+        where: {
+          OR: [{ googleId }, { email: email! }],
+        },
+      });
+
+      if (!user) {
+        user = await this.prisma.user.create({
+          data: {
+            username: email!,
+            email: email!,
+            fullName: fullName || 'Google User',
+            avatar: avatar || null,
+            googleId,
+            authProvider: 'google',
+            userType: 'user',
+          },
+        });
+      }
+
+      const token = await this.tokenService.createTokens(user);
+
+      return {
+        user: {
+          username: user.username,
+          fullName: user.fullName,
+          email: user.email,
+          avatar: user.avatar,
+          userType: user.userType,
+          cinemaComplexId: user.cinemaComplexId,
+        },
+        token,
+      };
+    } catch (error) {
+      console.error('Google Mobile Login Error:', error);
+      throw new UnauthorizedException('Xác thực Google thất bại');
+    }
+  }
+
   async verifyEmail(dto: VerifyEmailDto) {
     const user = await this.prisma.user.findFirst({
       where: { email: dto.email, authProvider: 'local' },

@@ -49,4 +49,13 @@ export class CreateBookingDto {
   @IsOptional()
   @IsString()
   voucherCode?: string;
+
+  @ApiProperty({
+    description: 'URL chuyển hướng về lại App/Web sau khi thanh toán VNPay',
+    required: false,
+    example: 'myapp://vnpay-return',
+  })
+  @IsOptional()
+  @IsString()
+  returnUrl?: string;
 }

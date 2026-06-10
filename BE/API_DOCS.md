@@ -77,6 +77,17 @@ Callback URL sau khi Google xác thực thành công. Tự động trả về JW
 
 ---
 
+### `POST /auth/google/mobile` [PUBLIC]
+
+Đăng nhập bằng Google dành riêng cho Mobile App. App gửi `idToken` lấy được từ Google SDK, Server xác thực và trả về JWT trực tiếp (Không dùng Redirect).
+
+**Request Body:**
+| Trường | Kiểu | Bắt buộc | Mô tả |
+|--------|------|----------|-------|
+| `idToken` | string | ✅ | ID Token do Google SDK trên Mobile sinh ra |
+
+---
+
 ## 2. 👤 Users – Quản lý người dùng
 
 ### `GET /users/profile` [AUTH]
@@ -623,6 +634,7 @@ Tạo đặt vé mới và sinh URL thanh toán VNPay.
 | `seatIds` | string[] | ✅ | Danh sách ID ghế đã chọn. VD: `["id1", "id2"]` |
 | `foodItems` | object[] | ❌ | Danh sách đồ ăn. Cấu trúc: `[{ foodId, quantity }]` |
 | `voucherCode` | string | ❌ | Mã giảm giá muốn áp dụng |
+| `returnUrl` | string | ❌ | URL chuyển hướng về App/Web sau khi thanh toán VNPay |
 
 **Response trả về URL VNPay để chuyển hướng thanh toán.**
 
@@ -631,6 +643,12 @@ Tạo đặt vé mới và sinh URL thanh toán VNPay.
 ### `GET /bookings/my-history` [AUTH]
 
 Lấy lịch sử đặt vé của người dùng hiện tại. Không có Query Params - trả toàn bộ.
+
+---
+
+### `GET /bookings/:id` [AUTH]
+
+Lấy thông tin chi tiết một hóa đơn đặt vé cụ thể của người dùng hiện tại (kèm theo rạp, phim, ghế ngồi). Thường dùng để polling lấy mã vé sau khi thanh toán VNPay.
 
 ---
 
