@@ -431,7 +431,8 @@ export default function useSelectSeat() {
                 showtimeId: routeShowtimeId,
                 seats: seatIds,
                 foods: foodsInput.length > 0 ? foodsInput : undefined,
-                voucherCode: appliedVoucher?.code || undefined
+                voucherCode: appliedVoucher?.code || undefined,
+                returnUrl: `${window.location.origin}/vnpay-return`
             };
 
             const res = await createBookingApi(payload);
