@@ -6,7 +6,7 @@ export const translations = {
     // Navigation / Header
     nav_movies: "Phim",
     nav_cinemas: "Rạp chiếu",
-    nav_news: "Tin tức",
+    nav_news: "Ưu đãi",
     search_placeholder: "Tìm phim, rạp...",
     login: "Đăng nhập",
     register: "Đăng ký",
@@ -370,7 +370,7 @@ export const translations = {
     // Navigation / Header
     nav_movies: "Movies",
     nav_cinemas: "Cinemas",
-    nav_news: "News",
+    nav_news: "Promotions",
     search_placeholder: "Search movies, cinemas...",
     login: "Login",
     register: "Register",

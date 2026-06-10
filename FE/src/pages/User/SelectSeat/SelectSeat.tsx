@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ArrowLeft, ChevronRight, LayoutGrid, ShoppingBag, CreditCard } from "lucide-react";
 import SeatSelection from "./SeatSelection/SeatSelection.tsx";
 import PopcornSelection from "./PopcornSelection/PopcornSelection.tsx";
@@ -5,11 +6,12 @@ import PaymentMethods from "./PaymentMethods/PaymentMethods.tsx";
 import QRTransferPage from "./QRTransferPage/QRTransferPage.tsx";
 import BookingSidebar from "./BookingSidebar/BookingSidebar.tsx";
 import ConfirmationModal from "./ConfirmationModal/ConfirmationModal.tsx";
+import VoucherModal from "./VoucherModal/VoucherModal.tsx";
 import useSelectSeat from "../../../hooks/useSelectSeat.ts";
 import { useLanguage } from "../../../contextAPI/LanguageContext.tsx";
 
 export default function SelectSeat() {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const {
         activeStep,
         setActiveStep,
@@ -55,16 +57,42 @@ export default function SelectSeat() {
         navigate,
         combos,
         loading,
-        seatsList
+        seatsList,
+        availableVouchers,
+        voucherCodeInput,
+        setVoucherCodeInput,
+        appliedVoucher,
+        voucherError,
+        handleApplyVoucher,
+        handleRemoveVoucher,
+        discountAmount,
+        finalPrice
     } = useSelectSeat();
 
     const movie = movieRaw as any;
+
+    const [showVoucherModal, setShowVoucherModal] = useState(false);
+    const [isVoucherClosing, setIsVoucherClosing] = useState(false);
+
+    const openVoucherModal = () => {
+        setShowVoucherModal(true);
+    };
+
+    const closeVoucherModal = () => {
+        setIsVoucherClosing(true);
+        setTimeout(() => {
+            setShowVoucherModal(false);
+            setIsVoucherClosing(false);
+        }, 250);
+    };
 
     if (loading) {
         return (
             <div className="w-full min-h-screen bg-[#EFEBF4] dark:bg-zinc-950 flex flex-col items-center justify-center">
                 <div className="w-12 h-12 border-4 border-[#8E7EFE] border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-[#8E7EFE] dark:text-[#a599ff] font-black mt-4 text-base tracking-wide animate-pulse">Loading booking details...</p>
+                <p className="text-[#8E7EFE] dark:text-[#a599ff] font-black mt-4 text-base tracking-wide animate-pulse">
+                    {language === "vi" ? "Đang tải thông tin đặt vé..." : "Loading booking details..."}
+                </p>
             </div>
         );
     }
@@ -201,6 +229,15 @@ export default function SelectSeat() {
                             setActiveStep={setActiveStep}
                             isBooking={isBooking}
                             handleCheckout={handleCheckout}
+                            voucherCodeInput={voucherCodeInput}
+                            setVoucherCodeInput={setVoucherCodeInput}
+                            appliedVoucher={appliedVoucher}
+                            voucherError={voucherError}
+                            handleApplyVoucher={handleApplyVoucher}
+                            handleRemoveVoucher={handleRemoveVoucher}
+                            discountAmount={discountAmount}
+                            finalPrice={finalPrice}
+                            openVoucherModal={openVoucherModal}
                         />
                     </div>
                 )}
@@ -224,9 +261,19 @@ export default function SelectSeat() {
                 guestPhone={guestPhone}
                 guestEmail={guestEmail}
                 paymentMethod={paymentMethod}
-                totalPrice={totalPrice}
+                totalPrice={appliedVoucher ? finalPrice : totalPrice}
                 formatPrice={formatPrice}
                 executeCheckout={executeCheckout}
+            />
+
+            <VoucherModal
+                showModal={showVoucherModal}
+                isClosing={isVoucherClosing}
+                closeModal={closeVoucherModal}
+                availableVouchers={availableVouchers}
+                currentTotalPrice={totalPrice}
+                onApplyVoucher={handleApplyVoucher}
+                formatPrice={formatPrice}
             />
         </div>
     );

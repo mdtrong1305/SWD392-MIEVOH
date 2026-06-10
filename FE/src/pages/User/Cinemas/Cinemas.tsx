@@ -188,20 +188,22 @@ export default function CinemasPage() {
             {/* Main Content Area */}
             <div className="max-w-[90%] mx-auto px-4 md:px-8 relative z-10">
                 {/* Filters Row */}
-                <CinemaFilters 
-                    selectedCity={selectedCity}
-                    onSelectCity={(city) => {
-                        setSelectedCity(city);
-                        setSelectedChainId("all");
-                    }}
-                    selectedChainId={selectedChainId}
-                    onSelectChain={setSelectedChainId}
-                    searchQuery={searchQuery}
-                    onSearchChange={setSearchQuery}
-                    theaterChains={theaterChains}
-                    filteredChains={filteredChains}
-                    totalMatchingBranches={allMatchingBranches.length}
-                />
+                <div className="animate__animated animate__fadeInUp">
+                    <CinemaFilters 
+                        selectedCity={selectedCity}
+                        onSelectCity={(city) => {
+                            setSelectedCity(city);
+                            setSelectedChainId("all");
+                        }}
+                        selectedChainId={selectedChainId}
+                        onSelectChain={setSelectedChainId}
+                        searchQuery={searchQuery}
+                        onSearchChange={setSearchQuery}
+                        theaterChains={theaterChains}
+                        filteredChains={filteredChains}
+                        totalMatchingBranches={allMatchingBranches.length}
+                    />
+                </div>
 
                 {/* Loading state or Branches Display Grid */}
                 {loading ? (
@@ -210,10 +212,12 @@ export default function CinemasPage() {
                         <p className="text-gray-500 font-semibold">{t("loading") || "Đang tải danh sách rạp..."}</p>
                     </div>
                 ) : (
-                    <CinemaBranches 
-                        branches={displayBranches}
-                        onResetFilters={handleResetFilters}
-                    />
+                    <div className="mt-8 animate__animated animate__fadeInUp [animation-delay:200ms]">
+                        <CinemaBranches 
+                            branches={displayBranches}
+                            onResetFilters={handleResetFilters}
+                        />
+                    </div>
                 )}
             </div>
         </div>

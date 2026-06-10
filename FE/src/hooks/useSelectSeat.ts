@@ -9,10 +9,10 @@ import {
     toggleSeat,
     updateCombo,
     startBooking,
-    resetBooking
+    bookingFailed
 } from "../pages/User/SelectSeat/slice.ts";
 import { useLanguage } from "../contextAPI/LanguageContext.tsx";
-import { getSeatsStatusApi, getFoodsByComplexApi, createBookingApi } from "../axios/booking.tsx";
+import { getSeatsStatusApi, getFoodsByComplexApi, createBookingApi, getMyVouchersApi } from "../axios/booking.tsx";
 import { getShowtimeDetailApi } from "../axios/cinemas.tsx";
 
 interface LocationState {
@@ -66,6 +66,12 @@ export default function useSelectSeat() {
     const [foodsList, setFoodsList] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
+    // Voucher states
+    const [availableVouchers, setAvailableVouchers] = useState<any[]>([]);
+    const [voucherCodeInput, setVoucherCodeInput] = useState("");
+    const [appliedVoucher, setAppliedVoucher] = useState<any | null>(null);
+    const [voucherError, setVoucherError] = useState<string | null>(null);
+
     // Fetch dynamic data
     useEffect(() => {
         if (!routeShowtimeId) {
@@ -87,6 +93,25 @@ export default function useSelectSeat() {
                 if (complexId) {
                     const foodsRes = await getFoodsByComplexApi(complexId);
                     setFoodsList(foodsRes.data || []);
+                    
+                    // Fetch vouchers for this user
+                    try {
+                        const vouchersRes = await getMyVouchersApi();
+                        let vouchers: any[] = [];
+                        if (vouchersRes && vouchersRes.data) {
+                            if (Array.isArray(vouchersRes.data)) {
+                                vouchers = vouchersRes.data;
+                            } else if (Array.isArray((vouchersRes.data as any).data)) {
+                                vouchers = (vouchersRes.data as any).data;
+                            }
+                        }
+                        const filteredVouchers = (vouchers || []).filter((v: any) => {
+                            return !v.cinemaComplexId || v.cinemaComplexId === complexId;
+                        });
+                        setAvailableVouchers(filteredVouchers);
+                    } catch (err) {
+                        console.error("Error loading my vouchers:", err);
+                    }
                 }
             } catch (err) {
                 console.error("Error loading showtime & seats:", err);
@@ -285,6 +310,56 @@ export default function useSelectSeat() {
 
     const totalPrice = ticketBreakdown.ticketPrice + comboPrice;
 
+    // Voucher calculations
+    const discountAmount = useMemo(() => {
+        if (!appliedVoucher) return 0;
+        let amount = 0;
+        if (appliedVoucher.discountType === 'FIXED') {
+            amount = appliedVoucher.discountValue;
+        } else if (appliedVoucher.discountType === 'PERCENTAGE') {
+            amount = Math.floor((totalPrice * appliedVoucher.discountValue) / 100);
+            if (appliedVoucher.maxDiscount && amount > appliedVoucher.maxDiscount) {
+                amount = appliedVoucher.maxDiscount;
+            }
+        }
+        return amount > totalPrice ? totalPrice : amount;
+    }, [appliedVoucher, totalPrice]);
+
+    const finalPrice = totalPrice - discountAmount;
+
+    const handleApplyVoucher = (code: string) => {
+        if (!code.trim()) {
+            setVoucherError(language === "en" ? "Please enter a voucher code" : "Vui lòng nhập mã giảm giá");
+            return;
+        }
+        const cleanCode = code.toUpperCase().replace(/\s+/g, "");
+        const found = availableVouchers.find(v => v.code.toUpperCase() === cleanCode);
+        
+        if (!found) {
+            setVoucherError(language === "en" ? "Invalid code or not applicable to this cinema" : "Mã không hợp lệ hoặc không áp dụng cho rạp này");
+            setAppliedVoucher(null);
+            return;
+        }
+
+        if (found.minPurchase && totalPrice < found.minPurchase) {
+            setVoucherError(language === "en" 
+                ? `Minimum order value of ${found.minPurchase.toLocaleString()}đ required` 
+                : `Yêu cầu giá trị đơn hàng tối thiểu từ ${found.minPurchase.toLocaleString()}đ`);
+            setAppliedVoucher(null);
+            return;
+        }
+
+        setAppliedVoucher(found);
+        setVoucherError(null);
+        toast.success(language === "en" ? "Voucher applied successfully!" : "Áp dụng mã giảm giá thành công!");
+    };
+
+    const handleRemoveVoucher = () => {
+        setAppliedVoucher(null);
+        setVoucherCodeInput("");
+        setVoucherError(null);
+    };
+
     // Checkout processing states
     const handleGuestChange = (name: "name" | "phone" | "email", value: string) => {
         if (name === "name") setGuestName(value);
@@ -355,7 +430,8 @@ export default function useSelectSeat() {
             const payload = {
                 showtimeId: routeShowtimeId,
                 seats: seatIds,
-                foods: foodsInput.length > 0 ? foodsInput : undefined
+                foods: foodsInput.length > 0 ? foodsInput : undefined,
+                voucherCode: appliedVoucher?.code || undefined
             };
 
             const res = await createBookingApi(payload);
@@ -387,7 +463,7 @@ export default function useSelectSeat() {
                     comboQuantities: comboQuantities,
                     combosList: combos,
                     comboPrice: comboPrice,
-                    totalPrice: totalPrice,
+                    totalPrice: finalPrice,
                     status: "Pending",
                     dateBooked: new Date().toLocaleDateString("vi-VN"),
                     movie: movie
@@ -403,7 +479,7 @@ export default function useSelectSeat() {
             console.error("Checkout failed:", err);
             const errMsg = err?.response?.data?.message || err?.message || "Booking failed. Please try again.";
             toast.error(errMsg);
-            dispatch(resetBooking());
+            dispatch(bookingFailed());
         }
     };
 
@@ -464,6 +540,16 @@ export default function useSelectSeat() {
         bookedSeats,
         combos,
         loading,
-        seatsList
+        seatsList,
+        // Voucher outputs
+        availableVouchers,
+        voucherCodeInput,
+        setVoucherCodeInput,
+        appliedVoucher,
+        voucherError,
+        handleApplyVoucher,
+        handleRemoveVoucher,
+        discountAmount,
+        finalPrice
     };
 }

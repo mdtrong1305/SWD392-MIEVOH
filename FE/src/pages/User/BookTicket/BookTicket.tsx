@@ -189,9 +189,9 @@ export default function BookTicket() {
             ageRating: data.ageRestriction || "P",
             duration: data.duration ? `${data.duration} mins` : "120 mins",
             rating: data.rating || 5,
-            releaseDate: data.releaseDate ? new Date(data.releaseDate).toLocaleDateString() : "Now showing",
-            director: data.director || "Unknown",
-            cast: Array.isArray(data.cast) ? data.cast : (typeof data.cast === 'string' ? data.cast.split(',').map((c: string) => c.trim()) : ["Unknown Cast"])
+            releaseDate: data.releaseDate ? new Date(data.releaseDate).toLocaleDateString() : (language === "vi" ? "Đang chiếu" : "Now showing"),
+            director: data.director || (language === "vi" ? "Chưa rõ" : "Unknown"),
+            cast: Array.isArray(data.cast) ? data.cast : (typeof data.cast === 'string' ? data.cast.split(',').map((c: string) => c.trim()) : [language === "vi" ? "Chưa rõ" : "Unknown Cast"])
         };
     }, [movieDetail, language]);
 
@@ -326,11 +326,15 @@ export default function BookTicket() {
     if (!movie) {
         return (
             <div className="w-full bg-[#EFEBF4] py-20 flex flex-col items-center justify-center text-center px-4 min-h-[60vh] font-sans">
-                <h2 className="text-2xl font-black text-slate-900 mb-2">Movie Not Found</h2>
-                <p className="text-slate-500 mb-6 font-medium">Please go back and select a valid movie.</p>
+                <h2 className="text-2xl font-black text-slate-900 mb-2">
+                    {language === "vi" ? "Không tìm thấy phim" : "Movie Not Found"}
+                </h2>
+                <p className="text-slate-500 mb-6 font-medium">
+                    {language === "vi" ? "Vui lòng quay lại và chọn một bộ phim hợp lệ." : "Please go back and select a valid movie."}
+                </p>
                 <Link to="/movies" className="inline-flex items-center gap-2 bg-[#6C5CE7] text-white font-extrabold px-6 py-2.5 rounded-full hover:bg-[#5f27cd] transition-colors duration-200 shadow-lg shadow-indigo-200">
                     <ArrowLeft className="h-4 w-4" />
-                    Back to Movie List
+                    {language === "vi" ? "Quay lại danh sách phim" : "Back to Movie List"}
                 </Link>
             </div>
         );
@@ -425,7 +429,9 @@ export default function BookTicket() {
                     {loading ? (
                         <div className="bg-white dark:bg-zinc-900/50 rounded-3xl p-12 text-center border border-slate-100 dark:border-zinc-800/80 shadow-sm flex flex-col items-center justify-center">
                             <Loader2 className="h-10 w-10 text-[#8E7EFE] animate-spin" />
-                            <p className="text-slate-500 dark:text-zinc-400 font-bold mt-4 text-sm">Loading showtimes...</p>
+                            <p className="text-slate-500 dark:text-zinc-400 font-bold mt-4 text-sm">
+                                {language === "vi" ? "Đang tải suất chiếu..." : "Loading showtimes..."}
+                            </p>
                         </div>
                     ) : groupedChains.length === 0 ? (
                         <div className="bg-white dark:bg-zinc-900/50 rounded-3xl p-12 text-center border border-slate-100 dark:border-zinc-800/80 shadow-sm flex flex-col items-center">
