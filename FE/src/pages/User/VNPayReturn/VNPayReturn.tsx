@@ -1,10 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { verifyVNPayReturnApi, triggerVNPayIPNApi } from "../../../axios/booking.tsx";
+import { getBookingByIdApi } from "../../../axios/booking.tsx";
 import { useLanguage } from "../../../contextAPI/LanguageContext.tsx";
 import { XCircle, Loader2, CheckCircle2 } from "lucide-react";
-
-const processedTxnRefs = new Set<string>();
 
 export default function VNPayReturn() {
     const { t, language } = useLanguage();
@@ -31,8 +29,7 @@ export default function VNPayReturn() {
             return;
         }
 
-        if (processedTxnRefs.has(txnRef)) return;
-        processedTxnRefs.add(txnRef);
+        let pollInterval: any = null;
 
         const verifyPayment = async () => {
             setLoading(true);
@@ -58,50 +55,66 @@ export default function VNPayReturn() {
                     return;
                 }
 
-                try {
-                    const paramsObj: Record<string, string> = {};
-                    queryParams.forEach((val, key) => {
-                        paramsObj[key] = val;
-                    });
+                let attempts = 0;
+                const maxAttempts = 10;
 
-                    // Trigger IPN locally so that the database is updated to Success
+                pollInterval = setInterval(async () => {
+                    attempts++;
                     try {
-                        await triggerVNPayIPNApi(paramsObj);
-                    } catch (ipnErr) {
-                        console.error("Local IPN trigger failed:", ipnErr);
+                        const res = await getBookingByIdApi(txnRef);
+                        const foundBooking = res.data;
+
+                        if (foundBooking && foundBooking.paymentStatus === "Success") {
+                            clearInterval(pollInterval);
+
+                            const paidBooking = {
+                                ...pending,
+                                bookingCode: foundBooking.ticketCode,
+                                status: "Paid",
+                                dateBooked: new Date(foundBooking.createdAt).toLocaleDateString("vi-VN")
+                            };
+
+                            const updatedHistory = [paidBooking, ...history];
+                            localStorage.setItem("mievoh_booking_history", JSON.stringify(updatedHistory));
+
+                            // Clean up pending
+                            delete pendingBookings[txnRef];
+                            localStorage.setItem("mievoh_pending_bookings", JSON.stringify(pendingBookings));
+
+                            setBookingData(paidBooking);
+                            setStatus("success");
+                            setLoading(false);
+                        } else if (foundBooking && foundBooking.paymentStatus === "Failed") {
+                            clearInterval(pollInterval);
+                            setStatus("failed");
+                            setErrorMessage(
+                                language === "vi" ? "Giao dịch thanh toán thất bại." : "Payment transaction failed."
+                            );
+                            setLoading(false);
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(pollInterval);
+                            setStatus("error");
+                            setErrorMessage(
+                                language === "vi"
+                                    ? "Giao dịch của bạn đang được xử lý, vui lòng kiểm tra Lịch sử vé sau ít phút."
+                                    : "Your transaction is being processed, please check your Ticket History in a few minutes."
+                            );
+                            setLoading(false);
+                        }
+                    } catch (err) {
+                        console.error("Error checking booking details:", err);
+                        if (attempts >= maxAttempts) {
+                            clearInterval(pollInterval);
+                            setStatus("error");
+                            setErrorMessage(
+                                language === "vi"
+                                    ? "Giao dịch của bạn đang được xử lý, vui lòng kiểm tra Lịch sử vé sau ít phút."
+                                    : "Your transaction is being processed, please check your Ticket History in a few minutes."
+                            );
+                            setLoading(false);
+                        }
                     }
-
-                    const res = await verifyVNPayReturnApi(paramsObj);
-
-                    if (res.data?.code === "00") {
-                        const ticketCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-                        const paidBooking = {
-                            ...pending,
-                            bookingCode: ticketCode,
-                            status: "Paid",
-                            dateBooked: new Date().toLocaleDateString("vi-VN")
-                        };
-
-                        const updatedHistory = [paidBooking, ...history];
-                        localStorage.setItem("mievoh_booking_history", JSON.stringify(updatedHistory));
-
-                        // Clean up pending
-                        delete pendingBookings[txnRef];
-                        localStorage.setItem("mievoh_pending_bookings", JSON.stringify(pendingBookings));
-
-                        setBookingData(paidBooking);
-                        setStatus("success");
-                    } else {
-                        setStatus("failed");
-                        setErrorMessage(res.data?.message || (language === "vi" ? "Xác minh thanh toán thất bại." : "Payment verification failed."));
-                    }
-                } catch (err: any) {
-                    console.error("Payment verification failed:", err);
-                    setStatus("error");
-                    setErrorMessage(err?.response?.data?.message || (language === "vi" ? "Đã xảy ra lỗi trong quá trình xác minh thanh toán." : "An error occurred while verifying your payment."));
-                } finally {
-                    setLoading(false);
-                }
+                }, 2000);
             } else {
                 // Payment was canceled or failed
                 setStatus("failed");
@@ -111,6 +124,10 @@ export default function VNPayReturn() {
         };
 
         verifyPayment();
+
+        return () => {
+            if (pollInterval) clearInterval(pollInterval);
+        };
     }, [location.search, responseCode, txnRef, queryParams, language]);
 
     if (loading) {

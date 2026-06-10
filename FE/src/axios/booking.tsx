@@ -33,6 +33,7 @@ export interface CreateBookingDto {
   seats: string[];
   foods?: FoodBookingInput[];
   voucherCode?: string;
+  returnUrl?: string;
 }
 
 export interface CreateBookingResponse {
@@ -83,6 +84,15 @@ export const verifyVNPayReturnApi = async (params: any): Promise<BaseResponse<{ 
  */
 export const triggerVNPayIPNApi = async (params: any): Promise<any> => {
   const response = await api.get('/payments/vnpay-ipn', { params });
+  return response.data;
+};
+
+/**
+ * Lấy thông tin chi tiết một hóa đơn đặt vé
+ * GET /api/bookings/:id
+ */
+export const getBookingByIdApi = async (id: string): Promise<BaseResponse<any>> => {
+  const response = await api.get<BaseResponse<any>>(`/bookings/${id}`);
   return response.data;
 };
 
