@@ -14,6 +14,8 @@ import {
 import { PrismaService } from '../../modules-system/prisma/prisma.service';
 import { TokenService } from '../../modules-system/token/token.service';
 import * as bcrypt from 'bcrypt';
+import { OAuth2Client } from 'google-auth-library';
+import { GOOGLE_CLIENT_ID } from '../../common/constant/app.constant';
 
 @Injectable()
 export class AuthService {
@@ -158,14 +160,13 @@ export class AuthService {
     }
 
     try {
-      const { OAuth2Client } = require('google-auth-library');
-      const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-      
+      const client = new OAuth2Client(GOOGLE_CLIENT_ID);
+
       const ticket = await client.verifyIdToken({
         idToken,
-        audience: process.env.GOOGLE_CLIENT_ID, // Chỉ chấp nhận token sinh ra cho app của mình
+        audience: GOOGLE_CLIENT_ID, // Chỉ chấp nhận token sinh ra cho app của mình
       });
-      
+
       const payload = ticket.getPayload();
       if (!payload) {
         throw new UnauthorizedException('Token Google không hợp lệ');
