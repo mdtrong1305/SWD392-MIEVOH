@@ -90,6 +90,9 @@ const bookingSlice = createSlice({
             state.bookingSuccess = true;
             state.bookingCode = action.payload;
         },
+        bookingFailed: (state) => {
+            state.isBooking = false;
+        },
         resetBooking: (state) => {
             state.selectedSeats = [];
             state.comboQuantities = {};
@@ -107,6 +110,7 @@ export const {
     updateCombo,
     startBooking,
     bookingFinished,
+    bookingFailed,
     resetBooking
 } = bookingSlice.actions;
 

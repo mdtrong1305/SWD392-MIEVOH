@@ -57,7 +57,7 @@ export default function Header({
     navItems = [
         { label: "Movies", href: "/movies" },
         { label: "Cinemas", href: "/cinemas" },
-        { label: "News", href: "/news" },
+        { label: "News", href: "/promotions" },
     ],
 }: HeaderProps) {
     const [isOpen, setIsOpen] = useState(false);
@@ -298,7 +298,7 @@ export default function Header({
             const domain = apiBase.replace('/api', '');
             image = `${domain}/movies/${movie.imageUrl}`;
         }
-        return image;
+        return image as string;
     };
 
     const getComplexLogo = (complex: CinemaComplex) => {
@@ -310,7 +310,7 @@ export default function Header({
             const domain = apiBase.replace('/api', '');
             logo = `${domain}/cinemas/${system.logo}`;
         }
-        return logo;
+        return logo as string;
     };
 
     const renderSearchDropdown = (isMobile: boolean) => {
@@ -369,7 +369,7 @@ export default function Header({
                                                 }}
                                                 className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-900 transition-colors"
                                             >
-                                                <img src={img} alt={title} className="w-10 h-14 object-cover rounded-lg shadow-sm" />
+                                                <img src={img} alt={title || undefined} className="w-10 h-14 object-cover rounded-lg shadow-sm" />
                                                 <div className="flex-1 min-w-0 text-left">
                                                     <h6 className="text-sm font-bold text-gray-800 dark:text-zinc-100 truncate">{title}</h6>
                                                     <p className="text-[11px] text-[#8E7EFE] font-extrabold mt-0.5 truncate">
@@ -412,7 +412,7 @@ export default function Header({
                                                 className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-900 transition-colors"
                                             >
                                                 {logo.startsWith('http') || logo.includes('/') ? (
-                                                    <img src={logo} alt={complex.name} className="w-10 h-10 object-contain rounded-lg p-0.5 border border-slate-100 dark:border-zinc-800 bg-white" />
+                                                    <img src={logo} alt={complex.name || undefined} className="w-10 h-10 object-contain rounded-lg p-0.5 border border-slate-100 dark:border-zinc-800 bg-white" />
                                                 ) : (
                                                     <div className="w-10 h-10 rounded-lg bg-violet-50 dark:bg-zinc-900 flex items-center justify-center text-lg">{logo}</div>
                                                 )}

@@ -43,6 +43,17 @@ export default function SeatSelection({
         return Object.keys(seatsByRow).sort();
     }, [seatsByRow]);
 
+    const hasVip = useMemo(() => {
+        return seatsList.some(s => s.seatType?.toUpperCase() === "VIP");
+    }, [seatsList]);
+
+    const hasCouple = useMemo(() => {
+        return seatsList.some(s => {
+            const t = s.seatType?.toUpperCase();
+            return t === "COUPLE" || t === "SWEETBOX";
+        });
+    }, [seatsList]);
+
     return (
         <div className="bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800/80 rounded-3xl p-4 sm:p-6 shadow-sm overflow-hidden flex flex-col items-center animate__animated animate__fadeIn w-full min-w-0">
             {/* Screen Visualizer */}
@@ -76,7 +87,7 @@ export default function SeatSelection({
                                             if (seatTypeUpper === "VIP") {
                                                 seatColorClass = "bg-indigo-50 border-indigo-400 text-indigo-900 hover:bg-indigo-100 hover:border-indigo-500 hover:text-indigo-955 dark:bg-indigo-950/40 dark:border-indigo-800 dark:text-indigo-200 dark:hover:bg-indigo-900/60 dark:hover:text-white dark:hover:border-indigo-500";
                                             } else if (isCouple) {
-                                                seatColorClass = "bg-rose-50 border-rose-400 text-rose-900 hover:bg-rose-100 hover:border-rose-500 hover:text-rose-950 dark:bg-rose-950/20 dark:border-rose-800 dark:text-rose-200 dark:hover:bg-rose-900/60 dark:hover:text-white dark:hover:border-rose-500";
+                                                seatColorClass = "bg-rose-50 border-rose-400 text-rose-900 hover:bg-rose-100 hover:border-rose-500 hover:text-rose-955 dark:bg-rose-950/20 dark:border-rose-800 dark:text-rose-200 dark:hover:bg-rose-900/60 dark:hover:text-white dark:hover:border-rose-500";
                                             } else {
                                                 // NORMAL / STANDARD
                                                 seatColorClass = "bg-white border-slate-350 text-slate-800 hover:bg-violet-50/60 hover:text-[#8E7EFE] hover:border-[#8E7EFE] dark:bg-zinc-800 dark:border-zinc-500 dark:text-white dark:hover:bg-zinc-700 dark:hover:text-white dark:hover:border-zinc-400";
@@ -117,25 +128,29 @@ export default function SeatSelection({
             </div>
 
             {/* Seat Legend */}
-            <div className="w-full border-t border-slate-100 dark:border-zinc-800/80 mt-6 pt-6 grid grid-cols-2 sm:grid-cols-5 gap-y-4 gap-x-6 text-xs sm:text-sm font-bold text-slate-700 dark:text-zinc-300 max-w-2xl mx-auto px-4 sm:px-0">
-                <div className="flex items-center gap-2.5 w-full justify-start">
+            <div className="w-full border-t border-slate-100 dark:border-zinc-800/80 mt-6 pt-6 flex flex-wrap justify-center gap-y-4 gap-x-6 text-xs sm:text-sm font-bold text-slate-700 dark:text-zinc-300 max-w-2xl mx-auto px-4 sm:px-0">
+                <div className="flex items-center gap-2.5">
                     <div className="w-4.5 h-4.5 rounded bg-white border border-slate-350 dark:bg-zinc-800 dark:border-zinc-550" />
                     <span>{t("seat_type_regular")}</span>
                 </div>
-                <div className="flex items-center gap-2.5 w-full justify-start">
-                    <div className="w-4.5 h-4.5 rounded bg-indigo-50 border border-indigo-400 dark:bg-indigo-950/40 dark:border-indigo-800" />
-                    <span>{t("seat_type_vip")}</span>
-                </div>
-                <div className="flex items-center gap-2.5 w-full justify-start">
-                    <div className="w-9 h-4.5 rounded bg-rose-50 border border-rose-400 dark:bg-rose-950/20 dark:border-rose-800" />
-                    <span>{t("seat_type_sweetbox")}</span>
-                </div>
-                <div className="flex items-center gap-2.5 w-full justify-start">
+                {hasVip && (
+                    <div className="flex items-center gap-2.5">
+                        <div className="w-4.5 h-4.5 rounded bg-indigo-50 border border-indigo-400 dark:bg-indigo-950/40 dark:border-indigo-800" />
+                        <span>{t("seat_type_vip")}</span>
+                    </div>
+                )}
+                {hasCouple && (
+                    <div className="flex items-center gap-2.5">
+                        <div className="w-9 h-4.5 rounded bg-rose-50 border border-rose-400 dark:bg-rose-950/20 dark:border-rose-800" />
+                        <span>{t("seat_type_sweetbox")}</span>
+                    </div>
+                )}
+                <div className="flex items-center gap-2.5">
                     <div className="w-4.5 h-4.5 rounded bg-[#8E7EFE] border border-[#8E7EFE]" />
                     <span>{t("seat_status_selected")}</span>
                 </div>
-                <div className="flex items-center gap-2.5 w-full justify-start">
-                    <div className="w-4.5 h-4.5 rounded bg-slate-200/60 border border-slate-200 dark:bg-zinc-800/40 dark:border-zinc-850 flex items-center justify-center text-[9px] text-slate-400 dark:text-zinc-500 font-black">✖</div>
+                <div className="flex items-center gap-2.5">
+                    <div className="w-4.5 h-4.5 rounded bg-slate-200/60 border border-slate-200 dark:bg-zinc-800/40 dark:border-zinc-850 flex items-center justify-center text-[9px] text-slate-400 dark:text-zinc-550 font-black">✖</div>
                     <span>{t("seat_status_booked")}</span>
                 </div>
             </div>

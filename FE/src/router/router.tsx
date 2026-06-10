@@ -13,6 +13,7 @@ import Cinemas from "../pages/User/Cinemas/Cinemas.tsx";
 import CinemaDetail from "../pages/User/CinemaDetail/CinemaDetail.tsx";
 import Profile from "../pages/User/Profile/Profile.tsx";
 import VNPayReturn from "../pages/User/VNPayReturn/VNPayReturn.tsx";
+import PromotionsPage from "../pages/User/PromotionsPage/PromotionsPage.tsx";
 
 
 export type AppRoute = {
@@ -57,6 +58,10 @@ export const routes: AppRoute[] = [
       {
         path: "profile",
         element: <Profile />,
+      },
+      {
+        path: "promotions",
+        element: <PromotionsPage />,
       },
       {
         path: "payments/vnpay-return",

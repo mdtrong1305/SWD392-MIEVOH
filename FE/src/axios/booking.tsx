@@ -32,6 +32,7 @@ export interface CreateBookingDto {
   showtimeId: string;
   seats: string[];
   foods?: FoodBookingInput[];
+  voucherCode?: string;
 }
 
 export interface CreateBookingResponse {
@@ -85,8 +86,58 @@ export const triggerVNPayIPNApi = async (params: any): Promise<any> => {
   return response.data;
 };
 
+export interface Voucher {
+  voucherId: string;
+  code: string;
+  discountType: 'PERCENTAGE' | 'FIXED';
+  discountValue: number;
+  maxDiscount: number | null;
+  minPurchase: number | null;
+  startDate: string;
+  endDate: string;
+  usageLimit: number | null;
+  usedCount: number;
+  isActive: boolean;
+  cinemaComplexId: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+
+
+export interface MyVouchersResponse {
+  message: string;
+  data: Voucher[];
+}
+
 /**
- * Lấy lịch sử đặt vé của user
- * GET /api/bookings/history
- * Wait! Let's check if there is an endpoint for booking history in backend.
+ * Lấy mã giảm giá khả dụng của tôi
+ * GET /api/vouchers/my-vouchers
  */
+export const getMyVouchersApi = async (): Promise<BaseResponse<MyVouchersResponse>> => {
+  const response = await api.get<BaseResponse<MyVouchersResponse>>('/vouchers/my-vouchers');
+  return response.data;
+};
+
+export interface ApplyVoucherDto {
+  code: string;
+  bookingId: string;
+}
+
+export interface ApplyVoucherResponse {
+  discountAmount: number;
+  originalPrice: number;
+  finalPrice: number;
+  voucherId: string;
+}
+
+/**
+ * Áp dụng mã giảm giá cho đơn hàng (Booking)
+ * POST /api/vouchers/apply
+ */
+export const applyVoucherApi = async (data: ApplyVoucherDto): Promise<BaseResponse<ApplyVoucherResponse>> => {
+  const response = await api.post<BaseResponse<ApplyVoucherResponse>>('/vouchers/apply', data);
+  return response.data;
+};
+
