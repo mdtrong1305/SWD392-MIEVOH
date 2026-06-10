@@ -84,9 +84,26 @@ export class AuthController {
     const user = result.user;
 
     const frontendUrl = FRONTEND_URL || 'http://localhost:5173';
-    const redirectUrl = `${frontendUrl}/login?token=${token}&username=${user.username}&fullName=${encodeURIComponent(user.fullName || '')}&email=${user.email || ''}&avatar=${user.avatar || ''}`;
+    const redirectUrl = `${frontendUrl}/login#token=${token}&username=${user.username}&fullName=${encodeURIComponent(user.fullName || '')}&email=${user.email || ''}&avatar=${user.avatar || ''}`;
 
     return res.redirect(redirectUrl);
+  }
+
+  @Public()
+  @Post('google/mobile')
+  @ApiOperation({
+    summary: 'Đăng nhập Google bằng idToken dành cho Mobile App',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Xác thực thành công, trả về JWT và thông tin user.',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token Google không hợp lệ hoặc đã hết hạn.',
+  })
+  async googleLoginMobile(@Body('idToken') idToken: string) {
+    return this.authService.googleLoginMobile(idToken);
   }
 
   @Public()

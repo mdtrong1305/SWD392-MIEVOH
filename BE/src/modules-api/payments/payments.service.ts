@@ -9,7 +9,6 @@ import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { SocketService } from '../../modules-system/socket/socket.service';
 import * as crypto from 'crypto';
 import * as qs from 'qs';
-import moment from 'moment';
 import { sortObject } from '../../common/helper/vnpay.helper';
 import {
   VNP_TMNCODE,
@@ -26,7 +25,11 @@ export class PaymentsService {
     private readonly socketService: SocketService,
   ) {}
 
-  async createPaymentUrl(bookingId: string, ipAddr: string) {
+  async createPaymentUrl(
+    bookingId: string,
+    ipAddr: string,
+    clientReturnUrl?: string,
+  ) {
     const booking = await this.prisma.booking.findUnique({
       where: { bookingId },
     });
@@ -41,7 +44,7 @@ export class PaymentsService {
     const tmnCode = VNP_TMNCODE!;
     const secretKey = VNP_HASHSECRET!;
     let vnpUrl = VNP_URL!;
-    const returnUrl = VNP_RETURN_URL!;
+    const returnUrl = clientReturnUrl || VNP_RETURN_URL!;
 
     if (!tmnCode || !secretKey || !vnpUrl) {
       throw new BadRequestException(
@@ -85,7 +88,7 @@ export class PaymentsService {
     vnp_Params['vnp_OrderType'] = 'other';
     vnp_Params['vnp_Amount'] = amount;
     vnp_Params['vnp_ReturnUrl'] = returnUrl;
-    vnp_Params['vnp_IpAddr'] = '12.34.56.78'; // Gắn cứng IP tĩnh để tránh lỗi IPv6 ::1 của localhost làm VNPay từ chối
+    vnp_Params['vnp_IpAddr'] = ipAddr; // Gắn cứng IP tĩnh để tránh lỗi IPv6 ::1 của localhost làm VNPay từ chối
     vnp_Params['vnp_CreateDate'] = createDate;
     vnp_Params['vnp_ExpireDate'] = expireDate;
     if (bankCode) {

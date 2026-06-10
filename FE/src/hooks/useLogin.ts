@@ -68,11 +68,13 @@ export default function useLogin(initialSliding: boolean) {
 
     // Handle Google OAuth redirect credentials
     useEffect(() => {
-        const token = params.get('token');
-        const username = params.get('username');
-        const fullName = params.get('fullName');
-        const email = params.get('email');
-        const avatar = params.get('avatar');
+        // Parse Hash parameters since we switched from ? to # for security
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const token = hashParams.get('token') || params.get('token');
+        const username = hashParams.get('username') || params.get('username');
+        const fullName = hashParams.get('fullName') || params.get('fullName');
+        const email = hashParams.get('email') || params.get('email');
+        const avatar = hashParams.get('avatar') || params.get('avatar');
 
         if (token && username) {
             // Prevent duplicate toast/processing in StrictMode (development)

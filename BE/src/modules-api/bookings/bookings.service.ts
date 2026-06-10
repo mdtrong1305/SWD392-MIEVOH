@@ -219,6 +219,7 @@ export class BookingsService {
     const payment = await this.paymentsService.createPaymentUrl(
       booking.bookingId,
       ipAddr,
+      data.returnUrl,
     );
 
     return {
@@ -255,6 +256,37 @@ export class BookingsService {
     });
 
     return bookings;
+  }
+
+  async getBookingById(username: string, bookingId: string) {
+    const booking = await this.prisma.booking.findFirst({
+      where: { bookingId, username },
+      include: {
+        Showtime: {
+          include: {
+            Movie: {
+              select: { title_vi: true, title_en: true, imageUrl: true },
+            },
+            Cinema: {
+              include: {
+                CinemaComplex: { select: { name: true, address: true } },
+              },
+            },
+          },
+        },
+        BookingDetails: {
+          include: { Seat: { select: { name: true, seatType: true } } },
+        },
+        BookingFoods: {
+          include: { Food: { select: { name: true, imageUrl: true } } },
+        },
+      },
+    });
+
+    if (!booking) {
+      throw new BadRequestException('Không tìm thấy hóa đơn này!');
+    }
+    return booking;
   }
 
   // Chạy mỗi phút 1 lần để quét các hóa đơn Pending quá hạn 5 phút
