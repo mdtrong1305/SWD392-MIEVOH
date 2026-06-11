@@ -4,7 +4,7 @@ import { loginApi } from "../../../axios/auth.tsx";
 
 // Types
 export type LoginCredentials = {
-    username: string;
+    email: string;
     password: string;
 };
 
@@ -50,12 +50,12 @@ export const loginUser = createAsyncThunk<
     async (credentials, { rejectWithValue }) => {
         try {
             // Verify basic fields are provided
-            if (!credentials.username || !credentials.password) {
-                return rejectWithValue("Username and password cannot be empty");
+            if (!credentials.email || !credentials.password) {
+                return rejectWithValue("Email and password cannot be empty");
             }
 
             const response = await loginApi({
-                username: credentials.username,
+                email: credentials.email,
                 password: credentials.password,
             });
 
@@ -72,11 +72,10 @@ export const loginUser = createAsyncThunk<
             return {
                 content: {
                     user: {
-                        username: user.username,
-                        name: user.fullName || user.username,
-                        email: user.email || user.username,
-                        fullName: user.fullName || user.username,
-                        hoTen: user.fullName || user.username,
+                        name: user.fullName || user.email,
+                        email: user.email,
+                        fullName: user.fullName || user.email,
+                        hoTen: user.fullName || user.email,
                         role: user.userType || "USER",
                         avatar: user.avatar || "/images/avatar.jpg"
                     },

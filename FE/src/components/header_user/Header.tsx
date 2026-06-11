@@ -76,14 +76,14 @@ export default function Header({
     const mobileButtonRef = useRef<HTMLButtonElement>(null);
 
     // Connect and listen to real-time notifications via socket
-    useAppSocket(user?.username || "");
+    useAppSocket(user?.email || "");
 
     const [notifications, setNotifications] = useState<NotificationItem[]>([]);
     const unreadCount = useMemo(() => notifications.filter(n => !n.isRead).length, [notifications]);
     const [showAllNotifications, setShowAllNotifications] = useState(false);
 
     const fetchNotifications = useCallback(async () => {
-        if (!isAuthenticated || !user?.username) return;
+        if (!isAuthenticated || !user?.email) return;
         try {
             const res = await getMyNotificationsApi({ page: 1, pageSize: 20 });
             // Safe extraction of the notifications list:
@@ -111,16 +111,16 @@ export default function Header({
         } catch (e) {
             console.error("Failed to fetch notifications:", e);
         }
-    }, [isAuthenticated, user?.username, language]);
+    }, [isAuthenticated, user?.email, language]);
 
     useEffect(() => {
-        if (isAuthenticated && user?.username) {
+        if (isAuthenticated && user?.email) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             fetchNotifications();
         } else {
             setNotifications([]);
         }
-    }, [isAuthenticated, user?.username, fetchNotifications]);
+    }, [isAuthenticated, user?.email, fetchNotifications]);
 
     useEffect(() => {
         const handleSync = () => {
@@ -586,8 +586,8 @@ export default function Header({
                                                         try {
                                                             setNotifications(prev => prev.map(item => ({ ...item, isRead: true })));
                                                             await markAllAsReadApi();
-                                                            if (user?.username) {
-                                                                emitMarkAllAsRead(user.username);
+                                                            if (user?.email) {
+                                                                emitMarkAllAsRead(user.email);
                                                             }
                                                         } catch (e) {
                                                             console.error("Failed to mark all as read:", e);
@@ -612,8 +612,8 @@ export default function Header({
                                                             try {
                                                                 setNotifications(prev => prev.map(item => item.id === n.id ? { ...item, isRead: true } : item));
                                                                 await markAsReadApi(n.id);
-                                                                if (user?.username) {
-                                                                    emitMarkAsRead(n.id, user.username);
+                                                                if (user?.email) {
+                                                                    emitMarkAsRead(n.id, user.email);
                                                                 }
                                                                 setNotiMenuOpen(false);
                                                                 if (n.link) {
@@ -901,8 +901,8 @@ export default function Header({
                                                                   try {
                                                                       setNotifications(prev => prev.map(item => item.id === n.id ? { ...item, isRead: true } : item));
                                                                       await markAsReadApi(n.id);
-                                                                      if (user?.username) {
-                                                                          emitMarkAsRead(n.id, user.username);
+                                                                      if (user?.email) {
+                                                                          emitMarkAsRead(n.id, user.email);
                                                                       }
                                                                   } catch (e) {
                                                                       console.error("Failed to mark notification as read:", e);
