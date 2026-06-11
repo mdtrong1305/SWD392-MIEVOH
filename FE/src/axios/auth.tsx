@@ -2,16 +2,27 @@ import api from '../config/axios/axiosConfig';
 
 // Định nghĩa các Interface cho dữ liệu Auth tương ứng với DTO của Backend
 export interface LoginPayload {
-  username: string; // Tên đăng nhập (Backend kiểm tra trường username)
+  email: string; // Địa chỉ email đăng nhập
   password: string; // Mật khẩu
 }
 
 export interface RegisterPayload {
-  username: string;    // Tên đăng nhập (có thể dùng email làm username)
   fullName: string;    // Họ tên đầy đủ
   email: string;       // Địa chỉ email
   phoneNumber: string; // Số điện thoại
   password: string;    // Mật khẩu
+}
+
+export interface SendRegisterOtpPayload {
+  email: string;       // Địa chỉ email (duy nhất)
+  phoneNumber: string; // Số điện thoại
+  fullName: string;    // Họ và tên
+  password: string;    // Mật khẩu (tối thiểu 6 ký tự)
+}
+
+export interface VerifyRegisterOtpPayload {
+  email: string;       // Địa chỉ email đã yêu cầu OTP
+  otp: string;         // Mã OTP 6 chữ số nhận từ email
 }
 
 export interface UserResponse {
@@ -51,6 +62,24 @@ export const registerApi = async (payload: RegisterPayload): Promise<AuthRespons
 };
 
 /**
+ * API gửi mã OTP đăng ký tài khoản qua Email (Register - Step 1)
+ * Endpoint: POST /api/auth/register/send-otp
+ */
+export const sendRegisterOtpApi = async (payload: SendRegisterOtpPayload): Promise<{ message: string, expiresIn?: number }> => {
+  const response = await api.post<{ message: string, expiresIn?: number }>('/auth/register/send-otp', payload);
+  return response.data;
+};
+
+/**
+ * API xác thực mã OTP và hoàn tất đăng ký tài khoản (Register - Step 2)
+ * Endpoint: POST /api/auth/register
+ */
+export const verifyRegisterOtpApi = async (payload: VerifyRegisterOtpPayload): Promise<AuthResponse> => {
+  const response = await api.post<AuthResponse>('/auth/register', payload);
+  return response.data;
+};
+
+/**
  * Khởi tạo quá trình đăng nhập bằng tài khoản Google.
  * Endpoint: GET /api/auth/google
  * Phương pháp này sẽ chuyển hướng trình duyệt của người dùng đến trang xác thực Google qua Backend.
@@ -69,8 +98,17 @@ export const googleCallbackApi = async (): Promise<AuthResponse> => {
   return response.data;
 };
 
-export interface ResetPasswordPayload {
+export interface ForgotPasswordPayload {
   email: string;
+}
+
+export interface VerifyResetOtpPayload {
+  email: string;
+  otp: string;
+}
+
+export interface ResetPasswordPayload {
+  resetToken: string;
   newPassword: string;
 }
 
@@ -80,16 +118,27 @@ export interface ChangePasswordPayload {
 }
 
 /**
- * API kiểm tra email tồn tại để khôi phục mật khẩu (Forgot Password - Step 1)
- * Endpoint: POST /api/auth/verify-email
+ * API khôi phục mật khẩu (Forgot Password - Step 1)
+ * Endpoint: POST /api/auth/forgot-password
  */
-export const verifyEmailApi = async (email: string): Promise<{ message: string }> => {
-  const response = await api.post<{ message: string }>('/auth/verify-email', { email });
+export const forgotPasswordApi = async (email: string): Promise<{ message: string }> => {
+  const response = await api.post<{ message: string }>('/auth/forgot-password', { email });
   return response.data;
 };
 
 /**
- * API đặt lại mật khẩu mới cho người dùng (Forgot Password - Step 2)
+ * API xác thực OTP khôi phục mật khẩu (Forgot Password - Step 2)
+ * Endpoint: POST /api/auth/forgot-password/verify-otp
+ */
+export const verifyResetOtpApi = async (payload: VerifyResetOtpPayload): Promise<{ resetToken: string }> => {
+  const response = await api.post<any>('/auth/forgot-password/verify-otp', payload);
+  // NestJS wraps successful response payload in a { message, statusCode, data } object
+  const data = response.data?.data || response.data;
+  return data;
+};
+
+/**
+ * API đặt lại mật khẩu mới cho người dùng (Forgot Password - Step 3)
  * Endpoint: POST /api/auth/reset-password
  */
 export const resetPasswordApi = async (payload: ResetPasswordPayload): Promise<{ message: string }> => {
