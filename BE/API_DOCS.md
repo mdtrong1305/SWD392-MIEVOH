@@ -139,6 +139,18 @@ Bước 3: Đặt lại mật khẩu mới bằng `resetToken`.
 
 ---
 
+### `POST /auth/change-password` [AUTH]
+
+Thay đổi mật khẩu khi đang đăng nhập. Chỉ áp dụng cho tài khoản nội bộ (đăng ký bằng email), không áp dụng cho tài khoản đăng nhập qua Google OAuth.
+
+**Request Body:**
+| Trường | Kiểu | Bắt buộc | Mô tả |
+|--------|------|----------|-------|
+| `oldPassword` | string | ✅ | Mật khẩu cũ hiện tại |
+| `newPassword` | string | ✅ | Mật khẩu mới muốn thay đổi |
+
+---
+
 ## 2. 👤 Users – Quản lý người dùng
 
 ### `GET /users/profile` [AUTH]
