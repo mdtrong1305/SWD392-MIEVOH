@@ -35,7 +35,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Lấy thông tin cá nhân (Profile)' })
   @ApiResponse({ status: 200, description: 'Lấy thông tin thành công' })
   getProfile(@User() user: PrismaUser) {
-    return this.usersService.getProfile(user.username);
+    return this.usersService.getProfile(user.email);
   }
 
   @Put('profile')
@@ -51,7 +51,7 @@ export class UsersController {
     @Body() updateProfileDto: UpdateProfileDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    return this.usersService.updateProfile(user.username, updateProfileDto, file?.filename);
+    return this.usersService.updateProfile(user.email, updateProfileDto, file?.filename);
   }
 
   @Get()
@@ -71,15 +71,15 @@ export class UsersController {
     return this.usersService.getAllUsers(page, limit, userType);
   }
 
-  @Get(':username')
+  @Get(':email')
   @UseGuards(RoleGuard)
   @Roles('admin')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Lấy chi tiết 1 người dùng (ADMIN)' })
   @ApiResponse({ status: 200, description: 'Thành công' })
   @ApiResponse({ status: 404, description: 'Không tìm thấy tài khoản' })
-  getUserById(@Param('username') username: string) {
-    return this.usersService.getUserById(username);
+  getUserById(@Param('email') email: string) {
+    return this.usersService.getUserById(email);
   }
 
   @Post('staff')
@@ -94,7 +94,7 @@ export class UsersController {
     return this.usersService.createStaff(createStaffDto);
   }
 
-  @Put('staff/:username')
+  @Put('staff/:email')
   @UseGuards(RoleGuard)
   @Roles('admin')
   @ApiBearerAuth('JWT-auth')
@@ -102,20 +102,20 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Cập nhật thành công' })
   @ApiResponse({ status: 404, description: 'Không tìm thấy tài khoản hoặc cụm rạp' })
   updateStaff(
-    @Param('username') username: string,
+    @Param('email') email: string,
     @Body() updateStaffDto: UpdateStaffDto,
   ) {
-    return this.usersService.updateStaff(username, updateStaffDto);
+    return this.usersService.updateStaff(email, updateStaffDto);
   }
 
-  @Delete(':username')
+  @Delete(':email')
   @UseGuards(RoleGuard)
   @Roles('admin')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Vô hiệu hóa tài khoản (ADMIN)' })
   @ApiResponse({ status: 200, description: 'Vô hiệu hóa thành công' })
   @ApiResponse({ status: 404, description: 'Không tìm thấy tài khoản' })
-  deleteUser(@Param('username') username: string) {
-    return this.usersService.deleteUser(username);
+  deleteUser(@Param('email') email: string) {
+    return this.usersService.deleteUser(email);
   }
 }

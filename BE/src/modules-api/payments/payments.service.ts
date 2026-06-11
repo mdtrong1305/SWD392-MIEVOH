@@ -189,7 +189,7 @@ export class PaymentsService {
           await this.prisma.voucherUsage.create({
             data: {
               voucherId: booking.voucherId,
-              username: booking.username,
+              email: booking.email,
               bookingId: booking.bookingId,
             },
           });
@@ -209,7 +209,7 @@ export class PaymentsService {
         // Lưu thông báo vào DB
         const notif = await this.prisma.notification.create({
           data: {
-            username: booking.username,
+            email: booking.email,
             title: 'Thanh toán thành công',
             message: `Hóa đơn mua vé xem phim của bạn đã được thanh toán. Mã vé: ${ticketCode}`,
             link: `/profile?tab=tickets`, // redirect về trang lịch sử mua vé
@@ -217,7 +217,7 @@ export class PaymentsService {
         });
 
         // Bắn Socket Realtime cho user ngay tức khắc
-        this.socketService.emitNotification(booking.username, {
+        this.socketService.emitNotification(booking.email, {
           title: notif.title,
           message: notif.message,
           link: notif.link,

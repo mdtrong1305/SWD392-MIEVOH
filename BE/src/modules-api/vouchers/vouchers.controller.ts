@@ -44,7 +44,7 @@ export class VouchersController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Lấy mã giảm giá khả dụng của tôi' })
   getMyVouchers(@User() user: PrismaUser) {
-    return this.vouchersService.getMyVouchers(user.username);
+    return this.vouchersService.getMyVouchers(user.email);
   }
 
   @Post()
@@ -82,6 +82,6 @@ export class VouchersController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Kiểm tra mã giảm giá (áp dụng trước khi thanh toán)' })
   applyVoucher(@Body() dto: ApplyVoucherDto, @User() user: PrismaUser) {
-    return this.vouchersService.applyVoucher(dto, user.username);
+    return this.vouchersService.applyVoucher(dto, user.email);
   }
 }

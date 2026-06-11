@@ -28,7 +28,7 @@ export class RecommendationsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Lấy ra top 3 phim được recommend' })
   getMyMovies(@User() user: PrismaUser) {
-    return this.recommendationsService.getMyMovies(user.username);
+    return this.recommendationsService.getMyMovies(user.email);
   }
 
   @Post('trigger-analysis')
@@ -39,7 +39,7 @@ export class RecommendationsController {
     summary: 'Force Run - Ép Worker tính toán recommend system (ADMIN)',
   })
   triggerAnalysis(@User() user: PrismaUser) {
-    return this.recommendationsService.triggerAnalysis(user.username);
+    return this.recommendationsService.triggerAnalysis(user.email);
   }
 
   @Post('trigger-email')

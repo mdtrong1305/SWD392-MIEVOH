@@ -47,7 +47,7 @@ export class BookingsController {
     @Body() data: CreateBookingDto,
   ) {
     return this.bookingsService.createBooking(
-      user.username,
+      user.email,
       data,
       ipAddr || '127.0.0.1',
     );
@@ -60,8 +60,8 @@ export class BookingsController {
   @ApiOperation({ summary: 'Lấy lịch sử đặt vé của người dùng hiện tại' })
   @ApiResponse({ status: 200, description: 'Lấy danh sách thành công' })
   getMyHistory(@User() user: PrismaUser) {
-    const username = user.username;
-    return this.bookingsService.getMyHistory(username);
+    const email = user.email;
+    return this.bookingsService.getMyHistory(email);
   }
 
   @Get(':id')
@@ -71,6 +71,6 @@ export class BookingsController {
   @ApiOperation({ summary: 'Lấy thông tin chi tiết một hóa đơn đặt vé' })
   @ApiResponse({ status: 200, description: 'Lấy dữ liệu thành công' })
   getBookingById(@User() user: PrismaUser, @Param('id') id: string) {
-    return this.bookingsService.getBookingById(user.username, id);
+    return this.bookingsService.getBookingById(user.email, id);
   }
 }

@@ -38,16 +38,15 @@ export class RecommendationsProcessor extends WorkerHost {
       return;
     }
 
-    const groupedData: Record<string, { userId: string; movies: any[] }> = {};
+    const groupedData: Record<string, { email: string; movies: any[] }> = {};
     const idsToUpdate: string[] = [];
 
     for (const rec of pendingRecs) {
-      const email = rec.User?.email;
-      const userId = rec.username;
-      if (!email || !userId) continue;
+      const email = rec.email;
+      if (!email) continue;
 
       if (!groupedData[email]) {
-        groupedData[email] = { userId, movies: [] };
+        groupedData[email] = { email, movies: [] };
       }
 
       // Gửi chung cả 3 phim vào 1 Email theo yêu cầu test của Admin
@@ -76,14 +75,14 @@ export class RecommendationsProcessor extends WorkerHost {
       const link = '/'; // redirect về home
 
       notificationsToInsert.push({
-        username: payload.userId,
+        email: payload.email,
         title,
         message,
         link,
       });
 
       // Bắn Notification Realtime tới đúng User
-      this.socketService.emitNotification(payload.userId, {
+      this.socketService.emitNotification(payload.email, {
         title,
         message,
         link,

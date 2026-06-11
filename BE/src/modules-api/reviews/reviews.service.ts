@@ -36,7 +36,7 @@ export class ReviewsService {
     };
   }
 
-  async createReview(username: string, createReviewDto: CreateReviewDto) {
+  async createReview(email: string, createReviewDto: CreateReviewDto) {
     const { movieId, rating, comment } = createReviewDto;
 
     // 1. Kiểm tra phim có tồn tại không
@@ -50,7 +50,7 @@ export class ReviewsService {
     // 2. Logic Verified Purchaser: Kiểm tra xem User đã mua vé phim này thành công chưa
     const hasBooked = await this.prisma.booking.findFirst({
       where: {
-        username,
+        email,
         paymentStatus: 'Success',
         Showtime: {
           movieId,
@@ -67,7 +67,7 @@ export class ReviewsService {
     // 3. Logic Duy nhất 1 lần (Upsert)
     const existingReview = await this.prisma.review.findFirst({
       where: {
-        username,
+        email,
         movieId,
       },
     });
@@ -96,7 +96,7 @@ export class ReviewsService {
       // Tạo đánh giá mới
       const newReview = await this.prisma.review.create({
         data: {
-          username,
+          email,
           movieId,
           rating,
           comment,
