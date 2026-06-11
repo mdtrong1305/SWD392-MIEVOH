@@ -39,17 +39,31 @@ Hệ thống sử dụng 2 định dạng tùy theo từng loại trường:
 
 ## 1. 🔐 Authentication – Xác thực
 
-### `POST /auth/register` [PUBLIC]
+### `POST /auth/register/send-otp` [PUBLIC]
 
-Đăng ký tài khoản mới.
+Gửi yêu cầu đăng ký tài khoản. Hệ thống sẽ sinh mã OTP 6 số và gửi về email. (Mã có hiệu lực 5 phút).
 
 **Request Body:**
 | Trường | Kiểu | Bắt buộc | Mô tả |
 |--------|------|----------|-------|
-| `username` | string | ✅ | Tên đăng nhập (duy nhất) |
-| `password` | string | ✅ | Mật khẩu (tối thiểu 6 ký tự) |
+| `email` | string | ✅ | Địa chỉ email (duy nhất) |
+| `phoneNumber` | string | ✅ | Số điện thoại |
 | `fullName` | string | ✅ | Họ và tên |
-| `email` | string | ❌ | Địa chỉ email |
+| `password` | string | ✅ | Mật khẩu (tối thiểu 6 ký tự) |
+
+---
+
+### `POST /auth/register` [PUBLIC]
+
+Xác nhận mã OTP để hoàn tất đăng ký tài khoản.
+
+**Request Body:**
+| Trường | Kiểu | Bắt buộc | Mô tả |
+|--------|------|----------|-------|
+| `email` | string | ✅ | Địa chỉ email đã yêu cầu OTP |
+| `otp` | string | ✅ | Mã OTP 6 chữ số nhận từ email |
+
+**Response trả về JWT Token sau khi tạo tài khoản thành công.**
 
 ---
 
@@ -85,6 +99,43 @@ Callback URL sau khi Google xác thực thành công. Tự động trả về JW
 | Trường | Kiểu | Bắt buộc | Mô tả |
 |--------|------|----------|-------|
 | `idToken` | string | ✅ | ID Token do Google SDK trên Mobile sinh ra |
+
+---
+
+### `POST /auth/forgot-password` [PUBLIC]
+
+Gửi yêu cầu khôi phục mật khẩu. Hệ thống sẽ sinh mã OTP 6 số và gửi về email. (Mã có hiệu lực 5 phút).
+
+**Request Body:**
+| Trường | Kiểu | Bắt buộc | Mô tả |
+|--------|------|----------|-------|
+| `email` | string | ✅ | Địa chỉ email đã đăng ký tài khoản |
+
+---
+
+### `POST /auth/forgot-password/verify-otp` [PUBLIC]
+
+Bước 2: Xác nhận mã OTP. Nếu mã đúng, hệ thống trả về `resetToken` dùng để đặt mật khẩu mới.
+
+**Request Body:**
+| Trường | Kiểu | Bắt buộc | Mô tả |
+|--------|------|----------|-------|
+| `email` | string | ✅ | Địa chỉ email đã yêu cầu OTP |
+| `otp` | string | ✅ | Mã OTP 6 chữ số nhận từ email |
+
+**Response:** Trả về `resetToken` (sống 15 phút).
+
+---
+
+### `POST /auth/reset-password` [PUBLIC]
+
+Bước 3: Đặt lại mật khẩu mới bằng `resetToken`.
+
+**Request Body:**
+| Trường | Kiểu | Bắt buộc | Mô tả |
+|--------|------|----------|-------|
+| `resetToken` | string | ✅ | Mã token nhận được từ bước 2 |
+| `newPassword` | string | ✅ | Mật khẩu mới |
 
 ---
 

@@ -23,4 +23,20 @@ export class EmailController {
       channel.nack(originalMsg, false, false);
     }
   }
+
+  @EventPattern('send_email')
+  async handleSendEmail(
+    @Payload() data: { to: string; subject: string; html: string },
+    @Ctx() context: RmqContext,
+  ) {
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+
+    try {
+      await this.emailService.sendOtpEmail(data);
+      channel.ack(originalMsg);
+    } catch (error) {
+      channel.nack(originalMsg, false, false);
+    }
+  }
 }

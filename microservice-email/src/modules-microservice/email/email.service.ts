@@ -59,11 +59,27 @@ export class EmailService {
         html: htmlContent,
       });
 
-      this.logger.log(
-        `[+] Gửi Email thành công tới ${email}. Mã tin nhắn: ${info.messageId}`,
-      );
+      this.logger.log(`[Recommendation Email] Đã gửi thành công đến ${info.messageId}`);
     } catch (error) {
-      this.logger.error(`[-] Thất bại khi gửi Email tới ${data.email}`, error);
+      this.logger.error(`[Recommendation Email] Lỗi khi gửi email: ${error}`);
+      throw error;
+    }
+  }
+
+  async sendOtpEmail(data: { to: string; subject: string; html: string }) {
+    try {
+      const { to, subject, html } = data;
+      const info = await transporter.sendMail({
+        from: `"MieVoh Cinema" <${EMAIL_USER}>`,
+        to,
+        subject,
+        html,
+      });
+
+      this.logger.log(`[OTP Email] Đã gửi thành công đến ${info.messageId}`);
+    } catch (error) {
+      this.logger.error(`[OTP Email] Lỗi khi gửi email: ${error}`);
+      throw error;
     }
   }
 }

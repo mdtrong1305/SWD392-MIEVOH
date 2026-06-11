@@ -184,6 +184,13 @@ export class PaymentsService {
           },
         });
 
+        // Tích điểm thưởng cho User (VD: 1,000 VNĐ = 1 điểm)
+        const earnedPoints = Math.floor(expectedAmount / 1000);
+        await this.prisma.user.updateMany({
+          where: { email: booking.email },
+          data: { rewardPoints: { increment: earnedPoints } },
+        });
+
         // Đánh dấu đã sử dụng Voucher nếu có
         if (booking.voucherId) {
           await this.prisma.voucherUsage.create({
@@ -211,7 +218,7 @@ export class PaymentsService {
           data: {
             email: booking.email,
             title: 'Thanh toán thành công',
-            message: `Hóa đơn mua vé xem phim của bạn đã được thanh toán. Mã vé: ${ticketCode}`,
+            message: `Hóa đơn mua vé xem phim của bạn đã được thanh toán. Mã vé: ${ticketCode}. Bạn được cộng thêm ${earnedPoints} điểm thưởng.`,
             link: `/profile?tab=tickets`, // redirect về trang lịch sử mua vé
           },
         });

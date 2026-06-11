@@ -53,6 +53,24 @@ export class RegisterAuthDto {
   password!: string;
 }
 
+export class VerifyRegisterOtpDto {
+  @ApiProperty({
+    description: 'Địa chỉ email đăng ký',
+    example: 'nguyenvana@gmail.com',
+  })
+  @IsEmail({}, { message: 'Email không hợp lệ' })
+  @IsNotEmpty({ message: 'Email không được để trống' })
+  email!: string;
+
+  @ApiProperty({
+    description: 'Mã OTP gồm 6 chữ số',
+    example: '123456',
+  })
+  @IsNotEmpty({ message: 'OTP không được để trống' })
+  @IsString({ message: 'OTP phải là chuỗi' })
+  otp!: string;
+}
+
 export class VerifyEmailDto {
   @ApiProperty({
     description: 'Địa chỉ email cần khôi phục mật khẩu',
@@ -63,7 +81,7 @@ export class VerifyEmailDto {
   email!: string;
 }
 
-export class ResetPasswordDto {
+export class VerifyResetOtpDto {
   @ApiProperty({
     description: 'Địa chỉ email cần khôi phục mật khẩu',
     example: 'nguyenvana@gmail.com',
@@ -71,6 +89,24 @@ export class ResetPasswordDto {
   @IsEmail({}, { message: 'Email không hợp lệ' })
   @IsNotEmpty({ message: 'Email không được để trống' })
   email!: string;
+
+  @ApiProperty({
+    description: 'Mã OTP 6 số nhận từ email',
+    example: '123456',
+  })
+  @IsNotEmpty({ message: 'OTP không được để trống' })
+  @IsString({ message: 'OTP phải là chuỗi' })
+  otp!: string;
+}
+
+export class ResetPasswordDto {
+  @ApiProperty({
+    description: 'Mã Reset Token nhận được sau khi xác thực OTP thành công',
+    example: 'a1b2c3d4e5...',
+  })
+  @IsNotEmpty({ message: 'Reset Token không được để trống' })
+  @IsString({ message: 'Reset Token phải là chuỗi' })
+  resetToken!: string;
 
   @ApiProperty({
     description: 'Mật khẩu mới',

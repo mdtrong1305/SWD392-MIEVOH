@@ -11,13 +11,16 @@ import { AuthService } from './auth.service';
 import {
   LoginAuthDto,
   RegisterAuthDto,
+  VerifyRegisterOtpDto,
   VerifyEmailDto,
+  VerifyResetOtpDto,
   ResetPasswordDto,
   ChangePasswordDto,
 } from './dto/auth.dto';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request } from 'express';
 import { Public } from '../../common/decorators/public.decorator';
+import { User } from '../../common/decorators/user.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -45,15 +48,27 @@ export class AuthController {
   }
 
   @Public()
-  @Post('register')
-  @ApiOperation({ summary: 'Đăng ký tài khoản Local mới' })
-  @ApiResponse({ status: 201, description: 'Đăng ký thành công.' })
+  @Post('register/send-otp')
+  @ApiOperation({ summary: 'Gửi mã OTP đăng ký tài khoản qua Email' })
+  @ApiResponse({ status: 201, description: 'Gửi OTP thành công.' })
   @ApiResponse({
     status: 400,
-    description: 'Tài khoản đã tồn tại hoặc dữ liệu không hợp lệ.',
+    description: 'Email hoặc số điện thoại đã tồn tại.',
   })
-  register(@Body() registerDto: RegisterAuthDto) {
-    return this.authService.register(registerDto);
+  requestRegisterOtp(@Body() registerDto: RegisterAuthDto) {
+    return this.authService.requestRegisterOtp(registerDto);
+  }
+
+  @Public()
+  @Post('register')
+  @ApiOperation({ summary: 'Xác thực OTP và tạo tài khoản' })
+  @ApiResponse({ status: 201, description: 'Đăng ký thành công, trả về JWT Token.' })
+  @ApiResponse({
+    status: 400,
+    description: 'Mã OTP không chính xác hoặc đã hết hạn.',
+  })
+  verifyRegisterOtp(@Body() verifyDto: VerifyRegisterOtpDto) {
+    return this.authService.verifyRegisterOtp(verifyDto);
   }
 
   @Public()
@@ -107,19 +122,28 @@ export class AuthController {
   }
 
   @Public()
-  @Post('verify-email')
-  @ApiOperation({ summary: 'Kiểm tra email tồn tại để khôi phục mật khẩu' })
-  @ApiResponse({ status: 200, description: 'Email tồn tại và hợp lệ.' })
+  @Post('forgot-password')
+  @ApiOperation({ summary: 'Gửi mã OTP khôi phục mật khẩu vào Email' })
+  @ApiResponse({ status: 201, description: 'Gửi mã OTP thành công.' })
   @ApiResponse({ status: 404, description: 'Email chưa đăng ký.' })
   verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
     return this.authService.verifyEmail(verifyEmailDto);
   }
 
   @Public()
+  @Post('forgot-password/verify-otp')
+  @ApiOperation({ summary: 'Xác thực OTP và nhận mã Reset Token (bước 2)' })
+  @ApiResponse({ status: 201, description: 'Xác thực thành công, trả về Reset Token.' })
+  @ApiResponse({ status: 400, description: 'Mã OTP không chính xác hoặc đã hết hạn.' })
+  verifyResetOtp(@Body() dto: VerifyResetOtpDto) {
+    return this.authService.verifyResetOtp(dto);
+  }
+
+  @Public()
   @Post('reset-password')
-  @ApiOperation({ summary: 'Đặt lại mật khẩu mới cho người dùng' })
-  @ApiResponse({ status: 200, description: 'Đặt lại mật khẩu thành công.' })
-  @ApiResponse({ status: 404, description: 'Email chưa đăng ký.' })
+  @ApiOperation({ summary: 'Dùng Reset Token để đặt lại mật khẩu mới (bước 3)' })
+  @ApiResponse({ status: 201, description: 'Đặt lại mật khẩu thành công.' })
+  @ApiResponse({ status: 400, description: 'Reset Token không hợp lệ hoặc đã hết hạn.' })
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetPasswordDto);
   }
@@ -133,10 +157,9 @@ export class AuthController {
     description: 'Mật khẩu cũ không chính xác hoặc tài khoản là OAuth.',
   })
   changePassword(
-    @Req() req: Request,
+    @User() user: any,
     @Body() changePasswordDto: ChangePasswordDto,
   ) {
-    const email = (req as any).user.email;
-    return this.authService.changePassword(email, changePasswordDto);
+    return this.authService.changePassword(user.email, changePasswordDto);
   }
 }
