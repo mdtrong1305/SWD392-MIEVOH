@@ -2,7 +2,9 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { DOMAIN_SERVER } from '../../common/constant/app.constant';
 import { deleteFile } from '../../common/helper/delete-file.helper';
 import { PrismaService } from '../../modules-system/prisma/prisma.service';
@@ -11,6 +13,8 @@ import { CreateMovieDto, UpdateMovieDto } from './dto/movies.dto';
 
 @Injectable()
 export class MoviesService {
+  private readonly logger = new Logger(MoviesService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateMovieDto = {}, filename?: string) {
@@ -32,8 +36,12 @@ export class MoviesService {
     }
 
     // Lọc releaseDate và duration không hợp lệ
-    const safeReleaseDate = releaseDate instanceof Date && !isNaN(releaseDate.getTime()) ? releaseDate : undefined;
-    const safeDuration = duration !== undefined && !isNaN(Number(duration)) ? duration : undefined;
+    const safeReleaseDate =
+      releaseDate instanceof Date && !isNaN(releaseDate.getTime())
+        ? releaseDate
+        : undefined;
+    const safeDuration =
+      duration !== undefined && !isNaN(Number(duration)) ? duration : undefined;
 
     // tạo dữ liệu phim mới
     const movie = await this.prisma.movie.create({
@@ -142,8 +150,12 @@ export class MoviesService {
     }
 
     // Lọc releaseDate và duration không hợp lệ
-    const safeReleaseDate = releaseDate instanceof Date && !isNaN(releaseDate.getTime()) ? releaseDate : undefined;
-    const safeDuration = duration !== undefined && !isNaN(Number(duration)) ? duration : undefined;
+    const safeReleaseDate =
+      releaseDate instanceof Date && !isNaN(releaseDate.getTime())
+        ? releaseDate
+        : undefined;
+    const safeDuration =
+      duration !== undefined && !isNaN(Number(duration)) ? duration : undefined;
 
     // cập nhật dữ liệu vào db
     const movie = await this.prisma.movie.update({
@@ -175,5 +187,42 @@ export class MoviesService {
     });
 
     return { message: 'Xóa phim thành công' };
+  }
+
+  // Chạy lúc 00:00 mỗi ngày để cập nhật trạng thái phim
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async updateMovieStatusDaily() {
+    this.logger.log(
+      'Bắt đầu cron job: Cập nhật trạng thái phim dựa trên releaseDate...',
+    );
+    const now = new Date();
+
+    // 1. Phim đến ngày chiếu: releaseDate <= now AND isComingSoon = true
+    const toShowing = await this.prisma.movie.updateMany({
+      where: {
+        releaseDate: { lte: now },
+        isComingSoon: true,
+      },
+      data: {
+        isComingSoon: false,
+        isShowing: true,
+      },
+    });
+
+    // 2. Phim chưa đến ngày chiếu nhưng đang lỡ để isShowing = true
+    const toComingSoon = await this.prisma.movie.updateMany({
+      where: {
+        releaseDate: { gt: now },
+        isShowing: true,
+      },
+      data: {
+        isComingSoon: true,
+        isShowing: false,
+      },
+    });
+
+    this.logger.log(
+      `Hoàn tất. Chuyển thành Đang chiếu: ${toShowing.count} phim. Chuyển thành Sắp chiếu: ${toComingSoon.count} phim.`,
+    );
   }
 }

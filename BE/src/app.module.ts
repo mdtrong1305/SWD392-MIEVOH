@@ -1,4 +1,5 @@
 import { Inject, Module, OnModuleInit } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { PrismaModule } from './modules-system/prisma/prisma.module';
 import { TokenModule } from './modules-system/token/token.module';
 import { AuthModule } from './modules-api/auth/auth.module';
@@ -32,6 +33,7 @@ import { VouchersModule } from './modules-api/vouchers/vouchers.module';
     RabbitMQModule,
     SocketModule,
     BullSystemModule,
+    ScheduleModule.forRoot(),
     CacheModule.register({
       // cấu hình cache toàn cục sử dụng Redis
       isGlobal: true, // cho phép sử dụng cache ở mọi module
