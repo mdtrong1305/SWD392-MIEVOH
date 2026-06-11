@@ -69,18 +69,20 @@ export class AuthService {
   }
 
   async requestRegisterOtp(registerDto: RegisterAuthDto) {
-    // kiểm tra user tồn tại qua email hoặc số điện thoại
+    // kiểm tra user tồn tại qua email hoặc số điện thoại (Bất kể Local hay Google)
     const user = await this.prisma.user.findFirst({
       where: {
         OR: [
           { email: registerDto.email },
           { phoneNumber: registerDto.phoneNumber },
         ],
-        authProvider: 'local',
       },
     });
 
     if (user) {
+      if (user.authProvider === 'google') {
+        throw new BadRequestException('Email này đã được đăng nhập qua Google. Vui lòng sử dụng Đăng nhập bằng Google.');
+      }
       throw new BadRequestException('Email hoặc Số điện thoại đã được đăng ký');
     }
 
@@ -212,6 +214,12 @@ export class AuthService {
           userType: 'user',
         },
       });
+    } else if (!user.googleId) {
+      // 2.1 Nếu user đã tồn tại (Local) nhưng chưa link Google -> Link ngay
+      user = await this.prisma.user.update({
+        where: { email: user.email },
+        data: { googleId },
+      });
     }
 
     // 3. Tạo Token
@@ -266,6 +274,12 @@ export class AuthService {
             authProvider: 'google',
             userType: 'user',
           },
+        });
+      } else if (!user.googleId) {
+        // Nếu user đã tồn tại (do đăng ký local trước đó) nhưng chưa có googleId -> Link account
+        user = await this.prisma.user.update({
+          where: { email: user.email },
+          data: { googleId },
         });
       }
 
