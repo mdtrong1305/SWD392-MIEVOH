@@ -74,7 +74,7 @@ Xác nhận mã OTP để hoàn tất đăng ký tài khoản.
 **Request Body:**
 | Trường | Kiểu | Bắt buộc | Mô tả |
 |--------|------|----------|-------|
-| `username` | string | ✅ | Tên đăng nhập |
+| `email` | string | ✅ | Địa chỉ email |
 | `password` | string | ✅ | Mật khẩu |
 
 **Response trả về JWT Token.**
