@@ -30,9 +30,8 @@ export class UsersService {
         skip,
         take: limit,
         select: {
-          username: true,
-          fullName: true,
           email: true,
+          fullName: true,
           phoneNumber: true,
           avatar: true,
           userType: true,
@@ -57,13 +56,12 @@ export class UsersService {
     };
   }
 
-  async getUserById(username: string) {
+  async getUserById(email: string) {
     const user = await this.prisma.user.findUnique({
-      where: { username },
+      where: { email },
       select: {
-        username: true,
-        fullName: true,
         email: true,
+        fullName: true,
         phoneNumber: true,
         avatar: true,
         userType: true,
@@ -85,13 +83,12 @@ export class UsersService {
     return user;
   }
 
-  async getProfile(username: string) {
+  async getProfile(email: string) {
     const user = await this.prisma.user.findUnique({
-      where: { username },
+      where: { email },
       select: {
-        username: true,
-        fullName: true,
         email: true,
+        fullName: true,
         phoneNumber: true,
         avatar: true,
         userType: true,
@@ -116,12 +113,12 @@ export class UsersService {
   }
 
   async updateProfile(
-    username: string,
+    email: string,
     updateProfileDto: UpdateProfileDto,
     filename?: string,
   ) {
     const user = await this.prisma.user.findUnique({
-      where: { username },
+      where: { email },
     });
 
     if (!user) {
@@ -151,16 +148,15 @@ export class UsersService {
     );
 
     const updatedUser = await this.prisma.user.update({
-      where: { username },
+      where: { email },
       data: {
         ...cleanDto,
         ...(parsedDateOfBirth ? { dateOfBirth: parsedDateOfBirth } : {}),
         avatar: avatarUrl,
       },
       select: {
-        username: true,
-        fullName: true,
         email: true,
+        fullName: true,
         phoneNumber: true,
         avatar: true,
         dateOfBirth: true,
@@ -175,14 +171,6 @@ export class UsersService {
   }
 
   async createStaff(createStaffDto: CreateStaffDto) {
-    // Kiểm tra username đã tồn tại chưa
-    const existingUsername = await this.prisma.user.findUnique({
-      where: { username: createStaffDto.username },
-    });
-    if (existingUsername) {
-      throw new ConflictException('Tên đăng nhập đã tồn tại');
-    }
-
     // Kiểm tra email đã tồn tại chưa
     const existingEmail = await this.prisma.user.findUnique({
       where: { email: createStaffDto.email },
@@ -207,7 +195,6 @@ export class UsersService {
     // Tạo staff
     const staff = await this.prisma.user.create({
       data: {
-        username: createStaffDto.username,
         email: createStaffDto.email,
         fullName: createStaffDto.fullName,
         password: hashedPassword,
@@ -216,9 +203,8 @@ export class UsersService {
         authProvider: 'local',
       },
       select: {
-        username: true,
-        fullName: true,
         email: true,
+        fullName: true,
         userType: true,
         cinemaComplexId: true,
         isActive: true,
@@ -229,9 +215,9 @@ export class UsersService {
     return staff;
   }
 
-  async updateStaff(username: string, updateStaffDto: UpdateStaffDto) {
+  async updateStaff(email: string, updateStaffDto: UpdateStaffDto) {
     const user = await this.prisma.user.findUnique({
-      where: { username },
+      where: { email },
     });
 
     if (!user) {
@@ -265,12 +251,11 @@ export class UsersService {
     }
 
     const updatedUser = await this.prisma.user.update({
-      where: { username },
+      where: { email },
       data: updateStaffDto,
       select: {
-        username: true,
-        fullName: true,
         email: true,
+        fullName: true,
         userType: true,
         cinemaComplexId: true,
         isActive: true,
@@ -281,9 +266,9 @@ export class UsersService {
     return updatedUser;
   }
 
-  async deleteUser(username: string) {
+  async deleteUser(email: string) {
     const user = await this.prisma.user.findUnique({
-      where: { username },
+      where: { email },
     });
 
     if (!user) {
@@ -292,7 +277,7 @@ export class UsersService {
 
     // Soft delete bằng cách set isActive = false
     await this.prisma.user.update({
-      where: { username },
+      where: { email },
       data: { isActive: false },
     });
 

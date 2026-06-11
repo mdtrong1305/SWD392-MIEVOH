@@ -84,7 +84,7 @@ export class AuthController {
     const user = result.user;
 
     const frontendUrl = FRONTEND_URL || 'http://localhost:5173';
-    const redirectUrl = `${frontendUrl}/login#token=${token}&username=${user.username}&fullName=${encodeURIComponent(user.fullName || '')}&email=${user.email || ''}&avatar=${user.avatar || ''}`;
+    const redirectUrl = `${frontendUrl}/login#token=${token}&email=${user.email}&fullName=${encodeURIComponent(user.fullName || '')}&avatar=${user.avatar || ''}`;
 
     return res.redirect(redirectUrl);
   }
@@ -136,7 +136,7 @@ export class AuthController {
     @Req() req: Request,
     @Body() changePasswordDto: ChangePasswordDto,
   ) {
-    const username = (req as any).user.username;
-    return this.authService.changePassword(username, changePasswordDto);
+    const email = (req as any).user.email;
+    return this.authService.changePassword(email, changePasswordDto);
   }
 }

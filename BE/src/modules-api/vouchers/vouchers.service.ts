@@ -68,7 +68,7 @@ export class VouchersService {
         endDate: parseVnDate(dto.endDate),
         usageLimit: dto.usageLimit || null,
         cinemaComplexId: targetCinemaComplexId,
-        createdBy: user.username,
+        createdByEmail: user.email,
       },
     });
 
@@ -84,7 +84,7 @@ export class VouchersService {
           title: '🎟️ Tặng bạn Mã Giảm Giá mới!',
           message: `Nhanh tay nhập mã ${code} để được giảm ngay ${discountText}. Số lượng có hạn!`,
         },
-        user.username,
+        user.email,
       );
     }
 
@@ -108,7 +108,7 @@ export class VouchersService {
     });
   }
 
-  async getMyVouchers(username: string) {
+  async getMyVouchers(email: string) {
     const now = new Date();
     // Lấy tất cả mã đang active
     const activeVouchers = await this.prisma.voucher.findMany({
@@ -121,7 +121,7 @@ export class VouchersService {
 
     // Lọc ra các mã mà User này đã dùng
     const userUsages = await this.prisma.voucherUsage.findMany({
-      where: { username },
+      where: { email },
       select: { voucherId: true },
     });
 
@@ -185,7 +185,7 @@ export class VouchersService {
     return { message: 'Xóa mã giảm giá thành công' };
   }
 
-  async applyVoucher(dto: ApplyVoucherDto, username: string) {
+  async applyVoucher(dto: ApplyVoucherDto, email: string) {
     // 1. Tìm đơn hàng Booking
     const booking = await this.prisma.booking.findUnique({
       where: { bookingId: dto.bookingId },
@@ -195,7 +195,7 @@ export class VouchersService {
     });
 
     if (!booking) throw new NotFoundException('Không tìm thấy đơn hàng (Booking)!');
-    if (booking.username !== username) throw new ForbiddenException('Đây không phải là đơn hàng của bạn!');
+    if (booking.email !== email) throw new ForbiddenException('Đây không phải là đơn hàng của bạn!');
     if (booking.paymentStatus === 'Success') throw new BadRequestException('Đơn hàng đã thanh toán không thể áp mã!');
 
     // 2. Tìm thông tin rạp để so sánh cinemaComplexId
@@ -227,7 +227,7 @@ export class VouchersService {
 
     // Kiểm tra User đã dùng chưa
     const alreadyUsed = await this.prisma.voucherUsage.findFirst({
-      where: { voucherId: voucher.voucherId, username },
+      where: { voucherId: voucher.voucherId, email },
     });
     if (alreadyUsed) {
       throw new BadRequestException('Bạn đã sử dụng mã giảm giá này rồi!');

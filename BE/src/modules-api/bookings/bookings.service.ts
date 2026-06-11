@@ -72,7 +72,7 @@ export class BookingsService {
   }
 
   async createBooking(
-    username: string,
+    email: string,
     data: CreateBookingDto,
     ipAddr: string,
   ) {
@@ -101,7 +101,7 @@ export class BookingsService {
       const heldBy = await this.cacheManager.get(
         `hold:${data.showtimeId}:${seatId}`,
       );
-      if (heldBy && heldBy !== username) {
+      if (heldBy && heldBy !== email) {
         throw new ConflictException(
           'Ghế bạn chọn đang được khách hàng khác giữ để thanh toán. Vui lòng chọn ghế khác hoặc thử lại sau 5 phút.',
         );
@@ -134,7 +134,7 @@ export class BookingsService {
     for (const seatId of data.seats) {
       await this.cacheManager.set(
         `hold:${data.showtimeId}:${seatId}`,
-        username,
+        email,
         300000,
       );
     }
@@ -162,7 +162,7 @@ export class BookingsService {
       }
 
       const alreadyUsed = await this.prisma.voucherUsage.findFirst({
-        where: { voucherId: voucher.voucherId, username },
+        where: { voucherId: voucher.voucherId, email },
       });
       if (alreadyUsed) {
         throw new BadRequestException('Bạn đã sử dụng mã giảm giá này rồi!');
@@ -192,7 +192,7 @@ export class BookingsService {
     const tempTicketCode = `PENDING-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
     const booking = await this.prisma.booking.create({
       data: {
-        username,
+        email,
         showtimeId: data.showtimeId,
         totalPrice,
         paymentStatus: 'Pending',
@@ -229,9 +229,9 @@ export class BookingsService {
     };
   }
 
-  async getMyHistory(username: string) {
+  async getMyHistory(email: string) {
     const bookings = await this.prisma.booking.findMany({
-      where: { username },
+      where: { email },
       orderBy: { createdAt: 'desc' },
       include: {
         Showtime: {
@@ -258,9 +258,9 @@ export class BookingsService {
     return bookings;
   }
 
-  async getBookingById(username: string, bookingId: string) {
+  async getBookingById(email: string, bookingId: string) {
     const booking = await this.prisma.booking.findFirst({
-      where: { bookingId, username },
+      where: { bookingId, email },
       include: {
         Showtime: {
           include: {

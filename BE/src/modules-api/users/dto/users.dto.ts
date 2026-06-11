@@ -9,11 +9,6 @@ import {
 } from 'class-validator';
 
 export class CreateStaffDto {
-  @ApiProperty({ description: 'Tên đăng nhập', example: 'staff_cgv' })
-  @IsNotEmpty({ message: 'Vui lòng nhập tên đăng nhập' })
-  @IsString()
-  username!: string;
-
   @ApiProperty({ description: 'Họ và tên', example: 'Nguyễn Văn A' })
   @IsNotEmpty({ message: 'Vui lòng nhập họ tên' })
   @IsString()

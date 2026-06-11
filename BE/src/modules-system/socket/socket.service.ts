@@ -33,10 +33,10 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
   // Lắng nghe sự kiện Frontend xin gia nhập phòng cá nhân
   @SubscribeMessage('join_room')
   handleJoinRoom(
-    @MessageBody() username: string,
+    @MessageBody() email: string,
     @ConnectedSocket() client: Socket,
   ) {
-    const roomName = `ROOM_${username}`;
+    const roomName = `ROOM_${email}`;
     client.join(roomName);
     this.logger.log(`Client ${client.id} joined room: ${roomName}`);
     return { event: 'joined', data: `Successfully joined room ${roomName}` };
@@ -45,35 +45,35 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
   // Lắng nghe sự kiện Frontend rời phòng cá nhân (khi đăng xuất)
   @SubscribeMessage('leave_room')
   handleLeaveRoom(
-    @MessageBody() username: string,
+    @MessageBody() email: string,
     @ConnectedSocket() client: Socket,
   ) {
-    const roomName = `ROOM_${username}`;
+    const roomName = `ROOM_${email}`;
     client.leave(roomName);
     this.logger.log(`Client ${client.id} left room: ${roomName}`);
   }
 
   // 1. Emit báo cáo tiến độ phân tích dữ liệu AI về cho Frontend (Chuẩn Room)
-  emitAnalysisProgress(username: string, progress: number) {
-    this.server.to(`ROOM_${username}`).emit('analysis_progress', { progress });
+  emitAnalysisProgress(email: string, progress: number) {
+    this.server.to(`ROOM_${email}`).emit('analysis_progress', { progress });
   }
 
   // 2. Thêm sự kiện bắn Thông báo (Notification) Realtime tới đích danh USER (Chuẩn Room)
-  emitNotification(username: string, payload: any) {
-    // Chỉ những Socket Client nào đã .join(`ROOM_${username}`) mới nhận được sự kiện này
-    this.server.to(`ROOM_${username}`).emit('notification', payload);
+  emitNotification(email: string, payload: any) {
+    // Chỉ những Socket Client nào đã .join(`ROOM_${email}`) mới nhận được sự kiện này
+    this.server.to(`ROOM_${email}`).emit('notification', payload);
   }
 
   // 3. Thêm sự kiện khi một thông báo được đánh dấu đã đọc
-  emitMarkAsRead(notificationId: string, username: string) {
+  emitMarkAsRead(notificationId: string, email: string) {
     this.server
-      .to(`ROOM_${username}`)
-      .emit('mark_as_read', { notificationId, username });
+      .to(`ROOM_${email}`)
+      .emit('mark_as_read', { notificationId, email });
   }
 
   // 4. Thêm sự kiện khi TẤT CẢ thông báo được đánh dấu đã đọc
-  emitMarkAllAsRead(username: string) {
-    this.server.to(`ROOM_${username}`).emit('mark_all_as_read', { username });
+  emitMarkAllAsRead(email: string) {
+    this.server.to(`ROOM_${email}`).emit('mark_all_as_read', { email });
   }
 
   // 5. Thêm sự kiện Broadcast thông báo toàn hệ thống (Bảo trì, Event hot...)

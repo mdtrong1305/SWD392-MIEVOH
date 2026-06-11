@@ -11,7 +11,7 @@ export class NotificationsService {
   ) {}
 
   async getMyNotifications(
-    username: string,
+    email: string,
     page: number = 1,
     pageSize: number = 10,
   ) {
@@ -19,13 +19,13 @@ export class NotificationsService {
 
     const [notifications, total, unreadCount] = await Promise.all([
       this.prisma.notification.findMany({
-        where: { username },
+        where: { email },
         orderBy: { createdAt: 'desc' },
         skip,
         take: pageSize,
       }),
-      this.prisma.notification.count({ where: { username } }),
-      this.prisma.notification.count({ where: { username, isRead: false } }),
+      this.prisma.notification.count({ where: { email } }),
+      this.prisma.notification.count({ where: { email, isRead: false } }),
     ]);
 
     return {
@@ -38,14 +38,14 @@ export class NotificationsService {
     };
   }
 
-  async markAsRead(username: string, notificationId: string) {
+  async markAsRead(email: string, notificationId: string) {
     const notif = await this.prisma.notification.findUnique({
       where: { notificationId },
     });
     if (!notif) {
       throw new NotFoundException('Không tìm thấy thông báo');
     }
-    if (notif.username !== username) {
+    if (notif.email !== email) {
       throw new NotFoundException('Không có quyền truy cập thông báo này');
     }
 
@@ -55,19 +55,19 @@ export class NotificationsService {
     });
 
     // Phát tín hiệu qua Socket để Frontend update UI realtime
-    this.socketService.emitMarkAsRead(notificationId, username);
+    this.socketService.emitMarkAsRead(notificationId, email);
 
     return updated;
   }
 
-  async markAllAsRead(username: string) {
+  async markAllAsRead(email: string) {
     const updated = await this.prisma.notification.updateMany({
-      where: { username, isRead: false },
+      where: { email, isRead: false },
       data: { isRead: true },
     });
 
     // Phát tín hiệu qua Socket
-    this.socketService.emitMarkAllAsRead(username);
+    this.socketService.emitMarkAllAsRead(email);
 
     return updated;
   }
@@ -79,7 +79,7 @@ export class NotificationsService {
     // 1. Lấy tất cả user đang active
     const activeUsers = await this.prisma.user.findMany({
       where: { isActive: true },
-      select: { username: true },
+      select: { email: true },
     });
 
     if (activeUsers.length === 0)
@@ -91,13 +91,13 @@ export class NotificationsService {
         title: dto.title,
         message: dto.message,
         link: dto.link || null,
-        createdBy: createdBy || 'system',
+        createdByEmail: createdBy || 'system',
       },
     });
 
     // 3. Tạo mảng data để insert nhiều dòng vào bảng Notification
     const dataToInsert = activeUsers.map((u) => ({
-      username: u.username,
+      email: u.email,
       title: dto.title,
       message: dto.message,
       link: dto.link || null,

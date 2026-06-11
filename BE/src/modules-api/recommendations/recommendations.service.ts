@@ -50,9 +50,9 @@ export class RecommendationsService implements OnModuleInit {
     }
   }
 
-  async getMyMovies(username: string) {
+  async getMyMovies(email: string) {
     const recs = await this.prisma.userRecommendation.findMany({
-      where: { username },
+      where: { email },
       include: {
         Movie: {
           select: { title_vi: true, imageUrl: true, averageRating: true },

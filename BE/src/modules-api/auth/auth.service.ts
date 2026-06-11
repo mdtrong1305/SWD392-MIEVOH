@@ -25,9 +25,9 @@ export class AuthService {
   ) {}
 
   async login(createAuthDto: LoginAuthDto) {
-    // 1. Kiểm tra user tồn tại qua email hoặc số điện thoại
+    // 1. Kiểm tra user tồn tại qua email
     const user = await this.prisma.user.findFirst({
-      where: { username: createAuthDto.username, authProvider: 'local' },
+      where: { email: createAuthDto.email, authProvider: 'local' },
     });
 
     if (!user) {
@@ -50,9 +50,8 @@ export class AuthService {
     // 4. Trả về thông tin user và token
     return {
       user: {
-        username: user.username,
-        fullName: user.fullName,
         email: user.email,
+        fullName: user.fullName,
         avatar: user.avatar,
         userType: user.userType,
         cinemaComplexId: user.cinemaComplexId,
@@ -62,13 +61,12 @@ export class AuthService {
   }
 
   async register(registerDto: RegisterAuthDto) {
-    // 1. Kiểm tra user tồn tại qua email hoặc số điện thoại hoặc username
+    // 1. Kiểm tra user tồn tại qua email hoặc số điện thoại
     const user = await this.prisma.user.findFirst({
       where: {
         OR: [
           { email: registerDto.email },
           { phoneNumber: registerDto.phoneNumber },
-          { username: registerDto.username },
         ],
         authProvider: 'local',
       },
@@ -81,9 +79,8 @@ export class AuthService {
     // 2. Tạo user
     const newUser = await this.prisma.user.create({
       data: {
-        username: registerDto.username,
-        fullName: registerDto.fullName,
         email: registerDto.email,
+        fullName: registerDto.fullName,
         phoneNumber: registerDto.phoneNumber,
         password: bcrypt.hashSync(registerDto.password, 10),
         authProvider: 'local',
@@ -97,9 +94,8 @@ export class AuthService {
     // 4. Trả về thông tin user và token
     return {
       user: {
-        username: newUser.username,
-        fullName: newUser.fullName,
         email: newUser.email,
+        fullName: newUser.fullName,
         avatar: newUser.avatar,
         userType: newUser.userType,
         cinemaComplexId: newUser.cinemaComplexId,
@@ -126,7 +122,6 @@ export class AuthService {
     if (!user) {
       user = await this.prisma.user.create({
         data: {
-          username: email, // Dùng email làm username
           email,
           fullName,
           avatar,
@@ -143,9 +138,8 @@ export class AuthService {
     // 4. Trả về thông tin
     return {
       user: {
-        username: user.username,
-        fullName: user.fullName,
         email: user.email,
+        fullName: user.fullName,
         avatar: user.avatar,
         userType: user.userType,
         cinemaComplexId: user.cinemaComplexId,
@@ -183,7 +177,6 @@ export class AuthService {
       if (!user) {
         user = await this.prisma.user.create({
           data: {
-            username: email!,
             email: email!,
             fullName: fullName || 'Google User',
             avatar: avatar || null,
@@ -198,9 +191,8 @@ export class AuthService {
 
       return {
         user: {
-          username: user.username,
-          fullName: user.fullName,
           email: user.email,
+          fullName: user.fullName,
           avatar: user.avatar,
           userType: user.userType,
           cinemaComplexId: user.cinemaComplexId,
@@ -235,7 +227,7 @@ export class AuthService {
     }
 
     await this.prisma.user.update({
-      where: { username: user.username },
+      where: { email: user.email },
       data: {
         password: bcrypt.hashSync(dto.newPassword, 10),
       },
@@ -244,9 +236,9 @@ export class AuthService {
     return { message: 'Khôi phục mật khẩu thành công' };
   }
 
-  async changePassword(username: string, dto: ChangePasswordDto) {
+  async changePassword(email: string, dto: ChangePasswordDto) {
     const user = await this.prisma.user.findUnique({
-      where: { username },
+      where: { email },
     });
 
     if (!user) {
@@ -268,7 +260,7 @@ export class AuthService {
     }
 
     await this.prisma.user.update({
-      where: { username },
+      where: { email },
       data: {
         password: bcrypt.hashSync(dto.newPassword, 10),
       },

@@ -69,7 +69,7 @@ export class ReviewsController {
     @User() user: PrismaUser,
     @Body() createReviewDto: CreateReviewDto,
   ) {
-    return this.reviewsService.createReview(user.username, createReviewDto);
+    return this.reviewsService.createReview(user.email, createReviewDto);
   }
 
   @Delete(':reviewId')

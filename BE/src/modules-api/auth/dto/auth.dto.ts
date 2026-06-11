@@ -3,12 +3,12 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginAuthDto {
   @ApiProperty({
-    description: 'Tên đăng nhập của người dùng',
-    example: 'nguyenvana',
+    description: 'Email của người dùng',
+    example: 'nguyenvana@gmail.com',
   })
-  @IsNotEmpty({ message: 'Tên tài khoản không được để trống' })
-  @IsString({ message: 'Tên tài khoản phải là chuỗi' })
-  username!: string;
+  @IsEmail({}, { message: 'Email không hợp lệ' })
+  @IsNotEmpty({ message: 'Email không được để trống' })
+  email!: string;
 
   @ApiProperty({
     description: 'Mật khẩu tài khoản',
@@ -20,14 +20,6 @@ export class LoginAuthDto {
 }
 
 export class RegisterAuthDto {
-  @ApiProperty({
-    description: 'Tên đăng nhập muốn đăng ký',
-    example: 'nguyenvana',
-  })
-  @IsNotEmpty({ message: 'Tên tài khoản không được để trống' })
-  @IsString({ message: 'Tên tài khoản phải là chuỗi' })
-  username!: string;
-
   @ApiProperty({
     description: 'Họ và tên đầy đủ',
     example: 'Nguyễn Văn A',

@@ -15,11 +15,11 @@ class PandasRecommendationService:
         
         # 1. Tải Data từ MongoDB
         print("[Pandas] Đang tải dữ liệu từ Database...")
-        bookings = list(self.db["Booking"].find({}, {"_id": 0, "username": 1, "showtimeId": 1}))
+        bookings = list(self.db["Booking"].find({}, {"_id": 0, "email": 1, "showtimeId": 1}))
         showtimes = list(self.db["Showtime"].find({}, {"_id": 1, "movieId": 1}))
         movies = list(self.db["Movie"].find({"isShowing": True}, {"_id": 1, "genres": 1, "director": 1, "cast": 1, "isHot": 1}))
         all_movies = list(self.db["Movie"].find({}, {"_id": 1, "genres": 1, "director": 1, "cast": 1}))
-        reviews = list(self.db["Review"].find({}, {"_id": 0, "username": 1, "movieId": 1, "rating": 1}))
+        reviews = list(self.db["Review"].find({}, {"_id": 0, "email": 1, "movieId": 1, "rating": 1}))
 
         # Tiền xử lý ObjectId thành chuỗi để Pandas dễ merge
         for m in movies: m["_id"] = str(m.get("_id", ""))
@@ -49,7 +49,7 @@ class PandasRecommendationService:
             df_history = pd.merge(df_history, df_all_movies, left_on="movieId", right_on="_id")
             # Kết hợp thêm dữ liệu Đánh giá (nếu có)
             if not df_reviews.empty:
-                df_history = pd.merge(df_history, df_reviews, on=["username", "movieId"], how="left")
+                df_history = pd.merge(df_history, df_reviews, on=["email", "movieId"], how="left")
             else:
                 df_history["rating"] = pd.NA
         else:
@@ -60,10 +60,10 @@ class PandasRecommendationService:
         
         # Chạy thuật toán cho từng user
         for user in users:
-            username = user.get("_id")
-            if not username: continue
+            email = user.get("_id")
+            if not email: continue
             
-            user_hist = df_history[df_history["username"] == username] if not df_history.empty else pd.DataFrame()
+            user_hist = df_history[df_history["email"] == email] if not df_history.empty else pd.DataFrame()
             
             # Yêu cầu: Bắt buộc phải có lịch sử mua vé mới phân tích
             if user_hist.empty:
@@ -139,7 +139,7 @@ class PandasRecommendationService:
 
             for _, row in df_unseen.iterrows():
                 new_recs.append({
-                    "username": username,
+                    "email": email,
                     "movieId": ObjectId(row["_id"]),
                     "matchScore": round(row["matchScore"], 1),
                     "isEmailSent": False,

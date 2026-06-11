@@ -55,7 +55,7 @@ export class NotificationsController {
     @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe) pageSize: number,
   ) {
     return this.notificationsService.getMyNotifications(
-      user.username,
+      user.email,
       page,
       pageSize,
     );
@@ -64,13 +64,13 @@ export class NotificationsController {
   @Put('read-all')
   @ApiOperation({ summary: 'Đánh dấu đã đọc TẤT CẢ thông báo' })
   markAllAsRead(@User() user: PrismaUser) {
-    return this.notificationsService.markAllAsRead(user.username);
+    return this.notificationsService.markAllAsRead(user.email);
   }
 
   @Put(':id/read')
   @ApiOperation({ summary: 'Đánh dấu 1 thông báo là đã đọc' })
   markAsRead(@Param('id') id: string, @User() user: PrismaUser) {
-    return this.notificationsService.markAsRead(user.username, id);
+    return this.notificationsService.markAsRead(user.email, id);
   }
 
   @Post('broadcast')
@@ -81,7 +81,7 @@ export class NotificationsController {
     @Body() dto: BroadcastNotificationDto,
     @User() user: PrismaUser,
   ) {
-    return this.notificationsService.broadcastNotification(dto, user.username);
+    return this.notificationsService.broadcastNotification(dto, user.email);
   }
 
   // =====================================
