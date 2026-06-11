@@ -13,6 +13,7 @@ services:
     env_file:
       - .env.docker
     environment:
+      - TZ=Asia/Ho_Chi_Minh
       - RABBIT_MQ_URL=amqp://admin:admin123@rabbitmq:5672
     depends_on:
       - redis-cache
@@ -59,6 +60,7 @@ services:
     env_file:
       - ../python-worker/.env.docker
     environment:
+      - TZ=Asia/Ho_Chi_Minh
       - RABBIT_MQ_URL=amqp://admin:admin123@rabbitmq:5672
     depends_on:
       - rabbitmq
@@ -75,6 +77,7 @@ services:
     env_file:
       - ../microservice-email/.env.docker
     environment:
+      - TZ=Asia/Ho_Chi_Minh
       - RABBIT_MQ_URL=amqp://admin:admin123@rabbitmq:5672
     depends_on:
       - rabbitmq
