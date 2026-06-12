@@ -939,6 +939,43 @@ Xem thống kê chiến dịch Email Marketing (số email đã gửi, tỉ lệ
 
 ---
 
+## 17. 📊 Statistics & Dashboard
+
+### `GET /statistics/overview` [STAFF, ADMIN, SYSTEM]
+
+Lấy các thông số tổng quan (Doanh thu, số vé, số user, số phim).
+*Lưu ý: Nếu user là Staff, doanh thu và số vé tự động được lọc theo cụm rạp quản lý.*
+
+---
+
+### `GET /statistics/revenue-chart` [STAFF, ADMIN, SYSTEM]
+
+Vẽ biểu đồ doanh thu theo ngày.
+
+**Query Parameters:**
+| Tham số | Kiểu | Bắt buộc | Mô tả |
+|---------|------|----------|-------|
+| `days` | number | ❌ | Số ngày lấy dữ liệu (Mặc định: 7) |
+
+---
+
+### `GET /statistics/top-movies` [STAFF, ADMIN, SYSTEM]
+
+Lấy danh sách các bộ phim có doanh thu cao nhất.
+
+**Query Parameters:**
+| Tham số | Kiểu | Bắt buộc | Mô tả |
+|---------|------|----------|-------|
+| `limit` | number | ❌ | Số lượng phim lấy ra (Mặc định: 5) |
+
+---
+
+### `GET /statistics/revenue-by-complex` [ADMIN, SYSTEM]
+
+Phân bổ doanh thu của từng cụm rạp trong toàn hệ thống. Dùng để vẽ biểu đồ tròn (Pie chart).
+
+---
+
 ## 🔌 Socket Events (Realtime)
 
 Kết nối: `ws://localhost:3069` (Socket.io)
