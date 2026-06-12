@@ -56,6 +56,7 @@ async function bootstrap() {
       'Recommendations',
       'Quản lý hệ thống Recommend System & Email Maketing',
     )
+    .addTag('Statistics', 'Thống kê và Báo cáo')
     .addBearerAuth(
       {
         type: 'http',

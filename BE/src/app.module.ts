@@ -27,6 +27,7 @@ import { RabbitMQModule } from './modules-system/rabbit-mq/rabbit-mq.module';
 import { RecommendationsModule } from './modules-api/recommendations/recommendations.module';
 import { NotificationsModule } from './modules-api/notifications/notifications.module';
 import { VouchersModule } from './modules-api/vouchers/vouchers.module';
+import { StatisticsModule } from './modules-api/statistics/statistics.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { VouchersModule } from './modules-api/vouchers/vouchers.module';
     RecommendationsModule,
     NotificationsModule,
     VouchersModule,
+    StatisticsModule,
   ],
   providers: [
     {
