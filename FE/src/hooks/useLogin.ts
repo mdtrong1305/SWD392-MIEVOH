@@ -6,10 +6,10 @@ import { toast } from '../components/Toast/Toast.tsx';
 import { loginUser, clearError, setAuthenticated } from '../pages/User/Login/slice.ts';
 import type { AppDispatch } from '../store/index.tsx';
 import { validateEmail, validatePassword, validateConfirmPassword } from '../validation/validation';
-import { verifyEmailApi, resetPasswordApi } from '../axios/auth.tsx';
+import { forgotPasswordApi, verifyResetOtpApi, resetPasswordApi } from '../axios/auth.tsx';
 
 export interface LoginForm {
-    username: string;
+    email: string;
     password: string;
 }
 
@@ -27,7 +27,7 @@ export default function useLogin(initialSliding: boolean) {
     const [params] = useSearchParams();
 
     const [isSliding, setIsSliding] = useState(initialSliding);
-    const [loginForm, setLoginForm] = useState<LoginForm>({ username: '', password: '' });
+    const [loginForm, setLoginForm] = useState<LoginForm>({ email: '', password: '' });
     const [showLoginPwd, setShowLoginPwd] = useState(false);
 
     // Forgot Password States
@@ -39,6 +39,14 @@ export default function useLogin(initialSliding: boolean) {
     const [showForgotPwd, setShowForgotPwd] = useState(false);
     const [showForgotConfirmPwd, setShowForgotConfirmPwd] = useState(false);
     const [forgotLoading, setForgotLoading] = useState(false);
+
+    // Forgot Password OTP States
+    const [showForgotOtpModal, setShowForgotOtpModal] = useState(false);
+    const [forgotOtpCode, setForgotOtpCode] = useState('');
+    const [forgotOtpLoading, setForgotOtpLoading] = useState(false);
+    const [forgotOtpError, setForgotOtpError] = useState<string | null>(null);
+    const [forgotOtpResendLoading, setForgotOtpResendLoading] = useState(false);
+    const [resetToken, setResetToken] = useState('');
 
     const { loading: loginLoading, error: loginError, isAuthenticated } = useSelector(
         (state: { login: LoginSliceState }) => state.login
@@ -71,12 +79,11 @@ export default function useLogin(initialSliding: boolean) {
         // Parse Hash parameters since we switched from ? to # for security
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const token = hashParams.get('token') || params.get('token');
-        const username = hashParams.get('username') || params.get('username');
         const fullName = hashParams.get('fullName') || params.get('fullName');
         const email = hashParams.get('email') || params.get('email');
         const avatar = hashParams.get('avatar') || params.get('avatar');
 
-        if (token && username) {
+        if (token && email) {
             // Prevent duplicate toast/processing in StrictMode (development)
             if ((window as any).__google_oauth_processed__ === token) {
                 return;
@@ -86,7 +93,7 @@ export default function useLogin(initialSliding: boolean) {
             // Check if user agent is mobile / emulator
             const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             if (isMobileUA) {
-                const deepLinkUrl = `mievohmobile://login?token=${token}&username=${username}&fullName=${encodeURIComponent(fullName || '')}&email=${email || ''}&avatar=${encodeURIComponent(avatar || '')}`;
+                const deepLinkUrl = `mievohmobile://login?token=${token}&fullName=${encodeURIComponent(fullName || '')}&email=${email}&avatar=${encodeURIComponent(avatar || '')}`;
                 window.location.href = deepLinkUrl;
                 return;
             }
@@ -96,11 +103,10 @@ export default function useLogin(initialSliding: boolean) {
             localStorage.setItem('auth_isAuthenticated', 'true');
             
             const userObj = {
-                username,
-                name: fullName || username,
-                email: email || username,
-                fullName: fullName || username,
-                hoTen: fullName || username,
+                name: fullName || email,
+                email: email,
+                fullName: fullName || email,
+                hoTen: fullName || email,
                 role: "USER",
                 avatar: avatar || "/images/avatar.jpg",
                 token
@@ -134,14 +140,56 @@ export default function useLogin(initialSliding: boolean) {
         setForgotLoading(true);
         setForgotErrors({});
         try {
-            await verifyEmailApi(forgotEmail);
-            toast.success(t("toast_email_verified_success"));
-            setForgotStep('reset');
+            await forgotPasswordApi(forgotEmail);
+            toast.success(t("toast_otp_sent"));
+            setShowForgotOtpModal(true);
+            setForgotOtpError(null);
+            setForgotOtpCode('');
         } catch (err: any) {
-            const message = err.response?.data?.message || 'Failed to verify email';
+            const message = err.response?.data?.message || err.message || 'Failed to verify email';
             setForgotErrors({ email: message });
         } finally {
             setForgotLoading(false);
+        }
+    };
+
+    const handleVerifyForgotOtp = async (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
+        if (forgotOtpCode.length !== 6) {
+            setForgotOtpError(t("otp_invalid_length"));
+            return;
+        }
+
+        setForgotOtpLoading(true);
+        setForgotOtpError(null);
+        try {
+            const res = await verifyResetOtpApi({
+                email: forgotEmail,
+                otp: forgotOtpCode
+            });
+            const token = res?.resetToken || (res as any)?.data?.resetToken;
+            setResetToken(token || '');
+            setShowForgotOtpModal(false);
+            setForgotStep('reset');
+        } catch (err: any) {
+            const message = err.response?.data?.message || err.message || 'OTP verification failed';
+            setForgotOtpError(message);
+        } finally {
+            setForgotOtpLoading(false);
+        }
+    };
+
+    const handleResendForgotOtp = async () => {
+        setForgotOtpResendLoading(true);
+        setForgotOtpError(null);
+        try {
+            await forgotPasswordApi(forgotEmail);
+            toast.success(t("toast_otp_sent"));
+        } catch (err: any) {
+            const message = err.response?.data?.message || err.message || 'Failed to resend OTP';
+            setForgotOtpError(message);
+        } finally {
+            setForgotOtpResendLoading(false);
         }
     };
 
@@ -167,14 +215,15 @@ export default function useLogin(initialSliding: boolean) {
         setForgotLoading(true);
         setForgotErrors({});
         try {
-            await resetPasswordApi({ email: forgotEmail, newPassword: forgotNewPassword });
+            await resetPasswordApi({ resetToken, newPassword: forgotNewPassword });
             toast.success(t("toast_password_reset_success"));
             setForgotStep('none');
             setForgotEmail('');
             setForgotNewPassword('');
             setForgotConfirmPassword('');
+            setResetToken('');
         } catch (err: any) {
-            const message = err.response?.data?.message || 'Failed to reset password';
+            const message = err.response?.data?.message || err.message || 'Failed to reset password';
             setForgotErrors({ password: message });
         } finally {
             setForgotLoading(false);
@@ -183,8 +232,8 @@ export default function useLogin(initialSliding: boolean) {
 
     const handleLoginSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!loginForm.username.trim()) {
-            toast.error(t("toast_username_required"));
+        if (!loginForm.email.trim()) {
+            toast.error(t("toast_email_required"));
             return;
         }
         if (!loginForm.password.trim()) {
@@ -243,6 +292,16 @@ export default function useLogin(initialSliding: boolean) {
         handleLoginChange,
         handleLoginSubmit,
         handleSwitchToRegister,
-        handleSwitchToLogin
+        handleSwitchToLogin,
+        // Forgot Password OTP states
+        showForgotOtpModal,
+        setShowForgotOtpModal,
+        forgotOtpCode,
+        setForgotOtpCode,
+        forgotOtpLoading,
+        forgotOtpError,
+        forgotOtpResendLoading,
+        handleVerifyForgotOtp,
+        handleResendForgotOtp
     };
 }

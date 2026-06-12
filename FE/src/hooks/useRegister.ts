@@ -1,9 +1,8 @@
 import { useLanguage } from "../contextAPI/LanguageContext.tsx";
 import React, { useState, useEffect } from 'react';
 import { toast } from '../components/Toast/Toast.tsx';
-import { registerApi } from '../axios/auth.tsx';
+import { sendRegisterOtpApi, verifyRegisterOtpApi } from '../axios/auth.tsx';
 import { 
-    validateUsername,
     validateEmail, 
     validatePhone, 
     validateName, 
@@ -12,7 +11,6 @@ import {
 } from '../validation/validation';
 
 export interface RegisterForm {
-    username: string;
     matKhau: string;
     xacNhanMatKhau: string;
     email: string;
@@ -21,7 +19,6 @@ export interface RegisterForm {
 }
 
 export interface FormErrors {
-    username?: string;
     email?: string;
     matKhau?: string;
     xacNhanMatKhau?: string;
@@ -37,7 +34,6 @@ export default function useRegister(onRegisterSuccess: () => void) {
     const [emailTaken, setEmailTaken] = useState(false);
 
     const [registerForm, setRegisterForm] = useState<RegisterForm>({
-        username: '',
         matKhau: '',
         xacNhanMatKhau: '',
         email: '',
@@ -49,6 +45,13 @@ export default function useRegister(onRegisterSuccess: () => void) {
 
     const [showRegPwd, setShowRegPwd] = useState(false);
     const [showRegConfirmPwd, setShowRegConfirmPwd] = useState(false);
+
+    // OTP states
+    const [showOtpModal, setShowOtpModal] = useState(false);
+    const [otpCode, setOtpCode] = useState('');
+    const [otpLoading, setOtpLoading] = useState(false);
+    const [otpError, setOtpError] = useState<string | null>(null);
+    const [otpResendLoading, setOtpResendLoading] = useState(false);
 
     useEffect(() => {
         if (regSuccess) {
@@ -84,12 +87,6 @@ export default function useRegister(onRegisterSuccess: () => void) {
         const newErrors: FormErrors = { ...errors };
 
         switch (fieldName) {
-            case 'username': {
-                const err = validateUsername(value);
-                if (err) newErrors.username = err;
-                else delete newErrors.username;
-                break;
-            }
             case 'matKhau': {
                 const err = validatePassword(value);
                 if (err) newErrors.matKhau = err;
@@ -136,9 +133,6 @@ export default function useRegister(onRegisterSuccess: () => void) {
     const validateRegisterForm = () => {
         const newErrors: FormErrors = {};
 
-        const usernameErr = validateUsername(registerForm.username);
-        if (usernameErr) newErrors.username = usernameErr;
-
         const nameErr = validateName(registerForm.hoTen);
         if (nameErr) newErrors.hoTen = nameErr;
 
@@ -163,24 +157,49 @@ export default function useRegister(onRegisterSuccess: () => void) {
         setEmailTaken(false);
     };
 
-    const registerUserAPI = async (payload: any) => {
+    const handleRegisterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!validateRegisterForm()) return;
+
         setRegLoading(true);
         setRegError(null);
-        setRegSuccess(false);
         try {
-            await registerApi({
-                username: payload.username,
-                fullName: payload.fullName,
-                email: payload.email,
-                phoneNumber: payload.phoneNumber,
-                password: payload.password
+            await sendRegisterOtpApi({
+                fullName: registerForm.hoTen,
+                email: registerForm.email,
+                phoneNumber: registerForm.soDT,
+                password: registerForm.matKhau
             });
+            setShowOtpModal(true);
+            setOtpError(null);
+            setOtpCode('');
+            toast.success(t("toast_otp_sent"));
+        } catch (err: any) {
+            const errorMessage = err?.response?.data?.message || err?.message || "Failed to send OTP";
+            setRegError(errorMessage);
+        } finally {
+            setRegLoading(false);
+        }
+    };
 
+    const handleVerifyOtpSubmit = async (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
+        if (otpCode.length !== 6) {
+            setOtpError(t("otp_invalid_length"));
+            return;
+        }
+
+        setOtpLoading(true);
+        setOtpError(null);
+        try {
+            await verifyRegisterOtpApi({
+                email: registerForm.email,
+                otp: otpCode
+            });
+            setShowOtpModal(false);
             setRegSuccess(true);
             toast.success(t("toast_register_success"));
-            setRegError(null);
             setRegisterForm({
-                username: '',
                 matKhau: '',
                 xacNhanMatKhau: '',
                 email: '',
@@ -188,30 +207,33 @@ export default function useRegister(onRegisterSuccess: () => void) {
                 soDT: ''
             });
         } catch (err: any) {
-            const errorMessage = err?.response?.data?.message || err?.message || "Registration failed";
-            setRegError(errorMessage);
-            setRegSuccess(false);
+            const errorMessage = err?.response?.data?.message || err?.message || "OTP verification failed";
+            setOtpError(errorMessage);
         } finally {
-            setRegLoading(false);
+            setOtpLoading(false);
         }
     };
 
-    const handleRegisterSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (!validateRegisterForm()) return;
-
-        const payload = {
-            username: registerForm.username,
-            fullName: registerForm.hoTen,
-            email: registerForm.email,
-            password: registerForm.matKhau,
-            phoneNumber: registerForm.soDT,
-        };
-        registerUserAPI(payload);
+    const handleResendOtp = async () => {
+        setOtpResendLoading(true);
+        setOtpError(null);
+        try {
+            await sendRegisterOtpApi({
+                fullName: registerForm.hoTen,
+                email: registerForm.email,
+                phoneNumber: registerForm.soDT,
+                password: registerForm.matKhau
+            });
+            toast.success(t("toast_otp_sent"));
+        } catch (err: any) {
+            const errorMessage = err?.response?.data?.message || err?.message || "Failed to resend OTP";
+            setOtpError(errorMessage);
+        } finally {
+            setOtpResendLoading(false);
+        }
     };
 
-    const isUsernameValid = registerForm.username.trim() !== '' && !errors.username;
-    const isHoTenValid = isUsernameValid && registerForm.hoTen.trim() !== '' && !errors.hoTen;
+    const isHoTenValid = registerForm.hoTen.trim() !== '' && !errors.hoTen;
     const isEmailValid = isHoTenValid && registerForm.email.trim() !== '' && !errors.email && !emailTaken;
     const isSoDTValid = isEmailValid && registerForm.soDT.trim() !== '' && !errors.soDT;
     const isMatKhauValid = isSoDTValid && registerForm.matKhau.trim() !== '' && !errors.matKhau;
@@ -229,11 +251,21 @@ export default function useRegister(onRegisterSuccess: () => void) {
         setShowRegConfirmPwd,
         handleRegisterChange,
         handleRegisterSubmit,
-        isUsernameValid,
         isHoTenValid,
         isEmailValid,
         isSoDTValid,
         isMatKhauValid,
-        isXacNhanMatKhauValid
+        isXacNhanMatKhauValid,
+        // OTP properties
+        showOtpModal,
+        setShowOtpModal,
+        otpCode,
+        setOtpCode,
+        otpLoading,
+        otpError,
+        setOtpError,
+        otpResendLoading,
+        handleVerifyOtpSubmit,
+        handleResendOtp
     };
 }
