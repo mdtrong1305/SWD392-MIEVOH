@@ -25,11 +25,18 @@ export class EmailService {
 
       movies.forEach((movie) => {
         htmlContent += `
-          <div style="background-color: #1a0f35; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #2e1a5a;">
-            <h2 style="color: #a78bfa; margin-top: 0; font-size: 20px;">${movie.title_vi}</h2>
-            <p style="color: #a1a1aa; font-size: 14px; margin-bottom: 15px;">${movie.title_en}</p>
-            <p style="color: #e4e4e7; font-size: 14px; line-height: 1.5;">${movie.description}</p>
-            <a href="${FRONTEND_URL}/movie/${movie.movieId}" style="display: inline-block; margin-top: 15px; padding: 10px 20px; background-color: #8b5cf6; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px;">Xem chi tiết</a>
+          <div style="background-color: #1a0f35; border-radius: 12px; overflow: hidden; margin-bottom: 24px; border: 1px solid #2e1a5a; display: table; width: 100%;">
+            <div style="display: table-cell; width: 120px; vertical-align: middle;">
+              <img src="${movie.imageUrl}" alt="${movie.name}" style="width: 120px; height: 180px; display: block; object-fit: cover;" />
+            </div>
+            <div style="display: table-cell; padding: 20px; vertical-align: top;">
+              <h3 style="margin: 0 0 12px; color: #ffffff; font-size: 20px; font-weight: 600;">${movie.name}</h3>
+              <div style="display: inline-block; background-color: rgba(139, 92, 246, 0.15); color: #a78bfa; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 700; border: 1px solid rgba(139, 92, 246, 0.3); margin-bottom: 20px;">
+                Độ phù hợp: ${movie.matchScore}%
+              </div>
+              <br>
+              <a href="${FRONTEND_URL}/movie/${movie.movieId}" style="display: inline-block; background-color: #8b5cf6; color: #ffffff; text-decoration: none; padding: 10px 24px; border-radius: 6px; font-weight: 600; font-size: 14px; text-align: center;">Xem chi tiết</a>
+            </div>
           </div>
         `;
       });
