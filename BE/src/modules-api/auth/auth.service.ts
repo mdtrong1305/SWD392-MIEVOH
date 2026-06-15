@@ -114,29 +114,11 @@ export class AuthService {
     await this.cacheManager.set(`REGISTER_OTP_COOLDOWN:${registerDto.email}`, '1', 60000);
 
     // gửi Email chứa OTP (Gửi qua RabbitMQ)
-    this.emailClient.emit('send_email', {
+    this.emailClient.emit('send_otp_email', {
       to: registerDto.email,
-      subject: 'Mã xác thực đăng ký tài khoản Mievoh',
-      html: `
-        <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #110826; color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #2e1a5a;">
-          <div style="background: linear-gradient(135deg, #8b5cf6, #4c1d95); padding: 40px 20px; text-align: center;">
-            <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 800; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">MIEVOH CINEMA</h1>
-            <p style="margin: 10px 0 0; color: rgba(255,255,255,0.9); font-size: 16px; font-weight: 500;">Xác Thực Tài Khoản Đăng Ký</p>
-          </div>
-          <div style="padding: 40px 30px;">
-            <p style="font-size: 16px; line-height: 1.6; color: #e4e4e7; margin-top: 0;">Chào ${registerDto.fullName},</p>
-            <p style="font-size: 16px; line-height: 1.6; color: #a1a1aa;">Bạn vừa yêu cầu lấy mã OTP để đăng ký tài khoản. Vui lòng sử dụng mã bảo mật dưới đây để hoàn tất quá trình:</p>
-            <div style="margin: 30px 0; text-align: center;">
-              <div style="display: inline-block; background-color: #1a0f35; color: #8b5cf6; padding: 15px 30px; border-radius: 12px; font-size: 32px; font-weight: 800; letter-spacing: 4px; border: 1px solid #2e1a5a;">${otp}</div>
-            </div>
-            <p style="font-size: 14px; line-height: 1.6; color: #a1a1aa; text-align: center;">Mã này sẽ hết hạn sau <strong>5 phút</strong>. Vui lòng không chia sẻ mã này với bất kỳ ai để đảm bảo an toàn.</p>
-            <div style="text-align: center; margin-top: 40px; border-top: 1px solid #2e1a5a; padding-top: 30px;">
-              <p style="color: #a1a1aa; font-size: 14px; margin: 0;">Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email.</p>
-              <h2 style="color: #8b5cf6; margin: 15px 0 0; font-size: 20px; font-weight: 700;">Đội ngũ MIEVOH</h2>
-            </div>
-          </div>
-        </div>
-      `,
+      fullName: registerDto.fullName,
+      otp,
+      type: 'register',
     });
 
     return { message: 'Mã OTP đã được gửi đến email của bạn', expiresIn: 300 };
@@ -325,29 +307,11 @@ export class AuthService {
     await this.cacheManager.set(`RESET_PASSWORD_OTP_COOLDOWN:${dto.email}`, '1', 60000);
 
     // gửi Email chứa OTP (Gửi qua RabbitMQ)
-    this.emailClient.emit('send_email', {
+    this.emailClient.emit('send_otp_email', {
       to: dto.email,
-      subject: 'Mã xác thực khôi phục mật khẩu Mievoh',
-      html: `
-        <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #110826; color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #2e1a5a;">
-          <div style="background: linear-gradient(135deg, #8b5cf6, #4c1d95); padding: 40px 20px; text-align: center;">
-            <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 800; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">MIEVOH CINEMA</h1>
-            <p style="margin: 10px 0 0; color: rgba(255,255,255,0.9); font-size: 16px; font-weight: 500;">Yêu Cầu Khôi Phục Mật Khẩu</p>
-          </div>
-          <div style="padding: 40px 30px;">
-            <p style="font-size: 16px; line-height: 1.6; color: #e4e4e7; margin-top: 0;">Chào ${user.fullName},</p>
-            <p style="font-size: 16px; line-height: 1.6; color: #a1a1aa;">Bạn vừa yêu cầu lấy mã OTP để khôi phục mật khẩu. Vui lòng sử dụng mã bảo mật dưới đây để đổi mật khẩu mới:</p>
-            <div style="margin: 30px 0; text-align: center;">
-              <div style="display: inline-block; background-color: #1a0f35; color: #8b5cf6; padding: 15px 30px; border-radius: 12px; font-size: 32px; font-weight: 800; letter-spacing: 4px; border: 1px solid #2e1a5a;">${otp}</div>
-            </div>
-            <p style="font-size: 14px; line-height: 1.6; color: #a1a1aa; text-align: center;">Mã này sẽ hết hạn sau <strong>5 phút</strong>. Vui lòng không chia sẻ mã này với bất kỳ ai để đảm bảo an toàn.</p>
-            <div style="text-align: center; margin-top: 40px; border-top: 1px solid #2e1a5a; padding-top: 30px;">
-              <p style="color: #a1a1aa; font-size: 14px; margin: 0;">Nếu bạn không yêu cầu đổi mật khẩu, có thể ai đó đang cố truy cập tài khoản của bạn. Vui lòng bỏ qua email này.</p>
-              <h2 style="color: #8b5cf6; margin: 15px 0 0; font-size: 20px; font-weight: 700;">Đội ngũ MIEVOH</h2>
-            </div>
-          </div>
-        </div>
-      `,
+      fullName: user.fullName,
+      otp,
+      type: 'forgot_password',
     });
 
     return { message: 'Mã OTP khôi phục mật khẩu đã được gửi đến email của bạn', expiresIn: 300 };

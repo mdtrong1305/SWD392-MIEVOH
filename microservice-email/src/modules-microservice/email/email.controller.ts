@@ -24,9 +24,9 @@ export class EmailController {
     }
   }
 
-  @EventPattern('send_email')
+  @EventPattern('send_otp_email')
   async handleSendEmail(
-    @Payload() data: { to: string; subject: string; html: string },
+    @Payload() data: { to: string; fullName: string; otp: string; type: 'register' | 'forgot_password' },
     @Ctx() context: RmqContext,
   ) {
     const channel = context.getChannelRef();
@@ -34,6 +34,30 @@ export class EmailController {
 
     try {
       await this.emailService.sendOtpEmail(data);
+      channel.ack(originalMsg);
+    } catch (error) {
+      channel.nack(originalMsg, false, false);
+    }
+  }
+
+  @EventPattern('booking_success')
+  async handleBookingSuccess(
+    @Payload() data: {
+      to: string;
+      ticketCode: string;
+      movieTitle: string;
+      cinemaName: string;
+      showTime: string;
+      seats: string;
+      amount: number;
+    },
+    @Ctx() context: RmqContext,
+  ) {
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+
+    try {
+      await this.emailService.sendBookingSuccessEmail(data);
       channel.ack(originalMsg);
     } catch (error) {
       channel.nack(originalMsg, false, false);
