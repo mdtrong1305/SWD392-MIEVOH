@@ -25,12 +25,12 @@ import {
 // (phòng chiếu, lịch chiếu, đồ ăn & combo) nên không thấy các mục cấp hệ thống.
 const navItems = [
   { to: '/admin', icon: LayoutDashboard, label: 'Dashboard', end: true, roles: ['admin', 'staff'] },
-  { to: '/admin/movies', icon: Film, label: 'Quản lý Phim', roles: ['admin'] },
+  { to: '/admin/movies', icon: Film, label: 'Quản lý Phim', roles: ['staff'] },
   { to: '/admin/cinema-systems', icon: Building2, label: 'Hệ thống rạp', roles: ['admin'] },
   { to: '/admin/cinema-complexes', icon: MapPin, label: 'Cụm rạp', roles: ['admin'] },
-  { to: '/admin/cinemas', icon: Monitor, label: 'Phòng chiếu', roles: ['admin', 'staff'] },
-  { to: '/admin/showtimes', icon: Calendar, label: 'Lịch chiếu', roles: ['admin', 'staff'] },
-  { to: '/admin/foods', icon: Popcorn, label: 'Đồ ăn & Combo', roles: ['admin', 'staff'] },
+  { to: '/admin/cinemas', icon: Monitor, label: 'Phòng chiếu', roles: ['staff'] },
+  { to: '/admin/showtimes', icon: Calendar, label: 'Lịch chiếu', roles: ['staff'] },
+  { to: '/admin/foods', icon: Popcorn, label: 'Đồ ăn & Combo', roles: ['staff'] },
   { to: '/admin/banners', icon: Image, label: 'Banner', roles: ['admin'] },
   { to: '/admin/staff', icon: UserRound, label: 'Quản lý nhân viên', roles: ['admin'] },
 ];
