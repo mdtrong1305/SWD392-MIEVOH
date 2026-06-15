@@ -4,6 +4,7 @@ import {
   BadRequestException,
   Inject,
 } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { PrismaService } from '../../modules-system/prisma/prisma.service';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { SocketService } from '../../modules-system/socket/socket.service';
@@ -23,6 +24,7 @@ export class PaymentsService {
     private readonly prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly socketService: SocketService,
+    @Inject('EMAIL_SERVICE') private readonly emailClient: ClientProxy,
   ) {}
 
   async createPaymentUrl(
@@ -151,7 +153,10 @@ export class PaymentsService {
 
       const booking = await this.prisma.booking.findUnique({
         where: { bookingId },
-        include: { BookingDetails: true },
+        include: {
+          BookingDetails: { include: { Seat: true } },
+          Showtime: { include: { Movie: true, Cinema: true } },
+        },
       });
 
       if (!booking) {
@@ -211,6 +216,19 @@ export class PaymentsService {
           await this.cacheManager.del(
             `hold:${booking.showtimeId}:${detail.seatId}`,
           );
+        }
+
+        // Bắn sự kiện gửi email xác nhận mua vé
+        if (booking.Showtime && booking.Showtime.Movie && booking.Showtime.Cinema) {
+          this.emailClient.emit('booking_success', {
+            to: booking.email,
+            ticketCode,
+            movieTitle: booking.Showtime.Movie.title_vi || booking.Showtime.Movie.title_en,
+            cinemaName: booking.Showtime.Cinema.name,
+            showTime: booking.Showtime.showDateTime?.toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
+            seats: booking.BookingDetails.map(d => d.Seat?.name).join(', '),
+            amount: expectedAmount,
+          });
         }
 
         // Lưu thông báo vào DB
