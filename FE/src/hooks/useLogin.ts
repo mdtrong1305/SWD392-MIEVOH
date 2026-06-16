@@ -99,29 +99,55 @@ export default function useLogin(initialSliding: boolean) {
                 return;
             }
 
-            // Write to localStorage
+            // Write to localStorage early so API interceptor can use token
             localStorage.setItem('accessToken', token);
             localStorage.setItem('auth_isAuthenticated', 'true');
             
-            const userObj = {
-                name: fullName || email,
-                email: email,
-                fullName: fullName || email,
-                hoTen: fullName || email,
-                role: userType || "USER",
-                avatar: avatar || "/images/avatar.jpg",
-                token
-            };
-            localStorage.setItem('auth_user', JSON.stringify(userObj));
-            
-            // Dispatch action to update Redux store
-            dispatch(setAuthenticated(userObj));
+            // Asynchronously fetch profile to get reliable userType, then dispatch
+            import('../axios/profile').then(({ getProfileApi }) => {
+                getProfileApi()
+                    .then(res => {
+                        const profile = res.data;
+                        const finalUserType = profile.userType || userType || "USER";
+                        
+                        const userObj = {
+                            name: profile.fullName || fullName || profile.email || email,
+                            email: profile.email || email,
+                            fullName: profile.fullName || fullName || profile.email || email,
+                            hoTen: profile.fullName || fullName || profile.email || email,
+                            role: finalUserType,
+                            avatar: profile.avatar || avatar || "/images/avatar.jpg",
+                            token
+                        };
+                        localStorage.setItem('auth_user', JSON.stringify(userObj));
+                        
+                        // Dispatch action to update Redux store
+                        dispatch(setAuthenticated(userObj));
 
-            toast.success(t("toast_google_login_success"));
+                        toast.success(t("toast_google_login_success"));
 
-            // Clear query params by navigating to homepage or redirect target
-            const redirect = params.get('redirect') || '/';
-            navigate(redirect, { replace: true });
+                        // Clear query params by navigating to homepage or redirect target
+                        const redirect = params.get('redirect') || '/';
+                        navigate(redirect, { replace: true });
+                    })
+                    .catch(() => {
+                        // Fallback to URL params if profile fetch fails
+                        const userObj = {
+                            name: fullName || email,
+                            email: email,
+                            fullName: fullName || email,
+                            hoTen: fullName || email,
+                            role: userType || "USER",
+                            avatar: avatar || "/images/avatar.jpg",
+                            token
+                        };
+                        localStorage.setItem('auth_user', JSON.stringify(userObj));
+                        dispatch(setAuthenticated(userObj));
+                        toast.success(t("toast_google_login_success"));
+                        const redirect = params.get('redirect') || '/';
+                        navigate(redirect, { replace: true });
+                    });
+            });
         }
     }, [params, dispatch, navigate]);
 
