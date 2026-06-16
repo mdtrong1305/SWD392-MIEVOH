@@ -3,6 +3,8 @@ import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '../store/index.tsx';
 import { logout, updateUser } from '../pages/User/Login/slice.ts';
+import { useTheme } from '../contextAPI/ThemeContext.tsx';
+import { useLanguage } from '../contextAPI/LanguageContext.tsx';
 import {
   LayoutDashboard,
   Film,
@@ -18,21 +20,24 @@ import {
   ChevronDown,
   Home,
   UserRound,
+  Globe,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 // `roles` xác định vai trò nào được phép thấy mục này.
 // Admin quản lý toàn bộ hệ thống; Staff chỉ vận hành trong phạm vi một cụm rạp
 // (phòng chiếu, lịch chiếu, đồ ăn & combo) nên không thấy các mục cấp hệ thống.
 const navItems = [
-  { to: '/admin', icon: LayoutDashboard, label: 'Dashboard', end: true, roles: ['admin', 'staff'] },
-  { to: '/admin/movies', icon: Film, label: 'Quản lý Phim', roles: ['staff'] },
-  { to: '/admin/cinema-systems', icon: Building2, label: 'Hệ thống rạp', roles: ['admin'] },
-  { to: '/admin/cinema-complexes', icon: MapPin, label: 'Cụm rạp', roles: ['admin'] },
-  { to: '/admin/cinemas', icon: Monitor, label: 'Phòng chiếu', roles: ['staff'] },
-  { to: '/admin/showtimes', icon: Calendar, label: 'Lịch chiếu', roles: ['staff'] },
-  { to: '/admin/foods', icon: Popcorn, label: 'Đồ ăn & Combo', roles: ['staff'] },
-  { to: '/admin/banners', icon: Image, label: 'Banner', roles: ['admin'] },
-  { to: '/admin/staff', icon: UserRound, label: 'Quản lý nhân viên', roles: ['admin'] },
+  { to: '/admin', icon: LayoutDashboard, labelKey: 'admin_dashboard' as const, end: true, roles: ['admin', 'staff'] },
+  { to: '/admin/movies', icon: Film, labelKey: 'admin_movies' as const, roles: ['staff'] },
+  { to: '/admin/cinema-systems', icon: Building2, labelKey: 'admin_cinema_systems' as const, roles: ['admin'] },
+  { to: '/admin/cinema-complexes', icon: MapPin, labelKey: 'admin_cinema_complexes' as const, roles: ['admin'] },
+  { to: '/admin/cinemas', icon: Monitor, labelKey: 'admin_cinemas' as const, roles: ['staff'] },
+  { to: '/admin/showtimes', icon: Calendar, labelKey: 'admin_showtimes' as const, roles: ['staff'] },
+  { to: '/admin/foods', icon: Popcorn, labelKey: 'admin_foods' as const, roles: ['staff'] },
+  { to: '/admin/banners', icon: Image, labelKey: 'admin_banners' as const, roles: ['admin'] },
+  { to: '/admin/staff', icon: UserRound, labelKey: 'admin_staff' as const, roles: ['admin'] },
 ];
 
 export default function AdminTemplate() {
@@ -41,6 +46,8 @@ export default function AdminTemplate() {
   const user = useSelector((state: RootState) => state.login.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { theme, toggleTheme } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
 
   const handleLogout = () => {
     dispatch(logout());
@@ -60,14 +67,14 @@ export default function AdminTemplate() {
   if (!user || (role !== 'admin' && role !== 'staff')) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center p-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Truy cập bị từ chối</h1>
-          <p className="text-gray-600 mb-4">Bạn không có quyền truy cập trang quản trị.</p>
+      <div className="text-center p-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('admin_access_denied')}</h1>
+          <p className="text-gray-600 mb-4">{t('admin_no_permission')}</p>
           <button
             onClick={() => navigate('/login')}
             className="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors"
           >
-            Đăng nhập
+            {t('login')}
           </button>
         </div>
       </div>
@@ -92,7 +99,7 @@ export default function AdminTemplate() {
         {/* Logo */}
         <div className="flex items-center gap-3 px-5 py-5 border-b border-gray-100">
           <img src="/mievoh_logo_rounded.svg" alt="Mievoh" className="w-9 h-9" />
-          <span className="text-lg font-bold text-violet-700">Mievoh Admin</span>
+          <span className="text-lg font-bold text-violet-700">{t('admin_title')}</span>
           <button className="lg:hidden ml-auto p-1" onClick={() => setSidebarOpen(false)}>
             <X className="w-5 h-5 text-gray-500" />
           </button>
@@ -114,7 +121,7 @@ export default function AdminTemplate() {
               }
             >
               <item.icon className="w-5 h-5 flex-shrink-0" />
-              <span>{item.label}</span>
+              <span>{t(item.labelKey)}</span>
             </NavLink>
           ))}
         </nav>
@@ -128,14 +135,14 @@ export default function AdminTemplate() {
               className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-gray-600 hover:bg-white hover:text-violet-700 transition-all"
             >
               <UserRound className="w-4 h-4" />
-              <span>Member</span>
+              <span>{t('admin_switch_member')}</span>
             </button>
             <button
               disabled
               className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-white text-violet-700 shadow-sm cursor-default"
             >
               <LayoutDashboard className="w-4 h-4" />
-              <span>Admin</span>
+              <span>{t('admin_switch_admin')}</span>
             </button>
           </div>
           <button
@@ -143,7 +150,7 @@ export default function AdminTemplate() {
             className="flex w-full items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
           >
             <LogOut className="w-5 h-5" />
-            <span>Đăng xuất</span>
+            <span>{t('logout')}</span>
           </button>
         </div>
       </aside>
@@ -151,7 +158,7 @@ export default function AdminTemplate() {
       {/* Main area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="sticky top-0 z-20 h-16 bg-white/80 backdrop-blur-md border-b border-gray-200 flex items-center justify-between px-4 lg:px-6">
+        <header className="sticky top-0 z-20 h-16 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-4 lg:px-6">
           <button
             className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
             onClick={() => setSidebarOpen(true)}
@@ -161,50 +168,77 @@ export default function AdminTemplate() {
 
           <div className="hidden lg:block" />
 
-          {/* User info */}
-          <div className="relative">
+          {/* Language & Theme toggles + User info */}
+          <div className="flex items-center gap-2">
+
+          {/* Language Toggle */}
             <button
-              onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors"
+              onClick={() => setLanguage(language === 'vi' ? 'en' : 'vi')}
+              className="flex items-center justify-center gap-1.5 h-9 px-3 rounded-full bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer outline-none border-none text-xs font-extrabold text-violet-700 dark:text-violet-400 shrink-0 select-none"
+              aria-label="Toggle language"
             >
-              <img
-                src={user?.avatar || '/images/avatar.jpg'}
-                alt="Avatar"
-                className="w-8 h-8 rounded-full object-cover border-2 border-violet-200"
-              />
-              <span className="text-sm font-medium text-gray-700 hidden sm:block">
-                {user?.fullName || user?.name || user?.username}
-              </span>
-              <ChevronDown className="w-4 h-4 text-gray-400" />
+              <Globe className="h-4 w-4" />
+              <span>{language.toUpperCase()}</span>
             </button>
 
-            {userMenuOpen && (
-              <>
-                <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-20">
-                  <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-sm font-medium text-gray-900">{user?.fullName || user?.username}</p>
-                    <p className="text-xs text-gray-500 capitalize">{role}</p>
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="flex items-center justify-center h-9 w-9 rounded-full bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer outline-none border-none shrink-0"
+              aria-label="Toggle theme"
+            >
+              {theme === 'light' ? (
+                <Moon className="h-4.5 w-4.5 text-gray-700 fill-gray-700" />
+              ) : (
+                <Sun className="h-4.5 w-4.5 text-amber-500 fill-amber-500" />
+              )}
+            </button>
+
+            {/* User info */}
+            <div className="relative">
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                <img
+                  src={user?.avatar || '/images/avatar.jpg'}
+                  alt="Avatar"
+                  className="w-8 h-8 rounded-full object-cover border-2 border-violet-200"
+                />
+                <span className="text-sm font-medium text-gray-700 hidden sm:block">
+                  {user?.fullName || user?.name || user?.username}
+                </span>
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+              </button>
+
+              {userMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-20">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-900">{user?.fullName || user?.username}</p>
+                      <p className="text-xs text-gray-500 capitalize">{role}</p>
+                    </div>
+                    <Link
+                      to="/"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <Home className="w-4 h-4" />
+                      {language === 'vi' ? 'Về trang chủ' : 'Go to Homepage'}
+                    </Link>
+                    <div className="my-1 border-t border-gray-100" />
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      {t('logout')}
+                    </button>
                   </div>
-                  <Link
-                    to="/"
-                    onClick={() => setUserMenuOpen(false)}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                  >
-                    <Home className="w-4 h-4" />
-                    Về trang chủ
-                  </Link>
-                  <div className="my-1 border-t border-gray-100" />
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Đăng xuất
-                  </button>
-                </div>
-              </>
-            )}
+                </>
+              )}
+            </div>
           </div>
         </header>
 

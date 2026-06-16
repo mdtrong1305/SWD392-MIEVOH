@@ -140,7 +140,7 @@ export default function Dashboard() {
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {recentMovies.map((movie) => (
-                                <tr key={movie.movieId} className="hover:bg-gray-50 transition-colors">
+                                <tr key={movie.movieId} className="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
                                     <td className="px-6 py-3 font-medium text-gray-900">
                                         {movie.title_vi || movie.title_en || '—'}
                                     </td>
