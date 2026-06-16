@@ -99,7 +99,7 @@ export class AuthController {
     const user = result.user;
 
     const frontendUrl = FRONTEND_URL || 'http://localhost:5173';
-    const redirectUrl = `${frontendUrl}/login#token=${token}&email=${user.email}&fullName=${encodeURIComponent(user.fullName || '')}&avatar=${user.avatar || ''}`;
+    const redirectUrl = `${frontendUrl}/login#token=${token}&email=${user.email}&fullName=${encodeURIComponent(user.fullName || '')}&avatar=${user.avatar || ''}&userType=${user.userType || 'USER'}`;
 
     return res.redirect(redirectUrl);
   }

@@ -82,6 +82,7 @@ export default function useLogin(initialSliding: boolean) {
         const fullName = hashParams.get('fullName') || params.get('fullName');
         const email = hashParams.get('email') || params.get('email');
         const avatar = hashParams.get('avatar') || params.get('avatar');
+        const userType = hashParams.get('userType') || params.get('userType');
 
         if (token && email) {
             // Prevent duplicate toast/processing in StrictMode (development)
@@ -93,7 +94,7 @@ export default function useLogin(initialSliding: boolean) {
             // Check if user agent is mobile / emulator
             const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             if (isMobileUA) {
-                const deepLinkUrl = `mievohmobile://login?token=${token}&fullName=${encodeURIComponent(fullName || '')}&email=${email}&avatar=${encodeURIComponent(avatar || '')}`;
+                const deepLinkUrl = `mievohmobile://login?token=${token}&fullName=${encodeURIComponent(fullName || '')}&email=${email}&avatar=${encodeURIComponent(avatar || '')}&userType=${userType || 'USER'}`;
                 window.location.href = deepLinkUrl;
                 return;
             }
@@ -107,7 +108,7 @@ export default function useLogin(initialSliding: boolean) {
                 email: email,
                 fullName: fullName || email,
                 hoTen: fullName || email,
-                role: "USER",
+                role: userType || "USER",
                 avatar: avatar || "/images/avatar.jpg",
                 token
             };
