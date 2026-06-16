@@ -16,6 +16,17 @@ import VNPayReturn from "../pages/User/VNPayReturn/VNPayReturn.tsx";
 import PromotionsPage from "../pages/User/PromotionsPage/PromotionsPage.tsx";
 
 
+// Admin pages
+import Dashboard from "../pages/Admin/Dashboard/Dashboard.tsx";
+import AdminMovies from "../pages/Admin/Movies/Movies.tsx";
+import AdminCinemaSystems from "../pages/Admin/CinemaSystems/CinemaSystems.tsx";
+import AdminCinemaComplexes from "../pages/Admin/CinemaComplexes/CinemaComplexes.tsx";
+import AdminCinemas from "../pages/Admin/Cinemas/Cinemas.tsx";
+import AdminShowtimes from "../pages/Admin/Showtimes/Showtimes.tsx";
+import AdminFoods from "../pages/Admin/Foods/Foods.tsx";
+import AdminBanners from "../pages/Admin/Banners/Banners.tsx";
+import AdminStaff from "../pages/Admin/Staff/Staff.tsx";
+
 export type AppRoute = {
   path: string;
   element: React.ReactElement;
@@ -90,7 +101,17 @@ export const routes: AppRoute[] = [
   {
     path: "admin",
     element: <AdminTemplate />,
-    nested: [],
+    nested: [
+      { path: "", element: <Dashboard /> },
+      { path: "movies", element: <AdminMovies /> },
+      { path: "cinema-systems", element: <AdminCinemaSystems /> },
+      { path: "cinema-complexes", element: <AdminCinemaComplexes /> },
+      { path: "cinemas", element: <AdminCinemas /> },
+      { path: "showtimes", element: <AdminShowtimes /> },
+      { path: "foods", element: <AdminFoods /> },
+      { path: "banners", element: <AdminBanners /> },
+      { path: "staff", element: <AdminStaff /> },
+    ],
   },
 ];
 

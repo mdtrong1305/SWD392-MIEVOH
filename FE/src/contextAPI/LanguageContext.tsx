@@ -376,6 +376,22 @@ export const translations = {
     footer_faq: "Câu Hỏi Thường Gặp",
     footer_download: "Tải Ứng Dụng",
     booking_saved_history_success: "Đã lưu thành công mã vé {code} vào lịch sử của bạn!",
+
+    // Admin
+    admin_dashboard: "Dashboard",
+    admin_movies: "Quản lý Phim",
+    admin_cinema_systems: "Hệ thống rạp",
+    admin_cinema_complexes: "Cụm rạp",
+    admin_cinemas: "Phòng chiếu",
+    admin_showtimes: "Lịch chiếu",
+    admin_foods: "Đồ ăn & Combo",
+    admin_banners: "Banner",
+    admin_staff: "Quản lý nhân viên",
+    admin_title: "Mievoh Admin",
+    admin_access_denied: "Truy cập bị từ chối",
+    admin_no_permission: "Bạn không có quyền truy cập trang quản trị.",
+    admin_switch_member: "Member",
+    admin_switch_admin: "Admin",
   },
   en: {
     // Navigation / Header
@@ -751,6 +767,22 @@ export const translations = {
     footer_download: "Download App",
     opening_booking_for: "Opening ticket booking for: {title}",
     booking_saved_history_success: "Successfully saved booking {code} to your history!",
+
+    // Admin
+    admin_dashboard: "Dashboard",
+    admin_movies: "Movie Management",
+    admin_cinema_systems: "Cinema Systems",
+    admin_cinema_complexes: "Cinema Complexes",
+    admin_cinemas: "Screening Rooms",
+    admin_showtimes: "Showtimes",
+    admin_foods: "Food & Combos",
+    admin_banners: "Banners",
+    admin_staff: "Staff Management",
+    admin_title: "Mievoh Admin",
+    admin_access_denied: "Access Denied",
+    admin_no_permission: "You do not have permission to access the admin panel.",
+    admin_switch_member: "Member",
+    admin_switch_admin: "Admin",
   }
 };
 

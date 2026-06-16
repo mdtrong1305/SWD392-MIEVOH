@@ -1,4 +1,3 @@
-import React from 'react';
 import { Lock, Eye, EyeOff } from 'lucide-react';
 import Button from '../../../../components/Button/Button.tsx';
 import { useLanguage } from '../../../../contextAPI/LanguageContext.tsx';
