@@ -34,7 +34,7 @@ const mapApiHistoryToRecord = (item: any): BookingRecord => {
             const month = String(d.getMonth() + 1).padStart(2, "0");
             const year = d.getFullYear();
             showtimeDate = `${year}-${month}-${day}`;
-            
+
             const hours = String(d.getHours()).padStart(2, "0");
             const minutes = String(d.getMinutes()).padStart(2, "0");
             showtimeTime = `${hours}:${minutes}`;
@@ -42,7 +42,7 @@ const mapApiHistoryToRecord = (item: any): BookingRecord => {
             console.error(e);
         }
     }
-    
+
     let dateBookedStr = "";
     if (item.createdAt) {
         try {
@@ -57,8 +57,8 @@ const mapApiHistoryToRecord = (item: any): BookingRecord => {
     }
 
     const seats = item.BookingDetails ? item.BookingDetails.map((d: any) => d.Seat?.name).filter(Boolean) : [];
-    const combos = item.BookingFoods && item.BookingFoods.length > 0 
-        ? item.BookingFoods.map((f: any) => `${f.quantity}x ${f.Food?.name}`).join(", ") 
+    const combos = item.BookingFoods && item.BookingFoods.length > 0
+        ? item.BookingFoods.map((f: any) => `${f.quantity}x ${f.Food?.name}`).join(", ")
         : "None";
 
     let statusMapped: "Paid" | "Pending" | "Cancelled" = "Pending";
@@ -90,7 +90,7 @@ export default function BookingHistory() {
     const dispatch = useDispatch();
     const [history, setHistory] = useState<BookingRecord[]>([]);
     const [selectedRecordForModal, setSelectedRecordForModal] = useState<BookingRecord | null>(null);
-    
+
     // Check if there is an active successful booking in the current state
     const booking = useSelector((state: RootState) => state.booking);
 
@@ -103,7 +103,9 @@ export default function BookingHistory() {
             try {
                 const res = await getBookingHistoryApi();
                 if (res && res.data) {
-                    const mapped = res.data.map(mapApiHistoryToRecord);
+                    const mapped = res.data
+                        .map(mapApiHistoryToRecord)
+                        .filter((record: BookingRecord) => record.status === "Paid");
                     setHistory(mapped);
                 }
             } catch (err) {
@@ -171,10 +173,10 @@ export default function BookingHistory() {
                     <p className="text-sm font-medium text-gray-550">{t("no_tickets_booked")}</p>
                 </div>
             ) : (
-                <div className="flex flex-col gap-4 max-h-[560px] overflow-y-auto pr-2 custom-booking-scrollbar">
+                <div className="flex flex-col gap-4 max-h-[700px] overflow-y-auto pr-2 custom-booking-scrollbar">
                     {history.map((record) => (
-                        <div 
-                            key={record.id} 
+                        <div
+                            key={record.id}
                             className="flex flex-col lg:flex-row border border-[#EAE6F0] rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300 shrink-0"
                         >
                             {/* Movie Banner - Smaller */}
@@ -210,7 +212,7 @@ export default function BookingHistory() {
                                             </span>
                                         )}
                                     </div>
-                                    
+
                                     {/* Info grid */}
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600 font-medium mt-1">
                                         <div className="flex items-center gap-2">
@@ -269,17 +271,17 @@ export default function BookingHistory() {
 
             {/* Ticket Modal */}
             {selectedRecordForModal && (
-                <div 
+                <div
                     className="fixed inset-0 bg-black/65 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate__animated animate__fadeIn animate__faster"
                     onClick={() => setSelectedRecordForModal(null)}
                 >
-                    <div 
+                    <div
                         className="bg-white mievoh-barcode-modal rounded-3xl max-w-[380px] w-full p-7 shadow-2xl flex flex-col items-center relative border border-violet-100/50 animate__animated animate__zoomIn animate__faster"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="w-full flex flex-col items-center gap-5">
                             <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">{t("ticket_receipt_code")}</span>
-                            
+
                             {/* Barcode Frame */}
                             <div className="bg-white mievoh-barcode-frame p-5 rounded-2xl border border-gray-150 shadow-sm flex flex-col items-center w-full">
                                 <img
