@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { UserRound, Plus, Pencil, Trash2, MapPin, Search, Phone } from 'lucide-react';
+import {
+    UserRound, Plus, Pencil, Trash2, MapPin, Search,
+    Phone, ShieldCheck, ShieldOff, Mail,
+} from 'lucide-react';
 import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import {
@@ -113,12 +116,13 @@ export default function Staff() {
         setSaving(true);
         try {
             if (editing) {
-                await updateStaffApi(editing.email, {
+                const payload: any = {
                     fullName: form.fullName.trim(),
-                    phoneNumber: form.phoneNumber.trim() || undefined,
-                    password: form.password ? form.password : undefined,
                     cinemaComplexId: form.cinemaComplexId,
-                });
+                };
+                if (form.phoneNumber.trim()) payload.phoneNumber = form.phoneNumber.trim();
+                if (form.password) payload.password = form.password;
+                await updateStaffApi(editing.email, payload);
                 toast.success('Cập nhật nhân viên thành công');
             } else {
                 await createStaffApi({
@@ -148,8 +152,8 @@ export default function Staff() {
             setConfirmOpen(false);
             setDeleteTarget(null);
             loadStaff();
-        } catch {
-            toast.error('Xóa nhân viên thất bại');
+        } catch (err: any) {
+            toast.error(err?.response?.data?.message || 'Xóa nhân viên thất bại');
         } finally {
             setDeleting(false);
         }
@@ -165,13 +169,17 @@ export default function Staff() {
             (s.fullName || '').toLowerCase().includes(search.toLowerCase())
     );
 
+    const activeCount = staffList.filter((s) => s.isActive !== false).length;
+
     return (
         <div>
             {/* Header */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Quản lý nhân viên</h1>
-                    <p className="text-sm text-gray-500 mt-1">Tạo và phân công nhân viên (staff) cho từng cụm rạp</p>
+                    <p className="text-sm text-gray-500 mt-1">
+                        Tạo và phân công nhân viên (staff) cho từng cụm rạp
+                    </p>
                 </div>
                 <button
                     onClick={openCreate}
@@ -182,7 +190,25 @@ export default function Staff() {
                 </button>
             </div>
 
-            {/* Filters */}
+            {/* Stats */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-5">
+                <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+                    <p className="text-xs text-gray-500 mb-1">Tổng nhân viên</p>
+                    <p className="text-2xl font-bold text-gray-900">{staffList.length}</p>
+                </div>
+                <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+                    <p className="text-xs text-gray-500 mb-1">Đang hoạt động</p>
+                    <p className="text-2xl font-bold text-green-600">{activeCount}</p>
+                </div>
+                <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+                    <p className="text-xs text-gray-500 mb-1">Cụm rạp có staff</p>
+                    <p className="text-2xl font-bold text-violet-600">
+                        {new Set(staffList.map((s) => s.cinemaComplexId).filter(Boolean)).size}
+                    </p>
+                </div>
+            </div>
+
+            {/* Search */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center mb-5">
                 <div className="relative flex-1 max-w-sm">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -210,34 +236,60 @@ export default function Staff() {
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="text-left text-gray-500 border-b border-gray-100 bg-gray-50/50">
-                                    <th className="px-6 py-3 font-medium">Email đăng nhập</th>
-                                    <th className="px-6 py-3 font-medium">Họ tên</th>
-                                    <th className="px-6 py-3 font-medium">Số điện thoại</th>
+                                    <th className="px-6 py-3 font-medium">Nhân viên</th>
+                                    <th className="px-6 py-3 font-medium">Liên hệ</th>
                                     <th className="px-6 py-3 font-medium">Cụm rạp phụ trách</th>
+                                    <th className="px-6 py-3 font-medium">Trạng thái</th>
                                     <th className="px-6 py-3 font-medium text-right">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {filtered.map((item) => (
                                     <tr key={item.email} className="hover:bg-gray-50/50 transition-colors">
-                                        <td className="px-6 py-3 font-medium text-gray-900">{item.email}</td>
-                                        <td className="px-6 py-3 text-gray-700">{item.fullName || '—'}</td>
-                                        <td className="px-6 py-3 text-gray-600">
-                                            <div className="flex flex-col gap-0.5">
-                                                {item.phoneNumber && (
-                                                    <span className="inline-flex items-center gap-1.5">
-                                                        <Phone className="w-3.5 h-3.5 text-gray-400" />
-                                                        {item.phoneNumber}
+                                        <td className="px-6 py-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-9 h-9 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
+                                                    <span className="text-violet-700 font-semibold text-sm">
+                                                        {(item.fullName || item.email || '?')[0].toUpperCase()}
                                                     </span>
-                                                )}
-                                                {!item.phoneNumber && '—'}
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium text-gray-900">{item.fullName || '—'}</p>
+                                                    <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                                        <Mail className="w-3 h-3" />
+                                                        {item.email}
+                                                    </p>
+                                                </div>
                                             </div>
+                                        </td>
+                                        <td className="px-6 py-3 text-gray-600">
+                                            {item.phoneNumber ? (
+                                                <span className="inline-flex items-center gap-1.5">
+                                                    <Phone className="w-3.5 h-3.5 text-gray-400" />
+                                                    {item.phoneNumber}
+                                                </span>
+                                            ) : (
+                                                <span className="text-gray-400">—</span>
+                                            )}
                                         </td>
                                         <td className="px-6 py-3">
                                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-violet-50 text-violet-700 text-xs font-medium">
                                                 <MapPin className="w-3 h-3" />
                                                 {complexName(item.cinemaComplexId)}
                                             </span>
+                                        </td>
+                                        <td className="px-6 py-3">
+                                            {item.isActive !== false ? (
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 text-green-700 text-xs font-medium">
+                                                    <ShieldCheck className="w-3 h-3" />
+                                                    Hoạt động
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-100 text-gray-500 text-xs font-medium">
+                                                    <ShieldOff className="w-3 h-3" />
+                                                    Vô hiệu
+                                                </span>
+                                            )}
                                         </td>
                                         <td className="px-6 py-3">
                                             <div className="flex items-center justify-end gap-1">
@@ -272,9 +324,10 @@ export default function Staff() {
             <Modal
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
-                title={editing ? 'Chỉnh sửa nhân viên' : 'Thêm nhân viên'}
+                title={editing ? 'Chỉnh sửa nhân viên' : 'Thêm nhân viên mới'}
             >
                 <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Email */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">
                             Email đăng nhập <span className="text-red-500">*</span>
@@ -291,6 +344,8 @@ export default function Staff() {
                             <p className="text-xs text-gray-400 mt-1">Không thể thay đổi email đăng nhập.</p>
                         )}
                     </div>
+
+                    {/* Full name */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">
                             Họ tên <span className="text-red-500">*</span>
@@ -303,6 +358,8 @@ export default function Staff() {
                             className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                         />
                     </div>
+
+                    {/* Phone */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">Số điện thoại</label>
                         <input
@@ -313,9 +370,11 @@ export default function Staff() {
                             className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                         />
                     </div>
+
+                    {/* Password */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                            Mật khẩu {editing ? '' : <span className="text-red-500">*</span>}
+                            Mật khẩu {!editing && <span className="text-red-500">*</span>}
                         </label>
                         <input
                             type="password"
@@ -325,6 +384,8 @@ export default function Staff() {
                             className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                         />
                     </div>
+
+                    {/* Cinema Complex */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">
                             Cụm rạp phụ trách <span className="text-red-500">*</span>
@@ -342,6 +403,7 @@ export default function Staff() {
                             ))}
                         </select>
                     </div>
+
                     <div className="flex items-center justify-end gap-3 pt-2">
                         <button
                             type="button"
@@ -366,7 +428,7 @@ export default function Staff() {
                 onClose={() => setConfirmOpen(false)}
                 onConfirm={handleDelete}
                 title="Xóa nhân viên"
-                message={`Bạn có chắc muốn xóa nhân viên "${deleteTarget?.fullName || deleteTarget?.email}"? Hành động này không thể hoàn tác.`}
+                message={`Bạn có chắc muốn xóa nhân viên "${deleteTarget?.fullName || deleteTarget?.email}"? Hành động này sẽ xóa hẳn tài khoản khỏi hệ thống.`}
                 confirmText="Xóa"
                 loading={deleting}
             />

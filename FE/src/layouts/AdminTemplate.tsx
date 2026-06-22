@@ -23,6 +23,11 @@ import {
   Globe,
   Sun,
   Moon,
+  Users,
+  Ticket,
+  Bell,
+  Brain,
+  BarChart3,
 } from 'lucide-react';
 
 // `roles` xác định vai trò nào được phép thấy mục này.
@@ -30,14 +35,19 @@ import {
 // (phòng chiếu, lịch chiếu, đồ ăn & combo) nên không thấy các mục cấp hệ thống.
 const navItems = [
   { to: '/admin', icon: LayoutDashboard, labelKey: 'admin_dashboard' as const, end: true, roles: ['admin', 'staff'] },
-  { to: '/admin/movies', icon: Film, labelKey: 'admin_movies' as const, roles: ['staff'] },
+  { to: '/admin/statistics', icon: BarChart3, labelKey: 'admin_statistics' as const, roles: ['admin'] },
+  { to: '/admin/movies', icon: Film, labelKey: 'admin_movies' as const, roles: ['admin', 'staff'] },
   { to: '/admin/cinema-systems', icon: Building2, labelKey: 'admin_cinema_systems' as const, roles: ['admin'] },
   { to: '/admin/cinema-complexes', icon: MapPin, labelKey: 'admin_cinema_complexes' as const, roles: ['admin'] },
-  { to: '/admin/cinemas', icon: Monitor, labelKey: 'admin_cinemas' as const, roles: ['staff'] },
-  { to: '/admin/showtimes', icon: Calendar, labelKey: 'admin_showtimes' as const, roles: ['staff'] },
-  { to: '/admin/foods', icon: Popcorn, labelKey: 'admin_foods' as const, roles: ['staff'] },
+  { to: '/admin/cinemas', icon: Monitor, labelKey: 'admin_cinemas' as const, roles: ['admin', 'staff'] },
+  { to: '/admin/showtimes', icon: Calendar, labelKey: 'admin_showtimes' as const, roles: ['admin', 'staff'] },
+  { to: '/admin/foods', icon: Popcorn, labelKey: 'admin_foods' as const, roles: ['admin', 'staff'] },
   { to: '/admin/banners', icon: Image, labelKey: 'admin_banners' as const, roles: ['admin'] },
+  { to: '/admin/vouchers', icon: Ticket, labelKey: 'admin_vouchers' as const, roles: ['admin', 'staff'] },
+  { to: '/admin/users', icon: Users, labelKey: 'admin_users' as const, roles: ['admin'] },
   { to: '/admin/staff', icon: UserRound, labelKey: 'admin_staff' as const, roles: ['admin'] },
+  { to: '/admin/notifications', icon: Bell, labelKey: 'admin_notifications' as const, roles: ['admin'] },
+  { to: '/admin/recommendations', icon: Brain, labelKey: 'admin_recommendations' as const, roles: ['admin'] },
 ];
 
 export default function AdminTemplate() {

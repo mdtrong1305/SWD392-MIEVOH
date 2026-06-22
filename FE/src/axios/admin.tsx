@@ -383,7 +383,7 @@ export const deleteBannerApi = async (bannerId: string): Promise<BaseResponse<an
 };
 
 // ==========================================
-// STAFF API (Admin only)
+// STAFF API (Admin only) — endpoint /api/staff
 // ==========================================
 
 export interface Staff {
@@ -393,7 +393,9 @@ export interface Staff {
     userType: string | null;
     cinemaComplexId: string | null;
     authProvider?: string | null;
+    isActive?: boolean;
     createdAt?: string;
+    updatedAt?: string;
     CinemaComplex?: CinemaComplex | null;
 }
 
@@ -415,7 +417,9 @@ export interface UpdateStaffPayload {
 /** GET /api/staff - Lấy danh sách nhân viên (admin) */
 export const getStaffApi = async (): Promise<BaseResponse<Staff[]>> => {
     const response = await api.get<BaseResponse<any>>('/staff');
-    return normalizeListResponse<Staff>(response.data);
+    const inner = response.data?.data;
+    const arr: Staff[] = Array.isArray(inner) ? inner : (Array.isArray(inner?.data) ? inner.data : []);
+    return { message: response.data?.message, statusCode: response.data?.statusCode, data: arr };
 };
 
 /** POST /api/staff - Tạo nhân viên mới (admin) */
@@ -433,5 +437,297 @@ export const updateStaffApi = async (email: string, data: UpdateStaffPayload): P
 /** DELETE /api/staff/:email - Xóa nhân viên (admin) */
 export const deleteStaffApi = async (email: string): Promise<BaseResponse<any>> => {
     const response = await api.delete<BaseResponse<any>>(`/staff/${email}`);
+    return response.data;
+};
+
+// ==========================================
+// USERS API (Admin only)
+// ==========================================
+
+export interface User {
+    userId?: string;
+    email: string;
+    fullName: string | null;
+    phoneNumber: string | null;
+    userType: string | null;
+    authProvider: string | null;
+    avatar: string | null;
+    dateOfBirth: string | null;
+    address: string | null;
+    gender: string | null;
+    cccd: string | null;
+    isActive?: boolean;
+    cinemaComplexId?: string | null;
+    createdAt: string;
+    updatedAt?: string;
+}
+
+export interface GetUsersParams {
+    page?: number;
+    limit?: number;
+    userType?: string;
+}
+
+/** GET /api/users - Lấy danh sách người dùng (admin) */
+export const getUsersApi = async (params?: GetUsersParams): Promise<BaseResponse<any>> => {
+    const response = await api.get<BaseResponse<any>>('/users', { params });
+    return response.data;
+};
+
+/** GET /api/users/:email - Lấy chi tiết 1 user (admin) */
+export const getUserByEmailApi = async (email: string): Promise<BaseResponse<User>> => {
+    const response = await api.get<BaseResponse<User>>(`/users/${email}`);
+    return response.data;
+};
+
+/** DELETE /api/users/:email - Vô hiệu hóa tài khoản (admin) */
+export const deleteUserApi = async (email: string): Promise<BaseResponse<any>> => {
+    const response = await api.delete<BaseResponse<any>>(`/users/${email}`);
+    return response.data;
+};
+
+// ==========================================
+// VOUCHERS API (Admin, Staff)
+// ==========================================
+
+export interface Voucher {
+    _id: string;
+    code: string;
+    discountType: 'PERCENTAGE' | 'FIXED';
+    discountValue: number;
+    maxDiscount?: number | null;
+    minPurchase?: number | null;
+    startDate: string;
+    endDate: string;
+    usageLimit?: number | null;
+    usedCount?: number;
+    cinemaComplexId?: string | null;
+    isActive?: boolean;
+    isBroadcast?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+    CinemaComplex?: CinemaComplex | null;
+}
+
+export interface CreateVoucherPayload {
+    code: string;
+    discountType: 'PERCENTAGE' | 'FIXED';
+    discountValue: number;
+    maxDiscount?: number;
+    minPurchase?: number;
+    startDate: string;
+    endDate: string;
+    usageLimit?: number;
+    cinemaComplexId?: string;
+    isBroadcast: boolean;
+}
+
+export interface UpdateVoucherPayload {
+    discountValue?: number;
+    maxDiscount?: number;
+    minPurchase?: number;
+    startDate?: string;
+    endDate?: string;
+    usageLimit?: number;
+    isActive?: boolean;
+}
+
+/** POST /api/vouchers - Tạo mã giảm giá (admin, staff) */
+export const createVoucherApi = async (data: CreateVoucherPayload): Promise<BaseResponse<Voucher>> => {
+    const response = await api.post<BaseResponse<Voucher>>('/vouchers', data);
+    return response.data;
+};
+
+/** PUT /api/vouchers/:id - Cập nhật mã giảm giá (admin, staff) */
+export const updateVoucherApi = async (id: string, data: UpdateVoucherPayload): Promise<BaseResponse<Voucher>> => {
+    const response = await api.put<BaseResponse<Voucher>>(`/vouchers/${id}`, data);
+    return response.data;
+};
+
+/** DELETE /api/vouchers/:id - Xóa mã giảm giá (admin, staff) */
+export const deleteVoucherApi = async (id: string): Promise<BaseResponse<any>> => {
+    const response = await api.delete<BaseResponse<any>>(`/vouchers/${id}`);
+    return response.data;
+};
+
+/** GET /api/vouchers/public - Lấy danh sách mã giảm giá */
+export const getVouchersPublicApi = async (cinemaComplexId?: string): Promise<BaseResponse<Voucher[]>> => {
+    const params = cinemaComplexId ? { cinemaComplexId } : undefined;
+    const response = await api.get<BaseResponse<any>>('/vouchers/public', { params });
+    return normalizeListResponse<Voucher>(response.data);
+};
+
+// ==========================================
+// NOTIFICATIONS BROADCAST API (Admin only)
+// ==========================================
+
+export interface BroadcastNotification {
+    _id: string;
+    title: string;
+    message: string;
+    link?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export interface BroadcastPayload {
+    title: string;
+    message: string;
+    link?: string;
+}
+
+export interface UpdateBroadcastPayload {
+    title?: string;
+    message?: string;
+    link?: string;
+}
+
+/** POST /api/notifications/broadcast - Gửi thông báo toàn hệ thống (admin) */
+export const broadcastNotificationApi = async (data: BroadcastPayload): Promise<BaseResponse<any>> => {
+    const response = await api.post<BaseResponse<any>>('/notifications/broadcast', data);
+    return response.data;
+};
+
+/** GET /api/notifications/broadcasts - Lấy danh sách broadcast đã phát (admin) */
+export const getBroadcastsApi = async (params?: { page?: number; pageSize?: number }): Promise<BaseResponse<any>> => {
+    const response = await api.get<BaseResponse<any>>('/notifications/broadcasts', { params });
+    return response.data;
+};
+
+/** PUT /api/notifications/broadcasts/:id - Cập nhật broadcast (admin) */
+export const updateBroadcastApi = async (id: string, data: UpdateBroadcastPayload): Promise<BaseResponse<any>> => {
+    const response = await api.put<BaseResponse<any>>(`/notifications/broadcasts/${id}`, data);
+    return response.data;
+};
+
+/** DELETE /api/notifications/broadcasts/:id - Xóa broadcast (admin) */
+export const deleteBroadcastApi = async (id: string): Promise<BaseResponse<any>> => {
+    const response = await api.delete<BaseResponse<any>>(`/notifications/broadcasts/${id}`);
+    return response.data;
+};
+
+// ==========================================
+// REVIEWS MODERATION API (Admin, Staff)
+// ==========================================
+
+export interface Review {
+    _id: string;
+    movieId: string;
+    userId?: string;
+    userName?: string;
+    userAvatar?: string;
+    rating: number;
+    comment: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+/** GET /api/reviews/movie/:movieId - Lấy danh sách đánh giá của phim */
+export const getReviewsByMovieIdApi = async (movieId: string): Promise<BaseResponse<Review[]>> => {
+    const response = await api.get<BaseResponse<any>>(`/reviews/movie/${movieId}`);
+    return normalizeListResponse<Review>(response.data);
+};
+
+/** DELETE /api/reviews/:reviewId - Xóa đánh giá spam (admin, staff) */
+export const deleteReviewApi = async (reviewId: string): Promise<BaseResponse<any>> => {
+    const response = await api.delete<BaseResponse<any>>(`/reviews/${reviewId}`);
+    return response.data;
+};
+
+// ==========================================
+// RECOMMENDATIONS API (Admin only)
+// ==========================================
+
+export interface CronJob {
+    key: string;
+    name?: string;
+    type?: string;
+    cronExpression?: string;
+    nextRun?: string;
+    lastRun?: string;
+}
+
+export interface ConfigCronPayload {
+    type: 'email' | 'analysis';
+    cronExpression: string;
+    name?: string;
+}
+
+export interface DeleteCronPayload {
+    repeatKey: string;
+}
+
+export interface CampaignStats {
+    totalSent?: number;
+    totalOpened?: number;
+    totalClicked?: number;
+    openRate?: number;
+    clickRate?: number;
+    [key: string]: any;
+}
+
+/** POST /api/recommendations/trigger-analysis - Force Run phân tích (admin) */
+export const triggerAnalysisApi = async (): Promise<BaseResponse<any>> => {
+    const response = await api.post<BaseResponse<any>>('/recommendations/trigger-analysis');
+    return response.data;
+};
+
+/** POST /api/recommendations/trigger-email - Force Run gửi email (admin) */
+export const triggerEmailApi = async (): Promise<BaseResponse<any>> => {
+    const response = await api.post<BaseResponse<any>>('/recommendations/trigger-email');
+    return response.data;
+};
+
+/** POST /api/recommendations/config-cron - Cấu hình cronjob (admin) */
+export const configCronApi = async (data: ConfigCronPayload): Promise<BaseResponse<any>> => {
+    const response = await api.post<BaseResponse<any>>('/recommendations/config-cron', data);
+    return response.data;
+};
+
+/** DELETE /api/recommendations/cron - Xóa cronjob (admin) */
+export const deleteCronApi = async (data: DeleteCronPayload): Promise<BaseResponse<any>> => {
+    const response = await api.delete<BaseResponse<any>>('/recommendations/cron', { data });
+    return response.data;
+};
+
+/** GET /api/recommendations/crons - Lấy danh sách cron jobs (admin) */
+export const getCronJobsApi = async (): Promise<BaseResponse<any>> => {
+    const response = await api.get<BaseResponse<any>>('/recommendations/crons');
+    return response.data;
+};
+
+/** GET /api/recommendations/campaign-stats - Thống kê campaign (admin) */
+export const getCampaignStatsApi = async (): Promise<BaseResponse<any>> => {
+    const response = await api.get<BaseResponse<any>>('/recommendations/campaign-stats');
+    return response.data;
+};
+
+// ==========================================
+// STATISTICS API (Admin only)
+// ==========================================
+
+/** GET /api/statistics/overview - Tổng quan (admin) */
+export const getStatisticsOverviewApi = async (): Promise<BaseResponse<any>> => {
+    const response = await api.get<BaseResponse<any>>('/statistics/overview');
+    return response.data;
+};
+
+/** GET /api/statistics/revenue-chart - Biểu đồ doanh thu (admin) */
+export const getRevenueChartApi = async (days?: number): Promise<BaseResponse<any>> => {
+    const params = days ? { days } : undefined;
+    const response = await api.get<BaseResponse<any>>('/statistics/revenue-chart', { params });
+    return response.data;
+};
+
+/** GET /api/statistics/top-movies - Top phim doanh thu (admin) */
+export const getTopMoviesApi = async (limit?: number): Promise<BaseResponse<any>> => {
+    const params = limit ? { limit } : undefined;
+    const response = await api.get<BaseResponse<any>>('/statistics/top-movies', { params });
+    return response.data;
+};
+
+/** GET /api/statistics/revenue-by-complex - Doanh thu theo cụm rạp (admin) */
+export const getRevenueByComplexApi = async (): Promise<BaseResponse<any>> => {
+    const response = await api.get<BaseResponse<any>>('/statistics/revenue-by-complex');
     return response.data;
 };

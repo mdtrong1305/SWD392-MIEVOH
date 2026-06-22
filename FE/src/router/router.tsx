@@ -26,6 +26,11 @@ import AdminShowtimes from "../pages/Admin/Showtimes/Showtimes.tsx";
 import AdminFoods from "../pages/Admin/Foods/Foods.tsx";
 import AdminBanners from "../pages/Admin/Banners/Banners.tsx";
 import AdminStaff from "../pages/Admin/Staff/Staff.tsx";
+import AdminUsers from "../pages/Admin/Users/Users.tsx";
+import AdminVouchers from "../pages/Admin/Vouchers/Vouchers.tsx";
+import AdminNotifications from "../pages/Admin/Notifications/Notifications.tsx";
+import AdminRecommendations from "../pages/Admin/Recommendations/Recommendations.tsx";
+import AdminStatistics from "../pages/Admin/Statistics/Statistics.tsx";
 
 export type AppRoute = {
   path: string;
@@ -111,6 +116,11 @@ export const routes: AppRoute[] = [
       { path: "foods", element: <AdminFoods /> },
       { path: "banners", element: <AdminBanners /> },
       { path: "staff", element: <AdminStaff /> },
+      { path: "users", element: <AdminUsers /> },
+      { path: "vouchers", element: <AdminVouchers /> },
+      { path: "notifications", element: <AdminNotifications /> },
+      { path: "recommendations", element: <AdminRecommendations /> },
+      { path: "statistics", element: <AdminStatistics /> },
     ],
   },
 ];

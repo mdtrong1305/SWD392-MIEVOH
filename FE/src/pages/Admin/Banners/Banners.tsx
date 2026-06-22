@@ -75,11 +75,15 @@ export default function Banners() {
             toast.error('Vui lòng chọn ảnh banner');
             return;
         }
+        if (!movieId) {
+            toast.error('Vui lòng chọn phim cho banner');
+            return;
+        }
         setSaving(true);
         try {
             const formData = new FormData();
             formData.append('image', imageFile);
-            if (movieId) formData.append('movieId', movieId);
+            formData.append('movieId', movieId);
             await createBannerApi(formData);
             toast.success('Đã thêm banner');
             setModalOpen(false);
@@ -226,13 +230,14 @@ export default function Banners() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Gắn với phim (tùy chọn)</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Gắn với phim *</label>
                         <select
                             value={movieId}
                             onChange={(e) => setMovieId(e.target.value)}
+                            required
                             className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                         >
-                            <option value="">-- Không gắn phim --</option>
+                            <option value="">-- Chọn phim --</option>
                             {movies.map((m) => (
                                 <option key={m.movieId} value={m.movieId}>
                                     {m.title_vi || m.title_en || m.movieId}

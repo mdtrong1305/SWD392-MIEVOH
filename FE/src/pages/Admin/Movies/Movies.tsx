@@ -6,8 +6,10 @@ import {
     createMovieApi,
     updateMovieApi,
     deleteMovieApi,
+    getReviewsByMovieIdApi,
+    deleteReviewApi,
 } from '../../../axios/admin';
-import type { Movie } from '../../../axios/admin';
+import type { Movie, Review } from '../../../axios/admin';
 import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import Pagination from '../components/Pagination';
@@ -27,6 +29,10 @@ export default function MoviesManagement() {
     const [detailMovie, setDetailMovie] = useState<Movie | null>(null);
     const [detailOpen, setDetailOpen] = useState(false);
     const [saving, setSaving] = useState(false);
+
+    // Reviews states
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [loadingReviews, setLoadingReviews] = useState(false);
 
     // Delete states
     const [deleteTarget, setDeleteTarget] = useState<Movie | null>(null);
@@ -60,16 +66,47 @@ export default function MoviesManagement() {
             const res = await getMoviesAdminApi({ page, pageSize, filters: search || undefined });
             setMovies(res.data.data || []);
             setTotalPages(res.data.totalPages || 1);
-        } catch (error) {
+        } catch {
             toast.error('Không thể tải danh sách phim');
         } finally {
             setLoading(false);
         }
     }, [page, search]);
 
+    useEffect(() => { fetchMovies(); }, [fetchMovies]);
+
+    const fetchMovieReviews = useCallback(async (movieId: string) => {
+        setLoadingReviews(true);
+        try {
+            const res = await getReviewsByMovieIdApi(movieId);
+            setReviews(res.data || []);
+        } catch {
+            toast.error('Không thể tải danh sách đánh giá');
+            setReviews([]);
+        } finally {
+            setLoadingReviews(false);
+        }
+    }, []);
+
     useEffect(() => {
-        fetchMovies();
-    }, [fetchMovies]);
+        if (detailOpen && detailMovie?.movieId) {
+            fetchMovieReviews(detailMovie.movieId);
+        } else {
+            setReviews([]);
+        }
+    }, [detailOpen, detailMovie, fetchMovieReviews]);
+
+    const handleDeleteReview = async (reviewId: string) => {
+        try {
+            await deleteReviewApi(reviewId);
+            toast.success('Đã xóa đánh giá thành công');
+            if (detailMovie?.movieId) {
+                fetchMovieReviews(detailMovie.movieId);
+            }
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || 'Không thể xóa đánh giá');
+        }
+    };
 
     const resetForm = () => {
         setForm({
@@ -614,6 +651,52 @@ export default function MoviesManagement() {
                                 <p className="text-sm text-gray-700">{detailMovie.description_vi}</p>
                             </div>
                         )}
+
+                        <div className="pt-4 border-t border-gray-100 mt-6">
+                            <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                Đánh giá của người dùng
+                            </h4>
+                            {loadingReviews ? (
+                                <p className="text-sm text-gray-500 text-center py-4">Đang tải đánh giá...</p>
+                            ) : reviews.length === 0 ? (
+                                <p className="text-sm text-gray-400 text-center py-4 bg-gray-50 rounded-lg">Chưa có đánh giá nào</p>
+                            ) : (
+                                <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
+                                    {reviews.map((review) => (
+                                        <div key={review._id} className="bg-gray-50 rounded-lg p-3 relative group border border-gray-100">
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-600 font-bold text-xs shrink-0">
+                                                        {review.userName?.charAt(0) || 'U'}
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-gray-900">{review.userName || 'Người dùng'}</p>
+                                                        <div className="flex items-center gap-1">
+                                                            <span className="text-yellow-500 text-xs">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
+                                                            <span className="text-xs text-gray-400 ml-2">
+                                                                {review.createdAt ? new Date(review.createdAt).toLocaleDateString('vi-VN') : ''}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        if (window.confirm('Bạn có chắc chắn muốn xóa đánh giá spam này?')) {
+                                                            handleDeleteReview(review._id);
+                                                        }
+                                                    }}
+                                                    className="p-1.5 rounded-md text-red-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all absolute top-2 right-2"
+                                                    title="Xóa đánh giá spam"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                            <p className="text-sm text-gray-700 mt-2">{review.comment}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
             </Modal>
