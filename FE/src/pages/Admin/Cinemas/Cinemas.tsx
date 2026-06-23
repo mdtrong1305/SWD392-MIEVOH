@@ -20,6 +20,9 @@ import {
 } from '../../../axios/admin';
 import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
+import useStaffComplex from '../../../hooks/useStaffComplex';
+import { Building2, MapPin } from 'lucide-react';
+import { useLanguage } from '../../../contextAPI/LanguageContext';
 
 const SEAT_TYPES = [
     { value: 'Standard', label: 'Thường', color: 'bg-gray-200 text-gray-700 border-gray-300' },
@@ -32,6 +35,10 @@ function seatTypeStyle(type: string) {
 }
 
 export default function CinemasPage() {
+    const { t } = useLanguage();
+    // Staff bị khóa vào cụm rạp được phân công; admin được tự chọn.
+    const { isStaff, complexId: staffComplexId, complex: staffComplex, ready: staffReady } = useStaffComplex();
+
     // Cascading filters
     const [systems, setSystems] = useState<CinemaSystem[]>([]);
     const [complexes, setComplexes] = useState<CinemaComplex[]>([]);
@@ -55,15 +62,25 @@ export default function CinemasPage() {
     const [seats, setSeats] = useState<Seat[]>([]);
     const [seatsLoading, setSeatsLoading] = useState(false);
 
-    // ---- Load systems on mount ----
+    // ---- Load systems on mount (chỉ admin cần chọn hệ thống) ----
     useEffect(() => {
+        if (!staffReady || isStaff) return;
         getCinemaSystemsApi()
             .then((res) => setSystems(res.data || []))
             .catch(() => toast.error('Không tải được hệ thống rạp'));
-    }, []);
+    }, [staffReady, isStaff]);
 
-    // ---- Load complexes when system changes ----
+    // ---- Staff: khóa luôn vào cụm rạp được phân công ----
     useEffect(() => {
+        if (!staffReady || !isStaff) return;
+        if (staffComplexId) {
+            setComplexId(staffComplexId);
+        }
+    }, [staffReady, isStaff, staffComplexId]);
+
+    // ---- Load complexes when system changes (admin) ----
+    useEffect(() => {
+        if (isStaff) return;
         setComplexId('');
         setCinemas([]);
         if (!systemId) {
@@ -73,7 +90,7 @@ export default function CinemasPage() {
         getCinemaComplexesApi(systemId)
             .then((res) => setComplexes(res.data || []))
             .catch(() => toast.error('Không tải được cụm rạp'));
-    }, [systemId]);
+    }, [systemId, isStaff]);
 
     // ---- Load cinemas when complex changes ----
     const loadCinemas = () => {
@@ -168,67 +185,91 @@ export default function CinemasPage() {
         <div className="space-y-6">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Quản lý Phòng chiếu</h1>
-                <p className="text-gray-500 mt-1">Chọn hệ thống và cụm rạp để quản lý phòng chiếu và sơ đồ ghế.</p>
+                <h1 className="text-2xl font-bold text-gray-900">{t('cin_title')}</h1>
+                <p className="text-gray-500 mt-1">
+                    {isStaff ? t('cin_subtitle_staff') : t('cin_subtitle_admin')}
+                </p>
             </div>
 
-            {/* Filters */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Hệ thống rạp</label>
-                        <select
-                            value={systemId}
-                            onChange={(e) => setSystemId(e.target.value)}
-                            className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none"
-                        >
-                            <option value="">-- Chọn hệ thống --</option>
-                            {systems.map((s) => (
-                                <option key={s.cinemaSystemId} value={s.cinemaSystemId}>
-                                    {s.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Cụm rạp</label>
-                        <select
-                            value={complexId}
-                            onChange={(e) => setComplexId(e.target.value)}
-                            disabled={!systemId}
-                            className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none disabled:bg-gray-50 disabled:text-gray-400"
-                        >
-                            <option value="">-- Chọn cụm rạp --</option>
-                            {complexes.map((c) => (
-                                <option key={c.cinemaComplexId} value={c.cinemaComplexId}>
-                                    {c.name}
-                                </option>
-                            ))}
-                        </select>
+            {/* Filters: admin chọn hệ thống/cụm rạp; staff bị khóa vào cụm rạp được phân công */}
+            {isStaff ? (
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-violet-50 text-violet-600 shrink-0">
+                            <Building2 className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <p className="text-xs text-gray-500">{t('adm_assigned_complex')}</p>
+                            <p className="font-semibold text-gray-900">
+                                {staffComplex?.name || (staffReady ? t('adm_not_assigned') : t('adm_loading'))}
+                            </p>
+                            {staffComplex?.address && (
+                                <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                    <MapPin className="w-3 h-3" />
+                                    {staffComplex.address}
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
+            ) : (
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('adm_system_label')}</label>
+                            <select
+                                value={systemId}
+                                onChange={(e) => setSystemId(e.target.value)}
+                                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none"
+                            >
+                                <option value="">{t('adm_select_system')}</option>
+                                {systems.map((s) => (
+                                    <option key={s.cinemaSystemId} value={s.cinemaSystemId}>
+                                        {s.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('adm_complex_label')}</label>
+                            <select
+                                value={complexId}
+                                onChange={(e) => setComplexId(e.target.value)}
+                                disabled={!systemId}
+                                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none disabled:bg-gray-50 disabled:text-gray-400"
+                            >
+                                <option value="">{t('adm_select_complex')}</option>
+                                {complexes.map((c) => (
+                                    <option key={c.cinemaComplexId} value={c.cinemaComplexId}>
+                                        {c.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Rooms list */}
             {complexId && (
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                     <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-                        <h2 className="font-semibold text-gray-900">Danh sách phòng chiếu</h2>
+                        <h2 className="font-semibold text-gray-900">{t('cin_room_list')}</h2>
                         <button
                             onClick={openCreateRoom}
                             className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors"
                         >
                             <Plus className="w-4 h-4" />
-                            Thêm phòng
+                            {t('cin_add_room')}
                         </button>
                     </div>
 
                     {loading ? (
-                        <div className="p-10 text-center text-gray-400">Đang tải...</div>
+                        <div className="p-10 text-center text-gray-400">{t('adm_loading')}</div>
                     ) : cinemas.length === 0 ? (
                         <div className="p-10 text-center text-gray-400">
                             <Monitor className="w-10 h-10 mx-auto mb-2 text-gray-300" />
-                            Chưa có phòng chiếu nào trong cụm rạp này.
+                            {t('cin_no_rooms')}
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-5">
@@ -244,7 +285,7 @@ export default function CinemasPage() {
                                             </div>
                                             <div>
                                                 <p className="font-semibold text-gray-900">{room.name}</p>
-                                                <p className="text-xs text-gray-400">Phòng chiếu</p>
+                                                <p className="text-xs text-gray-400">{t('cin_room')}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -254,7 +295,7 @@ export default function CinemasPage() {
                                             className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-medium text-violet-600 bg-violet-50 rounded-lg hover:bg-violet-100 transition-colors"
                                         >
                                             <Armchair className="w-4 h-4" />
-                                            Ghế
+                                            {t('cin_seats')}
                                         </button>
                                         <button
                                             onClick={() => openEditRoom(room)}
@@ -280,12 +321,12 @@ export default function CinemasPage() {
             <Modal
                 isOpen={roomModalOpen}
                 onClose={() => setRoomModalOpen(false)}
-                title={editingRoom ? 'Cập nhật phòng chiếu' : 'Thêm phòng chiếu'}
+                title={editingRoom ? t('adm_update') : t('cin_add_room')}
                 size="sm"
             >
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Tên phòng chiếu</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('cin_room_name')}</label>
                         <input
                             type="text"
                             value={roomName}
@@ -299,14 +340,14 @@ export default function CinemasPage() {
                             onClick={() => setRoomModalOpen(false)}
                             className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                         >
-                            Hủy
+                            {t('adm_cancel')}
                         </button>
                         <button
                             onClick={handleSaveRoom}
                             disabled={saving}
                             className="px-4 py-2 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-colors disabled:opacity-50"
                         >
-                            {saving ? 'Đang lưu...' : editingRoom ? 'Cập nhật' : 'Tạo mới'}
+                            {saving ? t('adm_saving') : editingRoom ? t('adm_update') : t('adm_add')}
                         </button>
                     </div>
                 </div>
@@ -317,9 +358,9 @@ export default function CinemasPage() {
                 isOpen={!!deleteRoom}
                 onClose={() => setDeleteRoom(null)}
                 onConfirm={handleDeleteRoom}
-                title="Xóa phòng chiếu"
-                message={`Bạn có chắc muốn xóa phòng "${deleteRoom?.name}"? Toàn bộ ghế sẽ bị xóa theo.`}
-                confirmText="Xóa"
+                title={t('cin_delete_room')}
+                message={`"${deleteRoom?.name}" — ${t('cin_delete_room_msg')}`}
+                confirmText={t('adm_delete')}
                 loading={deleting}
             />
 

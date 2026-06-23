@@ -12,8 +12,10 @@ import {
 import Modal from '../components/Modal.tsx';
 import ConfirmDialog from '../components/ConfirmDialog.tsx';
 import resolveImageUrl from '../utils/imageUrl.ts';
+import { useLanguage } from '../../../contextAPI/LanguageContext';
 
 export default function Banners() {
+    const { t } = useLanguage();
     const [banners, setBanners] = useState<Banner[]>([]);
     const [movies, setMovies] = useState<Movie[]>([]);
     const [loading, setLoading] = useState(true);
@@ -122,15 +124,15 @@ export default function Banners() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Quản lý Banner</h1>
-                    <p className="text-gray-500 mt-1">Banner hiển thị ở trang chủ</p>
+                    <h1 className="text-2xl font-bold text-gray-900">{t('ban_title')}</h1>
+                    <p className="text-gray-500 mt-1">{t('ban_subtitle')}</p>
                 </div>
                 <button
                     onClick={openCreate}
                     className="inline-flex items-center gap-2 px-4 py-2.5 bg-violet-600 text-white text-sm font-medium rounded-xl hover:bg-violet-700 transition-colors shadow-sm shadow-violet-300"
                 >
                     <Plus className="w-4 h-4" />
-                    Thêm banner
+                    {t('ban_add')}
                 </button>
             </div>
 
@@ -144,7 +146,7 @@ export default function Banners() {
             ) : banners.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-gray-100">
                     <ImageIcon className="w-12 h-12 text-gray-300 mb-3" />
-                    <p className="text-gray-500">Chưa có banner nào</p>
+                    <p className="text-gray-500">{t('ban_none')}</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

@@ -383,13 +383,19 @@ export const deleteBannerApi = async (bannerId: string): Promise<BaseResponse<an
 };
 
 // ==========================================
-// STAFF API (Admin only) — endpoint /api/staff
+// STAFF API (Admin only) — endpoint /api/users/staff
+// Lưu ý: BE bật forbidNonWhitelisted, chỉ gửi đúng field DTO cho phép.
+//  - List : GET    /api/users?userType=staff
+//  - Create: POST   /api/users/staff       { fullName, email, password?, cinemaComplexId }
+//  - Update: PUT    /api/users/staff/:email { fullName?, email?, cinemaComplexId?, isActive? }
+//  - Delete: DELETE /api/users/:email       (soft delete -> isActive=false)
 // ==========================================
 
 export interface Staff {
     email: string;
     fullName: string | null;
-    phoneNumber: string | null;
+    phoneNumber?: string | null;
+    avatar?: string | null;
     userType: string | null;
     cinemaComplexId: string | null;
     authProvider?: string | null;
@@ -402,41 +408,42 @@ export interface Staff {
 export interface CreateStaffPayload {
     email: string;
     fullName: string;
-    phoneNumber?: string;
-    password: string;
+    password?: string;
     cinemaComplexId: string;
 }
 
 export interface UpdateStaffPayload {
     fullName?: string;
-    phoneNumber?: string;
-    password?: string;
+    email?: string;
     cinemaComplexId?: string;
+    isActive?: boolean;
 }
 
-/** GET /api/staff - Lấy danh sách nhân viên (admin) */
+/** GET /api/users?userType=staff - Lấy danh sách nhân viên (admin) */
 export const getStaffApi = async (): Promise<BaseResponse<Staff[]>> => {
-    const response = await api.get<BaseResponse<any>>('/staff');
+    const response = await api.get<BaseResponse<any>>('/users', {
+        params: { userType: 'staff', page: 1, limit: 1000 },
+    });
     const inner = response.data?.data;
     const arr: Staff[] = Array.isArray(inner) ? inner : (Array.isArray(inner?.data) ? inner.data : []);
     return { message: response.data?.message, statusCode: response.data?.statusCode, data: arr };
 };
 
-/** POST /api/staff - Tạo nhân viên mới (admin) */
+/** POST /api/users/staff - Tạo nhân viên mới (admin) */
 export const createStaffApi = async (data: CreateStaffPayload): Promise<BaseResponse<Staff>> => {
-    const response = await api.post<BaseResponse<Staff>>('/staff', data);
+    const response = await api.post<BaseResponse<Staff>>('/users/staff', data);
     return response.data;
 };
 
-/** PATCH /api/staff/:email - Cập nhật nhân viên (admin) */
+/** PUT /api/users/staff/:email - Cập nhật nhân viên (admin) */
 export const updateStaffApi = async (email: string, data: UpdateStaffPayload): Promise<BaseResponse<Staff>> => {
-    const response = await api.patch<BaseResponse<Staff>>(`/staff/${email}`, data);
+    const response = await api.put<BaseResponse<Staff>>(`/users/staff/${email}`, data);
     return response.data;
 };
 
-/** DELETE /api/staff/:email - Xóa nhân viên (admin) */
+/** DELETE /api/users/:email - Vô hiệu hóa nhân viên (admin) */
 export const deleteStaffApi = async (email: string): Promise<BaseResponse<any>> => {
-    const response = await api.delete<BaseResponse<any>>(`/staff/${email}`);
+    const response = await api.delete<BaseResponse<any>>(`/users/${email}`);
     return response.data;
 };
 

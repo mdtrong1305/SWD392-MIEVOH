@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Users as UsersIcon, Search, Eye, Ban, Shield, UserRound, Mail } from 'lucide-react';
+import { Search, Eye, Ban, UserRound, Mail } from 'lucide-react';
+import { useLanguage } from '../../../contextAPI/LanguageContext';
 import toast from 'react-hot-toast';
 import { getUsersApi, deleteUserApi } from '../../../axios/admin';
 import type { User } from '../../../axios/admin';
@@ -9,6 +10,7 @@ import Pagination from '../components/Pagination';
 import resolveImageUrl from '../utils/imageUrl';
 
 export default function UsersManagement() {
+    const { t } = useLanguage();
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -79,8 +81,8 @@ export default function UsersManagement() {
         <div className="space-y-6">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Quản lý Người dùng</h1>
-                <p className="text-gray-500 mt-1">Xem danh sách, chi tiết và vô hiệu hóa tài khoản</p>
+                <h1 className="text-2xl font-bold text-gray-900">{t('usr_title')}</h1>
+                <p className="text-gray-500 mt-1">{t('usr_subtitle')}</p>
             </div>
 
             {/* Filters */}
@@ -91,7 +93,7 @@ export default function UsersManagement() {
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Tìm theo tên, email, SĐT..."
+                        placeholder={t('usr_search')}
                         className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                     />
                 </div>
@@ -100,7 +102,7 @@ export default function UsersManagement() {
                     onChange={(e) => { setUserTypeFilter(e.target.value); setPage(1); }}
                     className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white"
                 >
-                    <option value="">Tất cả vai trò</option>
+                    <option value="">{t('usr_all_roles')}</option>
                     <option value="user">User</option>
                     <option value="staff">Staff</option>
                     <option value="admin">Admin</option>
@@ -114,12 +116,12 @@ export default function UsersManagement() {
                         <thead>
                             <tr className="bg-gray-50 text-left">
                                 <th className="px-4 py-3 font-medium text-gray-500 w-12"></th>
-                                <th className="px-4 py-3 font-medium text-gray-500">Họ tên</th>
+                                <th className="px-4 py-3 font-medium text-gray-500">{t('usr_col_name')}</th>
                                 <th className="px-4 py-3 font-medium text-gray-500">Email</th>
-                                <th className="px-4 py-3 font-medium text-gray-500">SĐT</th>
-                                <th className="px-4 py-3 font-medium text-gray-500">Vai trò</th>
-                                <th className="px-4 py-3 font-medium text-gray-500">Đăng nhập</th>
-                                <th className="px-4 py-3 font-medium text-gray-500 text-right">Thao tác</th>
+                                <th className="px-4 py-3 font-medium text-gray-500">{t('usr_col_phone')}</th>
+                                <th className="px-4 py-3 font-medium text-gray-500">{t('usr_col_role')}</th>
+                                <th className="px-4 py-3 font-medium text-gray-500">{t('login')}</th>
+                                <th className="px-4 py-3 font-medium text-gray-500 text-right">{t('adm_actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">

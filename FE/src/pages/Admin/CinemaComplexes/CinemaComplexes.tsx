@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { MapPin, Plus, Pencil, Trash2, Building2, Search } from 'lucide-react';
 import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { useLanguage } from '../../../contextAPI/LanguageContext';
 import {
     getCinemaSystemsApi,
     getCinemaComplexesApi,
@@ -22,6 +23,7 @@ interface ComplexForm {
 const emptyForm: ComplexForm = { name: '', address: '', cinemaSystemId: '' };
 
 export default function CinemaComplexes() {
+    const { t } = useLanguage();
     const [systems, setSystems] = useState<CinemaSystem[]>([]);
     const [complexes, setComplexes] = useState<CinemaComplex[]>([]);
     const [loading, setLoading] = useState(true);
@@ -150,8 +152,8 @@ export default function CinemaComplexes() {
             {/* Header */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Cụm rạp</h1>
-                    <p className="text-sm text-gray-500 mt-1">Quản lý các cụm rạp thuộc từng hệ thống</p>
+                    <h1 className="text-2xl font-bold text-gray-900">{t('cpx_title')}</h1>
+                    <p className="text-sm text-gray-500 mt-1">{t('cpx_subtitle')}</p>
                 </div>
                 <button
                     onClick={openCreate}
@@ -170,7 +172,7 @@ export default function CinemaComplexes() {
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Tìm theo tên hoặc địa chỉ..."
+                        placeholder={t('cpx_search')}
                         className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                     />
                 </div>
@@ -195,18 +197,18 @@ export default function CinemaComplexes() {
                 ) : filtered.length === 0 ? (
                     <div className="p-12 text-center">
                         <MapPin className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                        <p className="text-gray-500">Chưa có cụm rạp nào</p>
+                        <p className="text-gray-500">{t('cpx_none')}</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="text-left text-gray-500 border-b border-gray-100 bg-gray-50/50">
-                                    <th className="px-6 py-3 font-medium">Tên cụm rạp</th>
-                                    <th className="px-6 py-3 font-medium">Địa chỉ</th>
-                                    <th className="px-6 py-3 font-medium">Hệ thống</th>
-                                    <th className="px-6 py-3 font-medium">Số phòng</th>
-                                    <th className="px-6 py-3 font-medium text-right">Thao tác</th>
+                                    <th className="px-6 py-3 font-medium">{t('cpx_col_name')}</th>
+                                    <th className="px-6 py-3 font-medium">{t('cpx_col_address')}</th>
+                                    <th className="px-6 py-3 font-medium">{t('adm_system_label')}</th>
+                                    <th className="px-6 py-3 font-medium">{t('cpx_col_rooms')}</th>
+                                    <th className="px-6 py-3 font-medium text-right">{t('adm_actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">

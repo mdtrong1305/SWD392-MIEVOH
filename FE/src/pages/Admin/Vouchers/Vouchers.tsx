@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Plus, Pencil, Trash2, Search, Ticket, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { useLanguage } from '../../../contextAPI/LanguageContext';
 import toast from 'react-hot-toast';
 import {
     getVouchersPublicApi,
@@ -13,6 +14,7 @@ import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
 
 export default function VouchersManagement() {
+    const { t } = useLanguage();
     const [vouchers, setVouchers] = useState<Voucher[]>([]);
     const [complexes, setComplexes] = useState<CinemaComplex[]>([]);
     const [loading, setLoading] = useState(true);
@@ -178,11 +180,11 @@ export default function VouchersManagement() {
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Quản lý Mã giảm giá</h1>
-                    <p className="text-gray-500 mt-1">Tạo và quản lý các mã khuyến mãi</p>
+                    <h1 className="text-2xl font-bold text-gray-900">{t('vou_title')}</h1>
+                    <p className="text-gray-500 mt-1">{t('vou_subtitle')}</p>
                 </div>
                 <button onClick={openCreate} className="inline-flex items-center gap-2 px-4 py-2.5 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors font-medium text-sm shadow-sm">
-                    <Plus className="w-4 h-4" /> Tạo mã giảm giá
+                    <Plus className="w-4 h-4" /> {t('vou_add')}
                 </button>
             </div>
 
@@ -191,7 +193,7 @@ export default function VouchersManagement() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                     type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Tìm theo mã..." className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    placeholder={t('vou_search')} className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
                 />
             </div>
 
@@ -215,7 +217,7 @@ export default function VouchersManagement() {
                             {loading ? (
                                 <tr><td colSpan={8} className="px-4 py-12 text-center text-gray-400">Đang tải...</td></tr>
                             ) : filteredVouchers.length === 0 ? (
-                                <tr><td colSpan={8} className="px-4 py-12 text-center text-gray-400">Chưa có mã giảm giá nào</td></tr>
+                                <tr><td colSpan={8} className="px-4 py-12 text-center text-gray-400">{t('vou_none')}</td></tr>
                             ) : (
                                 filteredVouchers.map((v) => (
                                     <tr key={v._id} className="hover:bg-gray-50 transition-colors">

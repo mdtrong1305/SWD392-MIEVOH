@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Play, Trash2, Plus, Clock, Mail, Brain, BarChart3, Zap, RefreshCw } from 'lucide-react';
+import { Play, Trash2, Plus, Clock, Mail, Brain, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
     triggerAnalysisApi,
@@ -10,9 +10,11 @@ import {
     getCampaignStatsApi,
 } from '../../../axios/admin';
 import Modal from '../components/Modal';
+import { useLanguage } from '../../../contextAPI/LanguageContext';
 import ConfirmDialog from '../components/ConfirmDialog';
 
 export default function RecommendationsManagement() {
+    const { t } = useLanguage();
     const [cronJobs, setCronJobs] = useState<any[]>([]);
     const [campaignStats, setCampaignStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -115,17 +117,14 @@ export default function RecommendationsManagement() {
     };
 
     const statCards = campaignStats ? [
-        { label: 'Email đã gửi', value: campaignStats.totalSent ?? campaignStats.total ?? '—', icon: Mail, color: 'bg-blue-100 text-blue-600' },
-        { label: 'Đã mở', value: campaignStats.totalOpened ?? '—', icon: BarChart3, color: 'bg-green-100 text-green-600' },
-        { label: 'Đã click', value: campaignStats.totalClicked ?? '—', icon: Zap, color: 'bg-orange-100 text-orange-600' },
-        { label: 'Tỷ lệ mở', value: campaignStats.openRate != null ? `${(campaignStats.openRate * 100).toFixed(1)}%` : '—', icon: BarChart3, color: 'bg-violet-100 text-violet-600' },
+        { label: t('rec_emails_sent'), value: campaignStats.totalSent ?? campaignStats.total ?? '—', icon: Mail, color: 'bg-blue-100 text-blue-600' },
     ] : [];
 
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Recommend System & Email Marketing</h1>
-                <p className="text-gray-500 mt-1">Quản lý hệ thống gợi ý phim và chiến dịch email</p>
+                <h1 className="text-2xl font-bold text-gray-900">{t('rec_title')}</h1>
+                <p className="text-gray-500 mt-1">{t('rec_subtitle')}</p>
             </div>
 
             {/* Force Run Actions */}
@@ -136,8 +135,8 @@ export default function RecommendationsManagement() {
                             <Brain className="w-5 h-5 text-violet-600" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-gray-900">Phân tích Recommend</h3>
-                            <p className="text-xs text-gray-500">Ép Worker chạy AI phân tích ngay</p>
+                            <h3 className="font-bold text-gray-900">{t('rec_analysis_title')}</h3>
+                            <p className="text-xs text-gray-500">{t('rec_analysis_desc')}</p>
                         </div>
                     </div>
                     <button
@@ -146,7 +145,7 @@ export default function RecommendationsManagement() {
                         className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors text-sm font-medium disabled:opacity-50"
                     >
                         {triggeringAnalysis ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-                        {triggeringAnalysis ? 'Đang chạy...' : 'Force Run Analysis'}
+                        {triggeringAnalysis ? t('rec_running') : t('rec_force_analysis')}
                     </button>
                 </div>
 
@@ -156,8 +155,8 @@ export default function RecommendationsManagement() {
                             <Mail className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-gray-900">Gửi Email Marketing</h3>
-                            <p className="text-xs text-gray-500">Ép Worker gửi email ngay lập tức</p>
+                            <h3 className="font-bold text-gray-900">{t('rec_email_title')}</h3>
+                            <p className="text-xs text-gray-500">{t('rec_email_desc')}</p>
                         </div>
                     </div>
                     <button
@@ -166,7 +165,7 @@ export default function RecommendationsManagement() {
                         className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50"
                     >
                         {triggeringEmail ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-                        {triggeringEmail ? 'Đang gửi...' : 'Force Run Email'}
+                        {triggeringEmail ? t('rec_sending') : t('rec_force_email')}
                     </button>
                 </div>
             </div>
@@ -174,7 +173,7 @@ export default function RecommendationsManagement() {
             {/* Campaign Stats */}
             {campaignStats && statCards.length > 0 && (
                 <div>
-                    <h2 className="text-lg font-bold text-gray-900 mb-3">Thống kê chiến dịch Email</h2>
+                    <h2 className="text-lg font-bold text-gray-900 mb-3">{t('rec_campaign_stats')}</h2>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         {statCards.map((card) => (
                             <div key={card.label} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
@@ -196,21 +195,21 @@ export default function RecommendationsManagement() {
             {/* Cron Jobs */}
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                    <h2 className="text-lg font-bold text-gray-900">CronJobs đang hoạt động</h2>
+                    <h2 className="text-lg font-bold text-gray-900">{t('rec_active_cron')}</h2>
                     <button
                         onClick={() => { setCronForm({ type: 'email', cronExpression: '', name: '' }); setCronModalOpen(true); }}
                         className="inline-flex items-center gap-2 px-3 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors text-sm font-medium"
                     >
-                        <Plus className="w-4 h-4" /> Thêm CronJob
+                        <Plus className="w-4 h-4" /> {t('rec_add_cron')}
                     </button>
                 </div>
                 <div className="p-6">
                     {loading ? (
-                        <p className="text-center text-gray-400 py-8">Đang tải...</p>
+                        <p className="text-center text-gray-400 py-8">{t('adm_loading')}</p>
                     ) : cronJobs.length === 0 ? (
                         <div className="text-center py-8">
                             <Clock className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-                            <p className="text-gray-400">Chưa có CronJob nào đang hoạt động</p>
+                            <p className="text-gray-400">{t('rec_no_cron')}</p>
                         </div>
                     ) : (
                         <div className="space-y-3">
@@ -242,32 +241,32 @@ export default function RecommendationsManagement() {
             </div>
 
             {/* Create Cron Modal */}
-            <Modal isOpen={cronModalOpen} onClose={() => setCronModalOpen(false)} title="Tạo CronJob mới" size="md">
+            <Modal isOpen={cronModalOpen} onClose={() => setCronModalOpen(false)} title={t('rec_create_cron')} size="md">
                 <form onSubmit={handleCreateCron} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Loại *</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('rec_cron_type')} *</label>
                         <select value={cronForm.type} onChange={(e) => setCronForm({ ...cronForm, type: e.target.value as any })}
                             className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500">
                             <option value="email">Email Marketing</option>
-                            <option value="analysis">Phân tích AI Recommend</option>
+                            <option value="analysis">{t('rec_cron_type_analysis')}</option>
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Biểu thức Cron *</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('rec_cron_expr')} *</label>
                         <input type="text" value={cronForm.cronExpression} onChange={(e) => setCronForm({ ...cronForm, cronExpression: e.target.value })}
                             placeholder="0 8 * * *" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-violet-500" />
-                        <p className="text-xs text-gray-400 mt-1">Cấu trúc: [Phút] [Giờ] [Ngày] [Tháng] [Thứ]. VD: "0 8 * * *" = 8h sáng mỗi ngày</p>
+                        <p className="text-xs text-gray-400 mt-1">{t('rec_cron_expr_hint')}</p>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Tên định danh</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('rec_cron_name')}</label>
                         <input type="text" value={cronForm.name} onChange={(e) => setCronForm({ ...cronForm, name: e.target.value })}
                             placeholder="VD: chien_dich_mua_he" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500" />
                     </div>
                     <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                        <button type="button" onClick={() => setCronModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">Hủy</button>
+                        <button type="button" onClick={() => setCronModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">{t('adm_cancel')}</button>
                         <button type="submit" disabled={savingCron} className="px-4 py-2 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-colors disabled:opacity-50 flex items-center gap-2">
                             {savingCron && <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>}
-                            Tạo CronJob
+                            {t('rec_add_cron')}
                         </button>
                     </div>
                 </form>
@@ -275,8 +274,8 @@ export default function RecommendationsManagement() {
 
             <ConfirmDialog
                 isOpen={!!deleteCronTarget} onClose={() => setDeleteCronTarget(null)} onConfirm={handleDeleteCron}
-                title="Xóa CronJob" message={`Bạn có chắc chắn muốn xóa CronJob "${deleteCronTarget?.name || deleteCronTarget?.key}"?`}
-                confirmText="Xóa" loading={deletingCron}
+                title={t('rec_delete_cron')} message={`"${deleteCronTarget?.name || deleteCronTarget?.key}" — ${t('rec_delete_cron_msg')}`}
+                confirmText={t('adm_delete')} loading={deletingCron}
             />
         </div>
     );

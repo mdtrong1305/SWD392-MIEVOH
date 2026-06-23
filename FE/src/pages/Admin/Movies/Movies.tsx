@@ -14,8 +14,10 @@ import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import Pagination from '../components/Pagination';
 import resolveImageUrl from '../utils/imageUrl';
+import { useLanguage } from '../../../contextAPI/LanguageContext';
 
 export default function MoviesManagement() {
+    const { t } = useLanguage();
     const [movies, setMovies] = useState<Movie[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -239,15 +241,15 @@ export default function MoviesManagement() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Quản lý Phim</h1>
-                    <p className="text-gray-500 mt-1">Quản lý danh sách phim trong hệ thống</p>
+                    <h1 className="text-2xl font-bold text-gray-900">{t('mov_title')}</h1>
+                    <p className="text-gray-500 mt-1">{t('mov_subtitle')}</p>
                 </div>
                 <button
                     onClick={openCreate}
                     className="inline-flex items-center gap-2 px-4 py-2.5 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors font-medium text-sm shadow-sm"
                 >
                     <Plus className="w-4 h-4" />
-                    Thêm phim
+                    {t('mov_add')}
                 </button>
             </div>
 
@@ -259,7 +261,7 @@ export default function MoviesManagement() {
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Tìm kiếm phim..."
+                        placeholder={t('mov_search')}
                         className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                     />
                 </div>
@@ -277,12 +279,12 @@ export default function MoviesManagement() {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="bg-gray-50 text-left">
-                                <th className="px-4 py-3 font-medium text-gray-500 w-16">Ảnh</th>
-                                <th className="px-4 py-3 font-medium text-gray-500">Tên phim</th>
-                                <th className="px-4 py-3 font-medium text-gray-500">Thời lượng</th>
-                                <th className="px-4 py-3 font-medium text-gray-500">Trạng thái</th>
-                                <th className="px-4 py-3 font-medium text-gray-500">Phân loại</th>
-                                <th className="px-4 py-3 font-medium text-gray-500 text-right">Thao tác</th>
+                                <th className="px-4 py-3 font-medium text-gray-500 w-16">{t('mov_col_image')}</th>
+                                <th className="px-4 py-3 font-medium text-gray-500">{t('mov_col_title')}</th>
+                                <th className="px-4 py-3 font-medium text-gray-500">{t('mov_col_duration')}</th>
+                                <th className="px-4 py-3 font-medium text-gray-500">{t('adm_status')}</th>
+                                <th className="px-4 py-3 font-medium text-gray-500">{t('mov_col_category')}</th>
+                                <th className="px-4 py-3 font-medium text-gray-500 text-right">{t('adm_actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">

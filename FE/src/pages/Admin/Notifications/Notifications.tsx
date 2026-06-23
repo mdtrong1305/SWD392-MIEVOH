@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Plus, Pencil, Trash2, Bell, Send, Link as LinkIcon } from 'lucide-react';
+import { Pencil, Trash2, Bell, Send, Link as LinkIcon } from 'lucide-react';
+import { useLanguage } from '../../../contextAPI/LanguageContext';
 import toast from 'react-hot-toast';
 import {
     broadcastNotificationApi,
@@ -13,6 +14,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import Pagination from '../components/Pagination';
 
 export default function NotificationsManagement() {
+    const { t } = useLanguage();
     const [broadcasts, setBroadcasts] = useState<BroadcastNotification[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -102,8 +104,8 @@ export default function NotificationsManagement() {
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Quản lý Thông báo</h1>
-                    <p className="text-gray-500 mt-1">Gửi và quản lý thông báo toàn hệ thống</p>
+                    <h1 className="text-2xl font-bold text-gray-900">{t('noti_title')}</h1>
+                    <p className="text-gray-500 mt-1">{t('noti_subtitle')}</p>
                 </div>
                 <button onClick={openCreate} className="inline-flex items-center gap-2 px-4 py-2.5 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors font-medium text-sm shadow-sm">
                     <Send className="w-4 h-4" /> Gửi thông báo mới
@@ -117,7 +119,7 @@ export default function NotificationsManagement() {
                 ) : broadcasts.length === 0 ? (
                     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-12 text-center">
                         <Bell className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-                        <p className="text-gray-400">Chưa có thông báo nào được gửi</p>
+                        <p className="text-gray-400">{t('noti_none')}</p>
                     </div>
                 ) : (
                     broadcasts.map((b) => (

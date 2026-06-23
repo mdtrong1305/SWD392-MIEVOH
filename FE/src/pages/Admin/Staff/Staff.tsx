@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import {
     UserRound, Plus, Pencil, Trash2, MapPin, Search,
-    Phone, ShieldCheck, ShieldOff, Mail,
+    Phone, ShieldCheck, ShieldOff, Mail, Building2, RotateCcw,
 } from 'lucide-react';
 import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
@@ -15,11 +15,11 @@ import {
     type Staff as StaffType,
     type CinemaComplex,
 } from '../../../axios/admin';
+import { useLanguage } from '../../../contextAPI/LanguageContext';
 
 interface StaffForm {
     email: string;
     fullName: string;
-    phoneNumber: string;
     password: string;
     cinemaComplexId: string;
 }
@@ -27,12 +27,12 @@ interface StaffForm {
 const emptyForm: StaffForm = {
     email: '',
     fullName: '',
-    phoneNumber: '',
     password: '',
     cinemaComplexId: '',
 };
 
 export default function Staff() {
+    const { t } = useLanguage();
     const [staffList, setStaffList] = useState<StaffType[]>([]);
     const [complexes, setComplexes] = useState<CinemaComplex[]>([]);
     const [loading, setLoading] = useState(true);
@@ -84,7 +84,6 @@ export default function Staff() {
         setForm({
             email: item.email || '',
             fullName: item.fullName || '',
-            phoneNumber: item.phoneNumber || '',
             password: '',
             cinemaComplexId: item.cinemaComplexId || '',
         });
@@ -101,11 +100,8 @@ export default function Staff() {
             toast.error('Vui lòng nhập họ tên nhân viên');
             return;
         }
-        if (!editing && form.password.length < 6) {
-            toast.error('Mật khẩu phải có ít nhất 6 ký tự');
-            return;
-        }
-        if (form.password && form.password.length < 6) {
+        // Tạo mới: mật khẩu tùy chọn, nếu nhập thì tối thiểu 6 ký tự (BE mặc định 123456)
+        if (!editing && form.password && form.password.length < 6) {
             toast.error('Mật khẩu phải có ít nhất 6 ký tự');
             return;
         }
@@ -116,20 +112,18 @@ export default function Staff() {
         setSaving(true);
         try {
             if (editing) {
-                const payload: any = {
+                // UpdateStaffDto chỉ nhận: fullName, email, cinemaComplexId, isActive
+                await updateStaffApi(editing.email, {
                     fullName: form.fullName.trim(),
                     cinemaComplexId: form.cinemaComplexId,
-                };
-                if (form.phoneNumber.trim()) payload.phoneNumber = form.phoneNumber.trim();
-                if (form.password) payload.password = form.password;
-                await updateStaffApi(editing.email, payload);
+                });
                 toast.success('Cập nhật nhân viên thành công');
             } else {
+                // CreateStaffDto: fullName, email, password?, cinemaComplexId
                 await createStaffApi({
                     email: form.email.trim(),
                     fullName: form.fullName.trim(),
-                    phoneNumber: form.phoneNumber.trim() || undefined,
-                    password: form.password,
+                    password: form.password.trim() || undefined,
                     cinemaComplexId: form.cinemaComplexId,
                 });
                 toast.success('Thêm nhân viên thành công');
@@ -140,6 +134,21 @@ export default function Staff() {
             toast.error(err?.response?.data?.message || 'Lưu nhân viên thất bại');
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleToggleActive = async (item: StaffType) => {
+        try {
+            if (item.isActive === false) {
+                await updateStaffApi(item.email, { isActive: true });
+                toast.success('Đã kích hoạt lại nhân viên');
+            } else {
+                await deleteStaffApi(item.email);
+                toast.success('Đã vô hiệu hóa nhân viên');
+            }
+            loadStaff();
+        } catch (err: any) {
+            toast.error(err?.response?.data?.message || 'Thao tác thất bại');
         }
     };
 
@@ -159,8 +168,8 @@ export default function Staff() {
         }
     };
 
-    const complexName = (id: string | null) =>
-        complexes.find((c) => c.cinemaComplexId === id)?.name || '—';
+    const complexById = (id: string | null) =>
+        complexes.find((c) => c.cinemaComplexId === id) || null;
 
     const filtered = staffList.filter(
         (s) =>
@@ -176,9 +185,9 @@ export default function Staff() {
             {/* Header */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Quản lý nhân viên</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">{t('staff_title')}</h1>
                     <p className="text-sm text-gray-500 mt-1">
-                        Tạo và phân công nhân viên (staff) cho từng cụm rạp
+                        {t('staff_subtitle')}
                     </p>
                 </div>
                 <button
@@ -186,22 +195,22 @@ export default function Staff() {
                     className="inline-flex items-center gap-2 px-4 py-2.5 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors shadow-sm shadow-violet-300"
                 >
                     <Plus className="w-4 h-4" />
-                    Thêm nhân viên
+                    {t('staff_add')}
                 </button>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-5">
                 <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-                    <p className="text-xs text-gray-500 mb-1">Tổng nhân viên</p>
+                    <p className="text-xs text-gray-500 mb-1">{t('staff_total')}</p>
                     <p className="text-2xl font-bold text-gray-900">{staffList.length}</p>
                 </div>
                 <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-                    <p className="text-xs text-gray-500 mb-1">Đang hoạt động</p>
+                    <p className="text-xs text-gray-500 mb-1">{t('staff_active')}</p>
                     <p className="text-2xl font-bold text-green-600">{activeCount}</p>
                 </div>
                 <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-                    <p className="text-xs text-gray-500 mb-1">Cụm rạp có staff</p>
+                    <p className="text-xs text-gray-500 mb-1">{t('staff_complex_count')}</p>
                     <p className="text-2xl font-bold text-violet-600">
                         {new Set(staffList.map((s) => s.cinemaComplexId).filter(Boolean)).size}
                     </p>
@@ -216,7 +225,7 @@ export default function Staff() {
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Tìm theo email hoặc họ tên..."
+                        placeholder={t('staff_search')}
                         className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                     />
                 </div>
@@ -225,22 +234,22 @@ export default function Staff() {
             {/* Table */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 {loading ? (
-                    <div className="p-12 text-center text-gray-400">Đang tải...</div>
+                    <div className="p-12 text-center text-gray-400">{t('adm_loading')}</div>
                 ) : filtered.length === 0 ? (
                     <div className="p-12 text-center">
                         <UserRound className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                        <p className="text-gray-500">Chưa có nhân viên nào</p>
+                        <p className="text-gray-500">{t('staff_none')}</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="text-left text-gray-500 border-b border-gray-100 bg-gray-50/50">
-                                    <th className="px-6 py-3 font-medium">Nhân viên</th>
-                                    <th className="px-6 py-3 font-medium">Liên hệ</th>
-                                    <th className="px-6 py-3 font-medium">Cụm rạp phụ trách</th>
-                                    <th className="px-6 py-3 font-medium">Trạng thái</th>
-                                    <th className="px-6 py-3 font-medium text-right">Thao tác</th>
+                                    <th className="px-6 py-3 font-medium">{t('staff_col_staff')}</th>
+                                    <th className="px-6 py-3 font-medium">{t('staff_col_contact')}</th>
+                                    <th className="px-6 py-3 font-medium">{t('staff_col_complex')}</th>
+                                    <th className="px-6 py-3 font-medium">{t('adm_status')}</th>
+                                    <th className="px-6 py-3 font-medium text-right">{t('adm_actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
@@ -273,10 +282,31 @@ export default function Staff() {
                                             )}
                                         </td>
                                         <td className="px-6 py-3">
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-violet-50 text-violet-700 text-xs font-medium">
-                                                <MapPin className="w-3 h-3" />
-                                                {complexName(item.cinemaComplexId)}
-                                            </span>
+                                            {(() => {
+                                                const cx = complexById(item.cinemaComplexId);
+                                                if (!cx) {
+                                                    return <span className="text-xs text-gray-400">Chưa phân công</span>;
+                                                }
+                                                return (
+                                                    <div className="flex flex-col gap-0.5">
+                                                        <span className="inline-flex items-center gap-1.5 font-medium text-gray-900">
+                                                            <Building2 className="w-3.5 h-3.5 text-violet-500" />
+                                                            {cx.name || '—'}
+                                                        </span>
+                                                        {cx.address && (
+                                                            <span className="inline-flex items-center gap-1.5 text-xs text-gray-500">
+                                                                <MapPin className="w-3 h-3" />
+                                                                {cx.address}
+                                                            </span>
+                                                        )}
+                                                        {cx.CinemaSystem?.name && (
+                                                            <span className="text-[11px] text-violet-600 mt-0.5">
+                                                                {cx.CinemaSystem.name}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })()}
                                         </td>
                                         <td className="px-6 py-3">
                                             {item.isActive !== false ? (
@@ -300,16 +330,26 @@ export default function Staff() {
                                                 >
                                                     <Pencil className="w-4 h-4" />
                                                 </button>
-                                                <button
-                                                    onClick={() => {
-                                                        setDeleteTarget(item);
-                                                        setConfirmOpen(true);
-                                                    }}
-                                                    className="p-2 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors"
-                                                    title="Xóa"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
+                                                {item.isActive === false ? (
+                                                    <button
+                                                        onClick={() => handleToggleActive(item)}
+                                                        className="p-2 rounded-lg text-gray-400 hover:bg-green-50 hover:text-green-600 transition-colors"
+                                                        title="Kích hoạt lại"
+                                                    >
+                                                        <RotateCcw className="w-4 h-4" />
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => {
+                                                            setDeleteTarget(item);
+                                                            setConfirmOpen(true);
+                                                        }}
+                                                        className="p-2 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                                                        title="Vô hiệu hóa"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
@@ -359,31 +399,24 @@ export default function Staff() {
                         />
                     </div>
 
-                    {/* Phone */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Số điện thoại</label>
-                        <input
-                            type="text"
-                            value={form.phoneNumber}
-                            onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
-                            placeholder="VD: 0901234567"
-                            className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
-                        />
-                    </div>
-
-                    {/* Password */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                            Mật khẩu {!editing && <span className="text-red-500">*</span>}
-                        </label>
-                        <input
-                            type="password"
-                            value={form.password}
-                            onChange={(e) => setForm({ ...form, password: e.target.value })}
-                            placeholder={editing ? 'Để trống nếu không đổi mật khẩu' : 'Tối thiểu 6 ký tự'}
-                            className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
-                        />
-                    </div>
+                    {/* Password (chỉ khi tạo mới — BE không hỗ trợ đổi mật khẩu qua API staff) */}
+                    {!editing && (
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                Mật khẩu
+                            </label>
+                            <input
+                                type="password"
+                                value={form.password}
+                                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                                placeholder="Để trống sẽ dùng mặc định: 123456"
+                                className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                            />
+                            <p className="text-xs text-gray-400 mt-1">
+                                Nếu để trống, hệ thống sẽ đặt mật khẩu mặc định là <span className="font-medium">123456</span>.
+                            </p>
+                        </div>
+                    )}
 
                     {/* Cinema Complex */}
                     <div>
@@ -427,9 +460,9 @@ export default function Staff() {
                 isOpen={confirmOpen}
                 onClose={() => setConfirmOpen(false)}
                 onConfirm={handleDelete}
-                title="Xóa nhân viên"
-                message={`Bạn có chắc muốn xóa nhân viên "${deleteTarget?.fullName || deleteTarget?.email}"? Hành động này sẽ xóa hẳn tài khoản khỏi hệ thống.`}
-                confirmText="Xóa"
+                title="Vô hiệu hóa nhân viên"
+                message={`Bạn có chắc muốn vô hiệu hóa nhân viên "${deleteTarget?.fullName || deleteTarget?.email}"? Tài khoản sẽ bị khóa nhưng vẫn có thể kích hoạt lại sau.`}
+                confirmText="Vô hiệu hóa"
                 loading={deleting}
             />
         </div>

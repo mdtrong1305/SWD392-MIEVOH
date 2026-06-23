@@ -77,7 +77,7 @@ export default function AdminTemplate() {
   if (!user || (role !== 'admin' && role !== 'staff')) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-center p-8">
+        <div className="text-center p-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('admin_access_denied')}</h1>
           <p className="text-gray-600 mb-4">{t('admin_no_permission')}</p>
           <button
@@ -152,7 +152,7 @@ export default function AdminTemplate() {
               className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-white text-violet-700 shadow-sm cursor-default"
             >
               <LayoutDashboard className="w-4 h-4" />
-              <span>{t('admin_switch_admin')}</span>
+              <span>{role === 'staff' ? 'Staff' : t('admin_switch_admin')}</span>
             </button>
           </div>
           <button
@@ -181,7 +181,7 @@ export default function AdminTemplate() {
           {/* Language & Theme toggles + User info */}
           <div className="flex items-center gap-2">
 
-          {/* Language Toggle */}
+            {/* Language Toggle */}
             <button
               onClick={() => setLanguage(language === 'vi' ? 'en' : 'vi')}
               className="flex items-center justify-center gap-1.5 h-9 px-3 rounded-full bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer outline-none border-none text-xs font-extrabold text-violet-700 dark:text-violet-400 shrink-0 select-none"

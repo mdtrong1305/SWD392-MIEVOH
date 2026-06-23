@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { TrendingUp, Users, Ticket, Film, DollarSign, BarChart3, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useLanguage } from '../../../contextAPI/LanguageContext';
 import {
     getStatisticsOverviewApi,
     getRevenueChartApi,
@@ -9,6 +10,7 @@ import {
 } from '../../../axios/admin';
 
 export default function StatisticsPage() {
+    const { t } = useLanguage();
     const [overview, setOverview] = useState<any>(null);
     const [revenueChart, setRevenueChart] = useState<any[]>([]);
     const [topMovies, setTopMovies] = useState<any[]>([]);
@@ -37,7 +39,7 @@ export default function StatisticsPage() {
             const complexData = complexRes.data;
             setRevenueByComplex(Array.isArray(complexData) ? complexData : (Array.isArray(complexData?.data) ? complexData.data : []));
         } catch {
-            toast.error('Không thể tải dữ liệu thống kê');
+            toast.error(t('stat_load_error'));
         } finally {
             setLoading(false);
         }
@@ -62,17 +64,17 @@ export default function StatisticsPage() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
-                    <span className="text-gray-500 text-sm">Đang tải thống kê...</span>
+                    <span className="text-gray-500 text-sm">{t('stat_loading')}</span>
                 </div>
             </div>
         );
     }
 
     const overviewCards = [
-        { label: 'Tổng doanh thu', value: formatVND(overview?.totalRevenue ?? 0), icon: DollarSign, color: 'bg-green-100 text-green-600' },
-        { label: 'Vé đã bán', value: overview?.totalBookings ?? overview?.totalTickets ?? 0, icon: Ticket, color: 'bg-violet-100 text-violet-600' },
-        { label: 'Người dùng', value: overview?.totalUsers ?? 0, icon: Users, color: 'bg-blue-100 text-blue-600' },
-        { label: 'Tổng số phim', value: overview?.totalMovies ?? 0, icon: Film, color: 'bg-orange-100 text-orange-600' },
+        { label: t('stat_total_revenue'), value: formatVND(overview?.totalRevenue ?? 0), icon: DollarSign, color: 'bg-green-100 text-green-600' },
+        { label: t('stat_tickets_sold'), value: overview?.totalBookings ?? overview?.totalTickets ?? 0, icon: Ticket, color: 'bg-violet-100 text-violet-600' },
+        { label: t('stat_users'), value: overview?.totalUsers ?? 0, icon: Users, color: 'bg-blue-100 text-blue-600' },
+        { label: t('stat_total_movies'), value: overview?.totalMovies ?? 0, icon: Film, color: 'bg-orange-100 text-orange-600' },
     ];
 
     // Find max revenue for chart scaling
@@ -81,8 +83,8 @@ export default function StatisticsPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Thống kê & Báo cáo</h1>
-                <p className="text-gray-500 mt-1">Tổng quan doanh thu và hiệu suất hệ thống</p>
+                <h1 className="text-2xl font-bold text-gray-900">{t('stat_title')}</h1>
+                <p className="text-gray-500 mt-1">{t('stat_subtitle')}</p>
             </div>
 
             {/* Overview Cards */}
@@ -106,7 +108,7 @@ export default function StatisticsPage() {
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                     <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-violet-500" /> Biểu đồ doanh thu
+                        <TrendingUp className="w-5 h-5 text-violet-500" /> {t('stat_revenue_chart')}
                     </h2>
                     <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
                         {[7, 14, 30].map((d) => (
@@ -114,14 +116,14 @@ export default function StatisticsPage() {
                                 key={d} onClick={() => setChartDays(d)}
                                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${chartDays === d ? 'bg-white text-violet-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                             >
-                                {d} ngày
+                                {d} {t('stat_days')}
                             </button>
                         ))}
                     </div>
                 </div>
                 <div className="p-6">
                     {revenueChart.length === 0 ? (
-                        <p className="text-center text-gray-400 py-12">Chưa có dữ liệu doanh thu</p>
+                        <p className="text-center text-gray-400 py-12">{t('stat_no_revenue')}</p>
                     ) : (
                         <div className="flex items-end gap-2 h-52">
                             {revenueChart.map((item, idx) => {
@@ -155,12 +157,12 @@ export default function StatisticsPage() {
                 <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
                     <div className="px-6 py-4 border-b border-gray-100">
                         <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                            <BarChart3 className="w-5 h-5 text-orange-500" /> Top phim doanh thu cao nhất
+                            <BarChart3 className="w-5 h-5 text-orange-500" /> {t('stat_top_movies')}
                         </h2>
                     </div>
                     <div className="p-6">
                         {topMovies.length === 0 ? (
-                            <p className="text-center text-gray-400 py-8">Chưa có dữ liệu</p>
+                            <p className="text-center text-gray-400 py-8">{t('stat_no_data')}</p>
                         ) : (
                             <div className="space-y-3">
                                 {topMovies.map((movie, idx) => {
@@ -191,12 +193,12 @@ export default function StatisticsPage() {
                 <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
                     <div className="px-6 py-4 border-b border-gray-100">
                         <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                            <MapPin className="w-5 h-5 text-pink-500" /> Doanh thu theo cụm rạp
+                            <MapPin className="w-5 h-5 text-pink-500" /> {t('stat_revenue_by_complex')}
                         </h2>
                     </div>
                     <div className="p-6">
                         {revenueByComplex.length === 0 ? (
-                            <p className="text-center text-gray-400 py-8">Chưa có dữ liệu</p>
+                            <p className="text-center text-gray-400 py-8">{t('stat_no_data')}</p>
                         ) : (
                             <div className="space-y-3">
                                 {revenueByComplex.map((complex, idx) => {

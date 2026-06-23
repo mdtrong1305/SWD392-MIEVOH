@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Popcorn, Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { Popcorn, Plus, Pencil, Trash2, Search, Building2, MapPin } from 'lucide-react';
 import {
     getCinemaSystemsApi,
     getCinemaComplexesApi,
@@ -15,6 +15,8 @@ import {
 import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import resolveImageUrl from '../utils/imageUrl';
+import useStaffComplex from '../../../hooks/useStaffComplex';
+import { useLanguage } from '../../../contextAPI/LanguageContext';
 
 interface FoodForm {
     name: string;
@@ -35,6 +37,10 @@ const emptyForm: FoodForm = {
 };
 
 export default function FoodsPage() {
+    const { t } = useLanguage();
+    // Staff bị khóa vào cụm rạp được phân công; admin được tự chọn.
+    const { isStaff, complexId: staffComplexId, complex: staffComplex, ready: staffReady } = useStaffComplex();
+
     const [systems, setSystems] = useState<CinemaSystem[]>([]);
     const [complexes, setComplexes] = useState<CinemaComplex[]>([]);
     const [systemId, setSystemId] = useState('');
@@ -52,16 +58,26 @@ export default function FoodsPage() {
     const [deleteTarget, setDeleteTarget] = useState<Food | null>(null);
     const [deleting, setDeleting] = useState(false);
 
+    // Admin: load hệ thống để chọn. Staff: bỏ qua.
     useEffect(() => {
+        if (!staffReady || isStaff) return;
         getCinemaSystemsApi().then((r) => setSystems(r.data || [])).catch(() => { });
-    }, []);
+    }, [staffReady, isStaff]);
 
+    // Staff: khóa luôn vào cụm rạp được phân công.
     useEffect(() => {
+        if (!staffReady || !isStaff) return;
+        if (staffComplexId) setComplexId(staffComplexId);
+    }, [staffReady, isStaff, staffComplexId]);
+
+    // Admin: load cụm rạp khi đổi hệ thống.
+    useEffect(() => {
+        if (isStaff) return;
         setComplexId('');
         setFoods([]);
         if (!systemId) { setComplexes([]); return; }
         getCinemaComplexesApi(systemId).then((r) => setComplexes(r.data || [])).catch(() => { });
-    }, [systemId]);
+    }, [systemId, isStaff]);
 
     useEffect(() => {
         if (!complexId) { setFoods([]); return; }
@@ -161,42 +177,66 @@ export default function FoodsPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Đồ ăn & Combo</h1>
-                <p className="text-gray-500 mt-1">Quản lý menu đồ ăn và combo theo từng cụm rạp.</p>
+                <h1 className="text-2xl font-bold text-gray-900">{t('food_title')}</h1>
+                <p className="text-gray-500 mt-1">
+                    {isStaff ? t('food_subtitle_staff') : t('food_subtitle_admin')}
+                </p>
             </div>
 
-            {/* Filters */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Hệ thống rạp</label>
-                        <select
-                            value={systemId}
-                            onChange={(e) => setSystemId(e.target.value)}
-                            className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none"
-                        >
-                            <option value="">-- Chọn hệ thống --</option>
-                            {systems.map((s) => (
-                                <option key={s.cinemaSystemId} value={s.cinemaSystemId}>{s.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Cụm rạp</label>
-                        <select
-                            value={complexId}
-                            onChange={(e) => setComplexId(e.target.value)}
-                            disabled={!systemId}
-                            className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none disabled:bg-gray-50 disabled:text-gray-400"
-                        >
-                            <option value="">-- Chọn cụm rạp --</option>
-                            {complexes.map((c) => (
-                                <option key={c.cinemaComplexId} value={c.cinemaComplexId}>{c.name}</option>
-                            ))}
-                        </select>
+            {/* Filters: admin chọn hệ thống/cụm rạp; staff bị khóa vào cụm rạp được phân công */}
+            {isStaff ? (
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-violet-50 text-violet-600 shrink-0">
+                            <Building2 className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <p className="text-xs text-gray-500">{t('adm_assigned_complex')}</p>
+                            <p className="font-semibold text-gray-900">
+                                {staffComplex?.name || (staffReady ? t('adm_not_assigned') : t('adm_loading'))}
+                            </p>
+                            {staffComplex?.address && (
+                                <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                    <MapPin className="w-3 h-3" />
+                                    {staffComplex.address}
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
+            ) : (
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('adm_system_label')}</label>
+                            <select
+                                value={systemId}
+                                onChange={(e) => setSystemId(e.target.value)}
+                                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none"
+                            >
+                                <option value="">{t('adm_select_system')}</option>
+                                {systems.map((s) => (
+                                    <option key={s.cinemaSystemId} value={s.cinemaSystemId}>{s.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('adm_complex_label')}</label>
+                            <select
+                                value={complexId}
+                                onChange={(e) => setComplexId(e.target.value)}
+                                disabled={!systemId}
+                                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none disabled:bg-gray-50 disabled:text-gray-400"
+                            >
+                                <option value="">{t('adm_select_complex')}</option>
+                                {complexes.map((c) => (
+                                    <option key={c.cinemaComplexId} value={c.cinemaComplexId}>{c.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Content */}
             {complexId && (
@@ -209,7 +249,7 @@ export default function FoodsPage() {
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Tìm tên món..."
+                                placeholder={t('food_search')}
                                 className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                             />
                         </div>
@@ -217,17 +257,17 @@ export default function FoodsPage() {
                             onClick={openCreate}
                             className="inline-flex items-center gap-2 px-4 py-2.5 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors shadow-sm"
                         >
-                            <Plus className="w-4 h-4" /> Thêm món
+                            <Plus className="w-4 h-4" /> {t('food_add')}
                         </button>
                     </div>
 
                     {/* Grid */}
                     {loading ? (
-                        <div className="p-10 text-center text-gray-400">Đang tải...</div>
+                        <div className="p-10 text-center text-gray-400">{t('adm_loading')}</div>
                     ) : filtered.length === 0 ? (
                         <div className="p-10 text-center text-gray-400">
                             <Popcorn className="w-10 h-10 mx-auto mb-2 text-gray-300" />
-                            Chưa có món nào trong cụm rạp này.
+                            {t('food_none')}
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

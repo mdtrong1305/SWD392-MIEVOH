@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Film, Building2, MapPin, Image, TrendingUp, Clock, Star, Home } from 'lucide-react';
+import { Film, Building2, MapPin, Image, TrendingUp, Clock, Star } from 'lucide-react';
 import { getMoviesAdminApi, getCinemaSystemsApi, getCinemaComplexesApi, getBannersApi } from '../../../axios/admin';
 import type { Movie } from '../../../axios/admin';
+import { useLanguage } from '../../../contextAPI/LanguageContext';
 
 interface Stats {
     totalMovies: number;
@@ -15,6 +15,7 @@ interface Stats {
 }
 
 export default function Dashboard() {
+    const { t } = useLanguage();
     const [stats, setStats] = useState<Stats>({
         totalMovies: 0,
         nowShowing: 0,
@@ -63,13 +64,13 @@ export default function Dashboard() {
     };
 
     const statCards = [
-        { label: 'Tổng số phim', value: stats.totalMovies, icon: Film, color: 'bg-violet-100 text-violet-600' },
-        { label: 'Đang chiếu', value: stats.nowShowing, icon: TrendingUp, color: 'bg-green-100 text-green-600' },
-        { label: 'Sắp chiếu', value: stats.comingSoon, icon: Clock, color: 'bg-blue-100 text-blue-600' },
-        { label: 'Phim Hot', value: stats.hotMovies, icon: Star, color: 'bg-orange-100 text-orange-600' },
-        { label: 'Hệ thống rạp', value: stats.cinemaSystems, icon: Building2, color: 'bg-indigo-100 text-indigo-600' },
-        { label: 'Cụm rạp', value: stats.cinemaComplexes, icon: MapPin, color: 'bg-pink-100 text-pink-600' },
-        { label: 'Banner', value: stats.banners, icon: Image, color: 'bg-cyan-100 text-cyan-600' },
+        { label: t('dash_total_movies'), value: stats.totalMovies, icon: Film, color: 'bg-violet-100 text-violet-600' },
+        { label: t('dash_now_showing'), value: stats.nowShowing, icon: TrendingUp, color: 'bg-green-100 text-green-600' },
+        { label: t('dash_coming_soon'), value: stats.comingSoon, icon: Clock, color: 'bg-blue-100 text-blue-600' },
+        { label: t('dash_hot_movies'), value: stats.hotMovies, icon: Star, color: 'bg-orange-100 text-orange-600' },
+        { label: t('dash_cinema_systems'), value: stats.cinemaSystems, icon: Building2, color: 'bg-indigo-100 text-indigo-600' },
+        { label: t('dash_cinema_complexes'), value: stats.cinemaComplexes, icon: MapPin, color: 'bg-pink-100 text-pink-600' },
+        { label: t('dash_banners'), value: stats.banners, icon: Image, color: 'bg-cyan-100 text-cyan-600' },
     ];
 
     if (loading) {
@@ -80,7 +81,7 @@ export default function Dashboard() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
-                    <span className="text-gray-500 text-sm">Đang tải dữ liệu...</span>
+                    <span className="text-gray-500 text-sm">{t('adm_loading_data')}</span>
                 </div>
             </div>
         );
@@ -91,16 +92,9 @@ export default function Dashboard() {
             {/* Page Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-                    <p className="text-gray-500 mt-1">Tổng quan hệ thống quản lý rạp chiếu phim</p>
+                    <h1 className="text-2xl font-bold text-gray-900">{t('admin_dashboard')}</h1>
+                    <p className="text-gray-500 mt-1">{t('dash_subtitle')}</p>
                 </div>
-                <Link
-                    to="/"
-                    className="flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-xl hover:bg-violet-700 transition-colors text-sm font-medium"
-                >
-                    <Home className="w-4 h-4" />
-                    Về trang chủ
-                </Link>
             </div>
 
             {/* Stats Grid */}
@@ -126,16 +120,16 @@ export default function Dashboard() {
             {/* Recent Movies */}
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
                 <div className="px-6 py-4 border-b border-gray-100">
-                    <h2 className="text-lg font-bold text-gray-900">Phim mới cập nhật</h2>
+                    <h2 className="text-lg font-bold text-gray-900">{t('dash_recent_movies')}</h2>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="bg-gray-50 text-left">
-                                <th className="px-6 py-3 font-medium text-gray-500">Tên phim</th>
-                                <th className="px-6 py-3 font-medium text-gray-500">Thời lượng</th>
-                                <th className="px-6 py-3 font-medium text-gray-500">Trạng thái</th>
-                                <th className="px-6 py-3 font-medium text-gray-500">Ngày phát hành</th>
+                                <th className="px-6 py-3 font-medium text-gray-500">{t('dash_col_title')}</th>
+                                <th className="px-6 py-3 font-medium text-gray-500">{t('dash_col_duration')}</th>
+                                <th className="px-6 py-3 font-medium text-gray-500">{t('dash_col_status')}</th>
+                                <th className="px-6 py-3 font-medium text-gray-500">{t('dash_col_release')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -145,22 +139,22 @@ export default function Dashboard() {
                                         {movie.title_vi || movie.title_en || '—'}
                                     </td>
                                     <td className="px-6 py-3 text-gray-600">
-                                        {movie.duration ? `${movie.duration} phút` : '—'}
+                                        {movie.duration ? `${movie.duration} ${t('dash_minutes')}` : '—'}
                                     </td>
                                     <td className="px-6 py-3">
                                         {movie.isShowing && (
                                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                                                Đang chiếu
+                                                {t('dash_status_showing')}
                                             </span>
                                         )}
                                         {movie.isComingSoon && (
                                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-                                                Sắp chiếu
+                                                {t('dash_status_coming')}
                                             </span>
                                         )}
                                         {!movie.isShowing && !movie.isComingSoon && (
                                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                                                Ngừng chiếu
+                                                {t('dash_status_stopped')}
                                             </span>
                                         )}
                                     </td>
@@ -174,7 +168,7 @@ export default function Dashboard() {
                             {recentMovies.length === 0 && (
                                 <tr>
                                     <td colSpan={4} className="px-6 py-8 text-center text-gray-400">
-                                        Chưa có phim nào
+                                        {t('dash_no_movies')}
                                     </td>
                                 </tr>
                             )}

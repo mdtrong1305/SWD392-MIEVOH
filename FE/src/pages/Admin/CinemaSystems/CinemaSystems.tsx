@@ -11,6 +11,7 @@ import {
 import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { resolveImageUrl } from '../utils/imageUrl';
+import { useLanguage } from '../../../contextAPI/LanguageContext';
 
 interface FormState {
     name: string;
@@ -21,6 +22,7 @@ interface FormState {
 const emptyForm: FormState = { name: '', logoFile: null, logoPreview: '' };
 
 export default function CinemaSystems() {
+    const { t } = useLanguage();
     const [systems, setSystems] = useState<CinemaSystem[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
@@ -127,15 +129,15 @@ export default function CinemaSystems() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Hệ thống rạp</h1>
-                    <p className="text-gray-500 text-sm mt-1">Quản lý các thương hiệu hệ thống rạp chiếu phim</p>
+                    <h1 className="text-2xl font-bold text-gray-900">{t('sys_title')}</h1>
+                    <p className="text-gray-500 text-sm mt-1">{t('sys_subtitle')}</p>
                 </div>
                 <button
                     onClick={openCreate}
                     className="inline-flex items-center gap-2 px-4 py-2.5 bg-violet-600 text-white text-sm font-medium rounded-xl hover:bg-violet-700 transition-colors shadow-sm shadow-violet-200"
                 >
                     <Plus className="w-4 h-4" />
-                    Thêm hệ thống
+                    {t('sys_add')}
                 </button>
             </div>
 
@@ -146,7 +148,7 @@ export default function CinemaSystems() {
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Tìm kiếm hệ thống rạp..."
+                    placeholder={t('sys_search')}
                     className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                 />
             </div>
@@ -159,7 +161,7 @@ export default function CinemaSystems() {
             ) : filtered.length === 0 ? (
                 <div className="text-center py-20 text-gray-400">
                     <Building2 className="w-12 h-12 mx-auto mb-3 opacity-40" />
-                    <p>Chưa có hệ thống rạp nào</p>
+                    <p>{t('sys_none')}</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
