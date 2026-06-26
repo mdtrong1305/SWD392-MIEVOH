@@ -43,28 +43,44 @@ Trong Repo tham chiếu gốc, tác giả sử dụng đoạn văn tóm tắt (`
 
 ---
 
-## 4. Kết Quả Đo Lường Trực Quan & Đánh Giá Thuật Toán
+## 4. Phân Tích Chân Dung Người Dùng (User Profiling)
+
+Trước khi tiến hành so sánh thuật toán, hệ thống đã trích xuất thành công chân dung sở thích của người dùng (`trongmdse182148@fpt.edu.vn`) dựa trên lịch sử xem phim:
+
+### 4.1. Phân Tích Gu Thể Loại (Preferred Genres)
+Biểu đồ dưới đây minh họa các thể loại phim mà người dùng này yêu thích nhất (Horror, Mystery). Đây là cơ sở cốt lõi để các thuật toán đưa ra quyết định gợi ý.
+
+![Biểu đồ Gu Thể loại](result/images/2_profiling/user_preferred_genres.png)
+
+### 4.2. Phân Tích Gu Nhân Sự (Preferred Directors & Actors)
+Hệ thống tiếp tục rà quét toàn bộ dàn diễn viên và đạo diễn từ các phim người dùng đã xem để tạo ra "Hồ sơ thần tượng". Việc này đóng vai trò quan trọng trong việc cá nhân hóa sâu trải nghiệm của người dùng.
+
+![Biểu đồ Gu Nhân sự](result/images/2_profiling/user_preferred_people.png)
+
+---
+
+## 5. Kết Quả Đo Lường Trực Quan & Đánh Giá Thuật Toán
 
 Để minh chứng cho sức mạnh của thuật toán đề xuất (Pandas Heuristic) so với mô hình Học máy (TF-IDF), hệ thống đã thực thi Benchmark trên tệp dữ liệu thực tế (52 phim, 118 đánh giá, 40 lượt mua vé). Kết quả được lượng hóa qua 4 tiêu chí cốt lõi:
 
-### 4.1. So sánh Điểm số Đầu ra (Score Analysis)
+### 5.1. So sánh Điểm số Đầu ra (Score Analysis)
 - **Pandas Heuristic** cho thấy các mốc điểm số khác biệt rõ ràng nhờ hệ thống cộng điểm có chủ đích (ví dụ: +50 cho thể loại chính).
 - **TF-IDF** gặp phải hiện tượng "Pha loãng điểm số" (Dilution Effect), đường điểm số nằm là là ở mức rất thấp, khiến việc phân loại các bộ phim kém hiệu quả.
 
 ![Biểu đồ So sánh Điểm số](result/images/3_comparison/algo_score_comparison.png)
 
-### 4.2. Độ Chính Xác: Bám sát Thể Loại (Genre Match Accuracy)
+### 5.2. Độ Chính Xác: Bám sát Thể Loại (Genre Match Accuracy)
 - **Pandas Heuristic** đạt tỷ lệ chính xác tuyệt đối **10/10 phim** trùng khớp với Gu thể loại (Horror, Mystery) của người dùng.
 - **TF-IDF** chỉ đạt **6/10 phim**, chứng tỏ mô hình học máy bị nhiễu bởi các từ khóa phụ (do không phân biệt được mức độ quan trọng giữa các từ khóa) và gợi ý sai thể loại.
 
 ![Biểu đồ Độ Bám sát Thể loại](result/images/3_comparison/algo_genre_accuracy.png)
 
-### 4.3. Độ Chính Xác: Bám sát Nhân Sự (People Match Accuracy)
+### 5.3. Độ Chính Xác: Bám sát Nhân Sự (People Match Accuracy)
 - Mặc dù tập dữ liệu khá nhỏ (tỷ lệ các diễn viên đóng trùng nhiều phim thấp), nhưng thuật toán vẫn trích xuất thành công **2/10 phim** có sự xuất hiện của Đạo diễn hoặc Diễn viên thần tượng của người dùng. Việc đưa thuộc tính `cast` và `director` vào thuật toán đã thực sự mang lại trải nghiệm cá nhân hóa sâu sắc.
 
 ![Biểu đồ Độ Bám sát Nhân sự](result/images/3_comparison/algo_people_accuracy.png)
 
-### 4.4. Tốc độ Thực thi (Performance)
+### 5.4. Tốc độ Thực thi (Performance)
 - **Pandas Heuristic:** Xử lý toàn bộ chỉ mất **0.0012 giây**.
 - **TF-IDF:** Mất **0.0039 giây** (chậm hơn xấp xỉ 3.27 lần).
 > **Kết luận:** Sự vượt trội về mặt tốc độ này đến từ việc thuật toán đề xuất tận dụng kiến trúc xử lý mảng (vectorized operations) cực nhanh của Pandas để xét các luật (If-Else logic), thay vì phải tốn tài nguyên tính toán góc lệch Cosine cho các ma trận TF-IDF khổng lồ và cồng kềnh.
