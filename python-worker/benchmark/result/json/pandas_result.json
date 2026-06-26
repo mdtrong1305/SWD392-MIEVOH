@@ -35,18 +35,7 @@
         ],
         "director": "Johansyah Jumberan",
         "cast": "Rio Dewanto, Putri Intan Kasela, Ochi Rosdiana, Jolene Marie, Dayu Wijanto",
-        "score": 84.76884393114454
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a3e58cff0e5adb0960da98e",
-        "title": "Linh Miêu Báo Thù",
-        "genres": [
-            "Horror"
-        ],
-        "director": "Anuwat Thanomrod",
-        "cast": "Anna Glucks, Intach Leorakwong, Wayne Falconer, Nuttanee Sittisamarn",
-        "score": 54.39388978867062
+        "score": 80.72310602804917
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
@@ -58,7 +47,7 @@
         ],
         "director": "Lưu Thành Luân",
         "cast": "Võ Tấn Phát, Trần Ngọc Vàng, Ốc Thanh Vân, Thanh Thủy, Phương Duyên",
-        "score": 53.809897309594405
+        "score": 54.74066808619201
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
@@ -69,19 +58,7 @@
         ],
         "director": "Shugo Praico, Joey De Guzman, Ian Loreños",
         "cast": "Carla Abellana, Richard Gutierrez, Ivana Alawi, Manilyn Reynes, Janice de Belen",
-        "score": 53.80979205624046
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad72d7b9abea8c2b24518",
-        "title": "Làng Trùng Tang",
-        "genres": [
-            "Thriller",
-            "Horror"
-        ],
-        "director": "Ginanti Rona",
-        "cast": "Fedi Nuril, Ali Fikry, Wavi Zihan, Muzakki Ramdhan, Gilang Devialdy",
-        "score": 53.754561416367665
+        "score": 52.931000890445354
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
@@ -93,7 +70,7 @@
         ],
         "director": "Phontharis Chotkijsadarsopon",
         "cast": "Witthawat Rattanaboonbaramee, Bhuripat Vejvongsatechavat, Phiravich Attachitsataporn, Atiwat Saengtien, Pond Khunnapat Pichetworawut",
-        "score": 51.999887996740554
+        "score": 52.771740758813486
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
@@ -104,18 +81,18 @@
         ],
         "director": "Damian Mc Carthy",
         "cast": "Adam Scott, Peter Coonan, David Wilmot, Florence Ordesh, Will O'Connell",
-        "score": 51.935786383804704
+        "score": 52.624140512194124
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad72e7b9abea8c2b2451b",
-        "title": "Ma Da Hàn Quốc: Hồ Nuốt Người",
+        "_id": "6a2ad72b7b9abea8c2b24512",
+        "title": "KHÁCH",
         "genres": [
             "Horror"
         ],
-        "director": "Lee Sang-min",
-        "cast": "Kim Hye-yoon, Lee Jong-won, Kim Jun-han, Kim Young-sung, Oh Dong-min",
-        "score": 51.90434447841427
+        "director": "André Øvredal",
+        "cast": "Jacob Scipio, Lou Llobell, Melissa Leo, Joseph Lopez, Tony Doupe",
+        "score": 52.50479289938674
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
@@ -127,18 +104,41 @@
         ],
         "director": "Phan Bá Hỷ",
         "cast": "Lê Khánh, Avin Lu, Tín Nguyễn, Hạnh Thúy, Gi A Nguyễn",
-        "score": 51.026175135673824
+        "score": 52.22375352755306
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad72b7b9abea8c2b24512",
-        "title": "KHÁCH",
+        "_id": "6a2ad72d7b9abea8c2b24518",
+        "title": "Làng Trùng Tang",
+        "genres": [
+            "Thriller",
+            "Horror"
+        ],
+        "director": "Ginanti Rona",
+        "cast": "Fedi Nuril, Ali Fikry, Wavi Zihan, Muzakki Ramdhan, Gilang Devialdy",
+        "score": 51.92781012142776
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a2ad72e7b9abea8c2b2451b",
+        "title": "Ma Da Hàn Quốc: Hồ Nuốt Người",
         "genres": [
             "Horror"
         ],
-        "director": "André Øvredal",
-        "cast": "Jacob Scipio, Lou Llobell, Melissa Leo, Joseph Lopez, Tony Doupe",
-        "score": 50.06177998443108
+        "director": "Lee Sang-min",
+        "cast": "Kim Hye-yoon, Lee Jong-won, Kim Jun-han, Kim Young-sung, Oh Dong-min",
+        "score": 50.93110958150375
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a3e58cff0e5adb0960da98e",
+        "title": "Linh Miêu Báo Thù",
+        "genres": [
+            "Horror"
+        ],
+        "director": "Anuwat Thanomrod",
+        "cast": "Anna Glucks, Intach Leorakwong, Wayne Falconer, Nuttanee Sittisamarn",
+        "score": 50.26488424384225
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
@@ -152,21 +152,33 @@
         ],
         "director": "Kyle Balda",
         "cast": "Hugh Jackman, Emma Thompson, Nicholas Braun, Nicholas Galitzine, Molly Gordon",
-        "score": 30.932199022460033
+        "score": 33.052526597089646
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad7287b9abea8c2b24509",
-        "title": "Doraemon Movie 45 (2026): Nobita Và Lâu Đài Dưới Đáy Biển",
+        "_id": "6a2ad72e7b9abea8c2b2451c",
+        "title": "Yêu Nữ Thích Hàng Hiệu 2",
         "genres": [
-            "Adventure",
-            "Animation",
-            "Family",
-            "Fantasy"
+            "Comedy",
+            "Drama"
         ],
-        "director": "Tetsuo Yajima",
-        "cast": "Wasabi Mizuta, Megumi Oohara, Yumi Kakazu, Subaru Kimura, Tomokazu Seki, Michelle Ziudith",
-        "score": 24.80314021341101
+        "director": "David Frankel",
+        "cast": "Meryl Streep, Anne Hathaway, Emily Blunt, Stanley Tucci, Kenneth Branagh",
+        "score": 4.869951537074506
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a2ad72c7b9abea8c2b24516",
+        "title": "Mobile Suit Gundam Tia Chớp Hathaway: Ma Thuật Nữ Thần Circe",
+        "genres": [
+            "Drama",
+            "Animation",
+            "War",
+            "Science Fiction"
+        ],
+        "director": "Shukou Murase",
+        "cast": "Kensho Ono, Reina Ueda, Junichi Suwabe, Souma Saitou, Kenjirou Tsuda",
+        "score": 4.82406083492614
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
@@ -175,190 +187,18 @@
         "genres": [],
         "director": "Mai Phương",
         "cast": "",
-        "score": 4.892869265693515
+        "score": 4.6916845701671335
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad73d7b9abea8c2b24530",
-        "title": "Supergirl",
-        "genres": [],
-        "director": "Craig Gillespie",
-        "cast": "Milly Alcock, Matthias Schoenaerts, Eve Ridley, Jason Momoa, David Krumholtz",
-        "score": 4.7982975696111385
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad7297b9abea8c2b2450e",
-        "title": "He-Man Và Những Chiến Binh Vũ Trụ",
+        "_id": "6a2ad72e7b9abea8c2b2451a",
+        "title": "Tạm Biệt Gohan",
         "genres": [
-            "Action",
-            "Adventure",
-            "Fantasy"
+            "Drama"
         ],
-        "director": "Aaron Nee, Adam Nee",
-        "cast": "Noah Centineo",
-        "score": 4.743553120602214
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad72f7b9abea8c2b2451f",
-        "title": "Shin Cậu Bé Bút Chì: Quậy Tung Vương Quốc Nguệch Ngoạc Và 4 Dũng Sĩ Bất Ổn",
-        "genres": [
-            "chan: Crash! Rakuga Kingdom and Almost Four Heroes"
-        ],
-        "director": "Takahiko Kyougoku",
-        "cast": "Yumiko Kobayashi, Tessyo Genda, Kyary Pamyu Pamyu, Mîna Tominaga, Shizuka Itou",
-        "score": 4.72871695150192
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad7317b9abea8c2b24523",
-        "title": "Dưới Bóng Điện Hạ",
-        "genres": [
-            "Drama",
-            "History"
-        ],
-        "director": "Jang Hang-jun",
-        "cast": "Yoo Hae-jin, Park Ji-hoon, Yoo Ji-tae, Jeon Mi-do, Kim Min",
-        "score": 4.582075779458965
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad7327b9abea8c2b24526",
-        "title": "Thoát Khỏi Tận Thế",
-        "genres": [
-            "Drama",
-            "Adventure",
-            "Science Fiction"
-        ],
-        "director": "Phil Lord, Christopher Miller",
-        "cast": "Ryan Gosling, Sandra Hüller, Milana Vayntrub, Isla McRae, Bastian Antonio Fuentes",
-        "score": 4.285744564691524
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a3e58d5f0e5adb0960da993",
-        "title": "Gintama The Movie 2026: Yoshiwara Trong Biển Lửa",
-        "genres": [
-            "Action",
-            "Animation",
-            "Science Fiction"
-        ],
-        "director": "Naoya Ando",
-        "cast": "Tomokazu Sugita, Daisuke Sakaguchi, Rie Kugimiya, Satoshi Hino, Yuhko Kaida",
-        "score": 4.256494690886974
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a3e58d3f0e5adb0960da991",
-        "title": "Mumbo Giải Cứu Bé Bự",
-        "genres": [
-            "Animation",
-            "Family"
-        ],
-        "director": "Karsten Kiilerich",
-        "cast": "Victor Spanning, Annevig Schelde Ebbe, Kirsten Lehfeldt, Rebecca Rønde Kiilerich, Asger Reher",
-        "score": 4.200251338573877
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad73b7b9abea8c2b2452b",
-        "title": "Bạch Xà: Một Kiếp Nhân Gian",
-        "genres": [
-            "Comedy",
-            "Romance",
-            "Animation",
-            "Fantasy"
-        ],
-        "director": "Chen Jianxi, Li Jiakai",
-        "cast": "Zhang Zhe, Tianxiang Yang, Tang Xiaoxi, He Zhang, Liu Cong",
-        "score": 4.1290029855778805
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad73d7b9abea8c2b2452f",
-        "title": "Trường Hè, 2001",
-        "genres": [
-            "Drama",
-            "Family"
-        ],
-        "director": "Dužan Duong",
-        "cast": "Bùi Thế Dương, Hoang Anh Doan, Tô Tiến Tài, Lê Quỳnh Lan, Dung Nguyen",
-        "score": 3.931164315253619
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad73b7b9abea8c2b2452a",
-        "title": "Yên Chi Khâu",
-        "genres": [
-            "胭脂扣"
-        ],
-        "director": "Stanley Kwan Kam-Pang",
-        "cast": "Anita Mui Yim-Fong, Leslie Cheung, Alex Man Chi-Leung, Emily Chu Bo-Yee, Irene Wan",
-        "score": 3.766016492409202
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad72f7b9abea8c2b2451e",
-        "title": "Mortal Kombat 2: Cuộc Chiến Sinh Tử",
-        "genres": [
-            "Action",
-            "Adventure",
-            "Fantasy"
-        ],
-        "director": "Simon McQuoid",
-        "cast": "Karl Urban, Lewis Tan, Jessica McNamee, Mehcad Brooks, Ludi Lin",
-        "score": 3.5417505520717993
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad7307b9abea8c2b24520",
-        "title": "Michael",
-        "genres": [],
-        "director": "Antoine Fuqua",
-        "cast": "Jaafar Jackson, Colman Domingo, Nia Long, Kendrick Sampson, Miles Teller",
-        "score": 3.531059834636147
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad73c7b9abea8c2b2452e",
-        "title": "Câu Chuyện Đồ Chơi 5",
-        "genres": [
-            "Comedy",
-            "Adventure",
-            "Animation",
-            "Family"
-        ],
-        "director": "Andrew Stanton",
-        "cast": "Tom Hanks, Tim Allen, Joan Cusack, Wallace Shawn, Tony Hale",
-        "score": 3.4404540700881276
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a3e58cff0e5adb0960da98f",
-        "title": "Tung Hoành Tứ Hải",
-        "genres": [
-            "Comedy",
-            "Action",
-            "Thriller",
-            "Crime"
-        ],
-        "director": "John Woo",
-        "cast": "Chow Yun-Fat, Leslie Cheung, Cherie Chung Cho-Hung, Paul Chu Kong, Kenneth Tsang",
-        "score": 3.4030678827923495
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad73b7b9abea8c2b24529",
-        "title": "Cơn Thịnh Nộ",
-        "genres": [
-            "Action",
-            "Thriller",
-            "Crime"
-        ],
-        "director": "Kenji Tanigaki",
-        "cast": "Xie Miao, Joe Taslim, En You Yang, Yayan Ruhian, JeeJa Yanin",
-        "score": 3.390513643351741
+        "director": "Nattawut Poonpiriya, Atta Hemwadee, Chayanop Bunprakob",
+        "cast": "Kori, Meechok, Hima, Yasushi Kitajima, Poe Mamhe Thar",
+        "score": 4.615454804205387
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
@@ -373,45 +213,41 @@
         ],
         "director": "Michael Jelenic, Aaron Horvath",
         "cast": "Chris Pratt, Anya Taylor-Joy, Charlie Day, Jack Black, Keegan-Michael Key",
-        "score": 3.3896069453722255
+        "score": 4.580700229189769
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a3e58d4f0e5adb0960da992",
-        "title": "BanG Dream! It's MyGO Part 1: Mèo Hoang Giữa Ánh Nắng Xuân",
-        "genres": [
-            "Animation",
-            "Music"
-        ],
-        "director": "Kohdai Kakimoto",
-        "cast": "Hina Youmiya, Rin Tateishi, Hina Aoki, Mika Kohinata, Coco Hayashi",
-        "score": 2.6092568687246196
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad72b7b9abea8c2b24513",
-        "title": "Tây Du Ký Đại Náo",
-        "genres": [
-            "Comedy",
-            "Adventure",
-            "Fantasy"
-        ],
-        "director": "Poj Arnon",
-        "cast": "Padung Songsang, Choosak Iamsook, Kajbhunditt Jaidee, Jakarin Puribhat, Ong-art Cheamcharoenpornkul",
-        "score": 2.5198269155330397
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad72d7b9abea8c2b24517",
-        "title": "Bài Trùng Phá Án",
+        "_id": "6a3e58cff0e5adb0960da98f",
+        "title": "Tung Hoành Tứ Hải",
         "genres": [
             "Comedy",
             "Action",
+            "Thriller",
             "Crime"
         ],
-        "director": "Park Chul-hwan",
-        "cast": "Bae Seong-Woo, Jung Ga-ram, Esom, Jo Han-chul, Yoon Kyung-ho",
-        "score": 2.2331343258975638
+        "director": "John Woo",
+        "cast": "Chow Yun-Fat, Leslie Cheung, Cherie Chung Cho-Hung, Paul Chu Kong, Kenneth Tsang",
+        "score": 4.506067663981704
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a2ad7327b9abea8c2b24525",
+        "title": "Hẹn Em Ngày Nhật Thực",
+        "genres": [
+            "Romance"
+        ],
+        "director": "Lê Thiện Viễn",
+        "cast": "Đoàn Thiên Ân, Khương Lê, Lê Khanh, Huỳnh Phương, Nguyên Thảo",
+        "score": 4.076449783550112
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a2ad7307b9abea8c2b24520",
+        "title": "Michael",
+        "genres": [],
+        "director": "Antoine Fuqua",
+        "cast": "Jaafar Jackson, Colman Domingo, Nia Long, Kendrick Sampson, Miles Teller",
+        "score": 3.801014696079528
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
@@ -425,57 +261,32 @@
         ],
         "director": "Masaki Kitamura",
         "cast": "Jun Fukuyama, Tomokazu Sugita, Shizuka Itou, Mai Fuchigami, Nobuhiko Okamoto",
-        "score": 2.218496774618808
+        "score": 3.149250730486304
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad72e7b9abea8c2b2451c",
-        "title": "Yêu Nữ Thích Hàng Hiệu 2",
-        "genres": [
-            "Comedy",
-            "Drama"
-        ],
-        "director": "David Frankel",
-        "cast": "Meryl Streep, Anne Hathaway, Emily Blunt, Stanley Tucci, Kenneth Branagh",
-        "score": 2.1705580221039487
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad72a7b9abea8c2b2450f",
-        "title": "Ốc Mượn Hồn",
-        "genres": [
-            "Drama"
-        ],
-        "director": "Đinh Tuấn Vũ",
-        "cast": "Tiểu Vy, Quốc Trường, Lương Gia Huy, Anh Phạm, Yên Đan",
-        "score": 2.104645161331788
-    },
-    {
-        "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad7297b9abea8c2b2450d",
-        "title": "The Amazing Digital Circus: Hồi Kết",
+        "_id": "6a2ad7317b9abea8c2b24523",
+        "title": "Dưới Bóng Điện Hạ",
         "genres": [
             "Drama",
-            "Thriller",
-            "Animation",
-            "Science Fiction"
+            "History"
         ],
-        "director": "Gooseworx",
-        "cast": "Lizzie Freeman, Michael Kovach, Amanda Hufford, Marissa Lenti, Sean Chiplock",
-        "score": 1.3765625534958397
+        "director": "Jang Hang-jun",
+        "cast": "Yoo Hae-jin, Park Ji-hoon, Yoo Ji-tae, Jeon Mi-do, Kim Min",
+        "score": 3.0879772097565494
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad73a7b9abea8c2b24528",
-        "title": "Cô Bé Ponyo",
+        "_id": "6a2ad72d7b9abea8c2b24517",
+        "title": "Bài Trùng Phá Án",
         "genres": [
-            "Adventure",
-            "Animation",
-            "Family"
+            "Comedy",
+            "Action",
+            "Crime"
         ],
-        "director": "Hayao Miyazaki",
-        "cast": "Yuria Nara, Hiroki Doi, Jôji Tokoro, Tomoko Yamaguchi, Yûki Amami",
-        "score": 1.2274529716527454
+        "director": "Park Chul-hwan",
+        "cast": "Bae Seong-Woo, Jung Ga-ram, Esom, Jo Han-chul, Yoon Kyung-ho",
+        "score": 3.0103484252240262
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
@@ -489,32 +300,91 @@
         ],
         "director": "Makoto Shinkai",
         "cast": "Ryuunosuke Kamiki, Mone Kamishiraishi, Nobunaga Shimazaki, Etsuko Ichihara, Tani Kanon",
-        "score": 1.1750849408958182
+        "score": 2.4447742446097864
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad72c7b9abea8c2b24516",
-        "title": "Mobile Suit Gundam Tia Chớp Hathaway: Ma Thuật Nữ Thần Circe",
+        "_id": "6a2ad7327b9abea8c2b24526",
+        "title": "Thoát Khỏi Tận Thế",
         "genres": [
             "Drama",
-            "Animation",
-            "War",
+            "Adventure",
             "Science Fiction"
         ],
-        "director": "Shukou Murase",
-        "cast": "Kensho Ono, Reina Ueda, Junichi Suwabe, Souma Saitou, Kenjirou Tsuda",
-        "score": 0.9473261128094074
+        "director": "Phil Lord, Christopher Miller",
+        "cast": "Ryan Gosling, Sandra Hüller, Milana Vayntrub, Isla McRae, Bastian Antonio Fuentes",
+        "score": 2.418193459972804
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad7327b9abea8c2b24525",
-        "title": "Hẹn Em Ngày Nhật Thực",
+        "_id": "6a2ad73d7b9abea8c2b24530",
+        "title": "Supergirl",
+        "genres": [],
+        "director": "Craig Gillespie",
+        "cast": "Milly Alcock, Matthias Schoenaerts, Eve Ridley, Jason Momoa, David Krumholtz",
+        "score": 2.3387693667563885
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a2ad72b7b9abea8c2b24513",
+        "title": "Tây Du Ký Đại Náo",
         "genres": [
-            "Romance"
+            "Comedy",
+            "Adventure",
+            "Fantasy"
         ],
-        "director": "Lê Thiện Viễn",
-        "cast": "Đoàn Thiên Ân, Khương Lê, Lê Khanh, Huỳnh Phương, Nguyên Thảo",
-        "score": 0.7349162343010879
+        "director": "Poj Arnon",
+        "cast": "Padung Songsang, Choosak Iamsook, Kajbhunditt Jaidee, Jakarin Puribhat, Ong-art Cheamcharoenpornkul",
+        "score": 2.3044840734986076
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a2ad72f7b9abea8c2b2451f",
+        "title": "Shin Cậu Bé Bút Chì: Quậy Tung Vương Quốc Nguệch Ngoạc Và 4 Dũng Sĩ Bất Ổn",
+        "genres": [
+            "chan: Crash! Rakuga Kingdom and Almost Four Heroes"
+        ],
+        "director": "Takahiko Kyougoku",
+        "cast": "Yumiko Kobayashi, Tessyo Genda, Kyary Pamyu Pamyu, Mîna Tominaga, Shizuka Itou",
+        "score": 2.11097998334079
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a2ad7297b9abea8c2b2450e",
+        "title": "He-Man Và Những Chiến Binh Vũ Trụ",
+        "genres": [
+            "Action",
+            "Adventure",
+            "Fantasy"
+        ],
+        "director": "Aaron Nee, Adam Nee",
+        "cast": "Noah Centineo",
+        "score": 2.1041628291967793
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a2ad7287b9abea8c2b24509",
+        "title": "Doraemon Movie 45 (2026): Nobita Và Lâu Đài Dưới Đáy Biển",
+        "genres": [
+            "Adventure",
+            "Animation",
+            "Family",
+            "Fantasy"
+        ],
+        "director": "Tetsuo Yajima",
+        "cast": "Wasabi Mizuta, Megumi Oohara, Yumi Kakazu, Subaru Kimura, Tomokazu Seki",
+        "score": 2.104011359851432
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a2ad72a7b9abea8c2b2450f",
+        "title": "Ốc Mượn Hồn",
+        "genres": [
+            "Drama"
+        ],
+        "director": "Đinh Tuấn Vũ",
+        "cast": "Tiểu Vy, Quốc Trường, Lương Gia Huy, Anh Phạm, Yên Đan",
+        "score": 2.099302363641015
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
@@ -523,30 +393,33 @@
         "genres": [],
         "director": "Bảo Nguyễn",
         "cast": "Trần Tuấn Lương, Hoàng Yến Chibi, Quốc Cường, Minh Thuận, NSND Kim Xuân",
-        "score": 0.7026268606232772
+        "score": 2.061564344274834
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad72e7b9abea8c2b2451a",
-        "title": "Tạm Biệt Gohan",
+        "_id": "6a2ad73a7b9abea8c2b24528",
+        "title": "Cô Bé Ponyo",
         "genres": [
-            "Drama"
+            "Adventure",
+            "Animation",
+            "Family"
         ],
-        "director": "Nattawut Poonpiriya, Atta Hemwadee, Chayanop Bunprakob",
-        "cast": "Kori, Meechok, Hima, Yasushi Kitajima, Poe Mamhe Thar",
-        "score": 0.5912245504024588
+        "director": "Hayao Miyazaki",
+        "cast": "Yuria Nara, Hiroki Doi, Jôji Tokoro, Tomoko Yamaguchi, Yûki Amami",
+        "score": 1.7252376729766667
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad7297b9abea8c2b2450b",
-        "title": "Siêu Quậy Marsupilami",
+        "_id": "6a2ad72d7b9abea8c2b24519",
+        "title": "Star Wars Mandalorian Và Grogu",
         "genres": [
-            "Comedy",
-            "Adventure"
+            "Action",
+            "Adventure",
+            "Science Fiction"
         ],
-        "director": "Philippe Lacheau",
-        "cast": "Philippe Lacheau, Jamel Debbouze, Tarek Boudali, Élodie Fontan, Julien Arruti",
-        "score": 0.5173619555799769
+        "director": "Jon Favreau",
+        "cast": "Pedro Pascal, Jeremy Allen White, Sigourney Weaver, Jonny Coyne, Dave Filoni",
+        "score": 1.7197739793218214
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
@@ -560,19 +433,146 @@
         ],
         "director": "Xie Junwei, Zou Jing, Cui Yuemei",
         "cast": "Lu Lifeng, Lin Qiang, He Zhang, Chen Ziping, Fu Bohan",
-        "score": 0.10892891031125673
+        "score": 1.3378859179046432
     },
     {
         "userId": "trongmdse182148@fpt.edu.vn",
-        "_id": "6a2ad72d7b9abea8c2b24519",
-        "title": "Star Wars Mandalorian Và Grogu",
+        "_id": "6a2ad73b7b9abea8c2b2452b",
+        "title": "Bạch Xà: Một Kiếp Nhân Gian",
+        "genres": [
+            "Comedy",
+            "Romance",
+            "Animation",
+            "Fantasy"
+        ],
+        "director": "Chen Jianxi, Li Jiakai",
+        "cast": "Zhang Zhe, Tianxiang Yang, Tang Xiaoxi, He Zhang, Liu Cong",
+        "score": 1.3042835063090235
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a3e58d4f0e5adb0960da992",
+        "title": "BanG Dream! It's MyGO Part 1: Mèo Hoang Giữa Ánh Nắng Xuân",
+        "genres": [
+            "Animation",
+            "Music"
+        ],
+        "director": "Kohdai Kakimoto",
+        "cast": "Hina Youmiya, Rin Tateishi, Hina Aoki, Mika Kohinata, Coco Hayashi",
+        "score": 1.1392807795334066
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a2ad7297b9abea8c2b2450d",
+        "title": "The Amazing Digital Circus: Hồi Kết",
+        "genres": [
+            "Drama",
+            "Thriller",
+            "Animation",
+            "Science Fiction"
+        ],
+        "director": "Gooseworx",
+        "cast": "Lizzie Freeman, Michael Kovach, Amanda Hufford, Marissa Lenti, Sean Chiplock",
+        "score": 1.0028396175606153
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a2ad7297b9abea8c2b2450b",
+        "title": "Siêu Quậy Marsupilami",
+        "genres": [
+            "Comedy",
+            "Adventure"
+        ],
+        "director": "Philippe Lacheau",
+        "cast": "Philippe Lacheau, Jamel Debbouze, Tarek Boudali, Élodie Fontan, Julien Arruti",
+        "score": 0.6451975187884501
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a2ad73c7b9abea8c2b2452e",
+        "title": "Câu Chuyện Đồ Chơi 5",
+        "genres": [
+            "Comedy",
+            "Adventure",
+            "Animation",
+            "Family"
+        ],
+        "director": "Andrew Stanton",
+        "cast": "Tom Hanks, Tim Allen, Joan Cusack, Wallace Shawn, Tony Hale",
+        "score": 0.49803992640597594
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a3e58d3f0e5adb0960da991",
+        "title": "Mumbo Giải Cứu Bé Bự",
+        "genres": [
+            "Animation",
+            "Family"
+        ],
+        "director": "Karsten Kiilerich",
+        "cast": "Victor Spanning, Annevig Schelde Ebbe, Kirsten Lehfeldt, Rebecca Rønde Kiilerich, Asger Reher",
+        "score": 0.4843205264004846
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a2ad72f7b9abea8c2b2451e",
+        "title": "Mortal Kombat 2: Cuộc Chiến Sinh Tử",
         "genres": [
             "Action",
             "Adventure",
+            "Fantasy"
+        ],
+        "director": "Simon McQuoid",
+        "cast": "Karl Urban, Lewis Tan, Jessica McNamee, Mehcad Brooks, Ludi Lin",
+        "score": 0.474207755569353
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a2ad73b7b9abea8c2b24529",
+        "title": "Cơn Thịnh Nộ",
+        "genres": [
+            "Action",
+            "Thriller",
+            "Crime"
+        ],
+        "director": "Kenji Tanigaki",
+        "cast": "Xie Miao, Joe Taslim, En You Yang, Yayan Ruhian, JeeJa Yanin",
+        "score": 0.2489948691234728
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a2ad73b7b9abea8c2b2452a",
+        "title": "Yên Chi Khâu",
+        "genres": [
+            "胭脂扣"
+        ],
+        "director": "Stanley Kwan Kam-Pang",
+        "cast": "Anita Mui Yim-Fong, Leslie Cheung, Alex Man Chi-Leung, Emily Chu Bo-Yee, Irene Wan",
+        "score": 0.1531065807529186
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a2ad73d7b9abea8c2b2452f",
+        "title": "Trường Hè, 2001",
+        "genres": [
+            "Drama",
+            "Family"
+        ],
+        "director": "Dužan Duong",
+        "cast": "Bùi Thế Dương, Hoang Anh Doan, Tô Tiến Tài, Lê Quỳnh Lan, Dung Nguyen",
+        "score": 0.11818041080949582
+    },
+    {
+        "userId": "trongmdse182148@fpt.edu.vn",
+        "_id": "6a3e58d5f0e5adb0960da993",
+        "title": "Gintama The Movie 2026: Yoshiwara Trong Biển Lửa",
+        "genres": [
+            "Action",
+            "Animation",
             "Science Fiction"
         ],
-        "director": "Jon Favreau",
-        "cast": "Pedro Pascal, Jeremy Allen White, Sigourney Weaver, Jonny Coyne, Dave Filoni",
-        "score": 0.04820017581045721
+        "director": "Naoya Ando",
+        "cast": "Tomokazu Sugita, Daisuke Sakaguchi, Rie Kugimiya, Satoshi Hino, Yuhko Kaida",
+        "score": 0.038068945929302656
     }
 ]

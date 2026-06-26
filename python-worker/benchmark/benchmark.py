@@ -54,8 +54,8 @@ if 'genres' in df_movies.columns:
     # Vẽ biểu đồ Genres
     plt.figure(figsize=(8, 5))
     top_genres.sort_values().plot(kind='barh', color='skyblue')
-    plt.title('Top 5 The loai phim pho bien nhat')
-    plt.xlabel('So luong phim')
+    plt.title('Top 5 Thể loại phim phổ biến nhất')
+    plt.xlabel('Số lượng phim')
     plt.tight_layout()
     base_img_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'result', 'images')
     dir_eda = os.path.join(base_img_dir, '1_eda')
@@ -79,8 +79,8 @@ if 'director' in df_movies.columns:
         # Vẽ biểu đồ Directors
         plt.figure(figsize=(8, 5))
         top_directors.sort_values().plot(kind='barh', color='lightgreen')
-        plt.title('Top 5 Dao dien co nhieu tac pham nhat')
-        plt.xlabel('So luong phim')
+        plt.title('Top 5 Đạo diễn có nhiều tác phẩm nhất')
+        plt.xlabel('Số lượng phim')
         plt.tight_layout()
         plt.savefig(os.path.join(dir_eda, 'eda_top_directors.png'))
         plt.close()
@@ -97,8 +97,8 @@ if 'cast' in df_movies.columns:
         # Vẽ biểu đồ Cast
         plt.figure(figsize=(8, 5))
         top_cast.sort_values().plot(kind='barh', color='salmon')
-        plt.title('Top 5 Dien vien co nhieu tac pham nhat')
-        plt.xlabel('So luong phim')
+        plt.title('Top 5 Diễn viên có nhiều tác phẩm nhất')
+        plt.xlabel('Số lượng phim')
         plt.tight_layout()
         plt.savefig(os.path.join(dir_eda, 'eda_top_cast.png'))
         plt.close()
@@ -175,7 +175,7 @@ print("\n")
 if not genre_counts.empty:
     plt.figure(figsize=(6, 6))
     genre_counts.plot(kind='pie', autopct='%1.1f%%', startangle=90, colors=plt.cm.Paired.colors)
-    plt.title(f'Phan bo Gu The loai cua User:\n{user_to_predict}')
+    plt.title(f'Phân bổ Gu Thể loại của User:\n{user_to_predict}')
     plt.ylabel('')
     plt.tight_layout()
     plt.savefig(os.path.join(dir_profiling, 'user_preferred_genres.png'))
@@ -185,8 +185,8 @@ if not genre_counts.empty:
 if not people_counts.empty:
     plt.figure(figsize=(8, 4))
     people_counts.sort_values().plot(kind='barh', color='orange')
-    plt.title(f'Top Nhan su (Dao dien/Dien vien) yeu thich cua User:\n{user_to_predict}')
-    plt.xlabel('So lan xem')
+    plt.title(f'Top Nhân sự (Đạo diễn/Diễn viên) yêu thích của User:\n{user_to_predict}')
+    plt.xlabel('Số lần xem')
     plt.tight_layout()
     plt.savefig(os.path.join(dir_profiling, 'user_preferred_people.png'))
     plt.close()
@@ -297,9 +297,9 @@ if not df_ranked_pandas.empty and not df_ranked_tfidf.empty:
     plt.plot(range(1, top_n + 1), scores_pandas, marker='o', linestyle='-', color='#28a745', label='Pandas Heuristic', linewidth=2)
     plt.plot(range(1, top_n + 1), scores_tfidf, marker='s', linestyle='--', color='#dc3545', label='TF-IDF', linewidth=2)
     
-    plt.title(f'So sanh Diem so Top {top_n} Phim duoc de xuat')
-    plt.xlabel('Thu hang (Rank)')
-    plt.ylabel('Diem so (Score 0-100)')
+    plt.title(f'So sánh Điểm số Top {top_n} Phim được đề xuất')
+    plt.xlabel('Thứ hạng (Rank)')
+    plt.ylabel('Điểm số (Score 0-100)')
     plt.xticks(range(1, top_n + 1))
     plt.legend()
     plt.grid(True, linestyle=':', alpha=0.7)
@@ -337,8 +337,8 @@ if not df_ranked_pandas.empty and not df_ranked_tfidf.empty:
     matches = [pandas_match, tfidf_match]
     
     bars = plt.bar(algos, matches, color=['#28a745', '#dc3545'], width=0.5)
-    plt.title(f'Do bam sat The loai trong Top 10\n(Gu: {gu_1}, {gu_2})')
-    plt.ylabel('So luong phim dung Gu (Max 10)')
+    plt.title(f'Độ bám sát Thể loại trong Top 10\n(Gu: {gu_1}, {gu_2})')
+    plt.ylabel('Số lượng phim đúng Gu (Max 10)')
     plt.ylim(0, 11)
     
     for bar in bars:
@@ -383,8 +383,8 @@ if not df_ranked_pandas.empty and not df_ranked_tfidf.empty and favorite_people:
     p_matches = [pandas_p_match, tfidf_p_match]
     
     bars = plt.bar(algos, p_matches, color=['#28a745', '#dc3545'], width=0.5)
-    plt.title('Do bam sat Nhan su (Dao dien/Dien vien) trong Top 10')
-    plt.ylabel('So luong phim dung Gu (Max 10)')
+    plt.title('Độ bám sát Nhân sự (Đạo diễn/Diễn viên) trong Top 10')
+    plt.ylabel('Số lượng phim đúng Gu (Max 10)')
     plt.ylim(0, 11)
     
     for bar in bars:
@@ -393,6 +393,53 @@ if not df_ranked_pandas.empty and not df_ranked_tfidf.empty and favorite_people:
         
     plt.tight_layout()
     plt.savefig(os.path.join(dir_comparison, 'algo_people_accuracy.png'))
+    plt.close()
+
+# ---------------------------------------------------------
+# 2.8. SO SÁNH TOP 3 PHIM ĐẦU RA
+# ---------------------------------------------------------
+if not df_ranked_pandas.empty and not df_ranked_tfidf.empty:
+    top3_pandas = df_ranked_pandas.head(3)
+    top3_tfidf = df_ranked_tfidf.head(3)
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, 4))
+    
+    def truncate(text, length=30):
+        return text[:length] + '...' if len(text) > length else text
+
+    titles_pandas = [truncate(t) for t in top3_pandas['title'][::-1]]
+    titles_tfidf = [truncate(t) for t in top3_tfidf['title'][::-1]]
+    
+    # Subplot 1: Pandas Heuristic
+    axes[0].barh(range(3), top3_pandas['score'][::-1], color='#2E86C1', height=0.6, edgecolor='black', linewidth=1.2)
+    axes[0].set_title('Top 3: Pandas Heuristic (0-100 điểm)', fontsize=13, fontweight='bold', pad=15)
+    axes[0].set_xlim(0, 110)
+    axes[0].set_yticks([])
+    axes[0].grid(axis='x', linestyle='--', alpha=0.6)
+    axes[0].spines['top'].set_visible(False)
+    axes[0].spines['right'].set_visible(False)
+    axes[0].spines['left'].set_visible(False)
+    for index, (title, value) in enumerate(zip(titles_pandas, top3_pandas['score'][::-1])):
+        axes[0].text(value + 2, index, f'{value:.1f}', va='center', fontweight='bold', color='#2E86C1', fontsize=11)
+        axes[0].text(2, index, title, va='center', color='white', fontweight='bold', fontsize=11)
+        
+    # Subplot 2: TF-IDF
+    axes[1].barh(range(3), top3_tfidf['tfidf_score'][::-1], color='#E74C3C', height=0.6, edgecolor='black', linewidth=1.2)
+    axes[1].set_title('Top 3: TF-IDF (Cosine Similarity x 100)', fontsize=13, fontweight='bold', pad=15)
+    max_tfidf = top3_tfidf['tfidf_score'].max()
+    axes[1].set_xlim(0, max_tfidf + (max_tfidf * 0.2) if max_tfidf > 0 else 20)
+    axes[1].set_yticks([])
+    axes[1].grid(axis='x', linestyle='--', alpha=0.6)
+    axes[1].spines['top'].set_visible(False)
+    axes[1].spines['right'].set_visible(False)
+    axes[1].spines['left'].set_visible(False)
+    for index, (title, value) in enumerate(zip(titles_tfidf, top3_tfidf['tfidf_score'][::-1])):
+        axes[1].text(value + (max_tfidf * 0.05), index, f'{value:.1f}', va='center', fontweight='bold', color='#E74C3C', fontsize=11)
+        # Sử dụng chữ đen cho TF-IDF vì thanh điểm thường rất ngắn, chữ sẽ tràn ra ngoài nền trắng
+        axes[1].text(0.5, index, title, va='center', color='black', fontweight='bold', fontsize=11)
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(dir_comparison, 'algo_top3_movies.png'), dpi=300)
     plt.close()
 
 
@@ -416,8 +463,8 @@ if pandas_t > 0:
     algos = ['Pandas Heuristic', 'TF-IDF']
     times = [pandas_t, tfidf_t]
     plt.bar(algos, times, color=['#28a745', '#dc3545'])
-    plt.title('So sanh thoi gian chay thuat toan (Giay)')
-    plt.ylabel('Thoi gian (Giay) - Cang thap cang tot')
+    plt.title('So sánh thời gian chạy thuật toán (Giây)')
+    plt.ylabel('Thời gian (Giây) - Càng thấp càng tốt')
     
     for i, v in enumerate(times):
         plt.text(i, v + (max(times)*0.01), f"{v:.5f}s", ha='center', fontweight='bold')
