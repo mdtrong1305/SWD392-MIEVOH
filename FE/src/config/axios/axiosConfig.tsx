@@ -76,6 +76,9 @@ api.interceptors.response.use(
       const originalRequestUrl = error.config?.url || '';
       if (!originalRequestUrl.includes('/auth/login') && !originalRequestUrl.includes('/auth/register')) {
         localStorage.removeItem('accessToken');
+        localStorage.removeItem('auth_user');
+        localStorage.removeItem('auth_isAuthenticated');
+        localStorage.removeItem('lastActivity');
         localStorage.removeItem('mievoh_user');
         // Redirect to login page
         window.location.href = '/login';

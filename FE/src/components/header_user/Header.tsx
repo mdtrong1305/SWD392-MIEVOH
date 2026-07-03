@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useMemo } from "react";
-import { User, Menu, X, Ticket, LogOut, Lock, Sun, Moon, Globe, LayoutDashboard } from "lucide-react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { User, Menu, X, Ticket, LogOut, Lock, Sun, Moon, Globe, Bell, LayoutDashboard } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch } from "../../store/index.tsx";
+import type { AppDispatch, RootState } from "../../store/index.tsx";
 import { logout, updateUser } from "../../pages/User/Login/slice.ts";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import Button from "../Button/Button";
@@ -283,9 +283,9 @@ export default function Header({
         return allMovies.filter(movie => {
             const titleVi = (movie.title_vi || "").toLowerCase();
             const titleEn = (movie.title_en || "").toLowerCase();
-            const genres = Array.isArray(movie.genres)
-                ? movie.genres.join(" ").toLowerCase()
-                : (movie.genres || "").toLowerCase();
+            const genres = Array.isArray(movie.genres) 
+                ? movie.genres.join(" ").toLowerCase() 
+                : (typeof movie.genres === "string" ? movie.genres : "").toLowerCase();
             return titleVi.includes(q) || titleEn.includes(q) || genres.includes(q);
         });
     }, [searchQuery, allMovies]);
