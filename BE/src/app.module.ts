@@ -56,6 +56,12 @@ import { StatisticsModule } from './modules-api/statistics/statistics.module';
     FoodsModule,
     BookingsModule,
     PaymentsModule,
+    UsersModule,
+    ReviewsModule,
+    RecommendationsModule,
+    NotificationsModule,
+    VouchersModule,
+    StatisticsModule,
     StaffModule,
   ],
   providers: [
