@@ -14,6 +14,7 @@ import CinemaDetail from "../pages/User/CinemaDetail/CinemaDetail.tsx";
 import Profile from "../pages/User/Profile/Profile.tsx";
 import VNPayReturn from "../pages/User/VNPayReturn/VNPayReturn.tsx";
 import PromotionsPage from "../pages/User/PromotionsPage/PromotionsPage.tsx";
+import NotFound from "../pages/NotFound/NotFound.tsx";
 
 
 // Admin pages
@@ -122,6 +123,10 @@ export const routes: AppRoute[] = [
       { path: "recommendations", element: <AdminRecommendations /> },
       { path: "statistics", element: <AdminStatistics /> },
     ],
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ];
 
