@@ -15,7 +15,7 @@ export default function NotFound() {
                 <AlertCircle className={`w-24 h-24 mb-6 ${isDark ? 'text-blue-400' : 'text-blue-600'} animate-bounce`} />
                 <h1 className="text-8xl font-black mb-4 tracking-tighter">404</h1>
                 <h2 className="text-3xl font-bold mb-4">
-                    {t('movie_not_found') || "Page Not Found"}
+                    {t('movie_not_found') || "Pages Not Found"}
                 </h2>
                 <p className={`text-lg mb-8 max-w-md mx-auto ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                     {t('movie_not_found_desc') || "Oops! The page you are looking for does not exist. It might have been moved or deleted."}
