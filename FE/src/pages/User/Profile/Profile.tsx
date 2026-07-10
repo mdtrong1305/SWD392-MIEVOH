@@ -7,6 +7,7 @@ import { updateUser } from "../Login/slice.ts";
 import { toast } from "../../../components/Toast/Toast.tsx";
 import ProfileInfo from "./ProfileInfo/ProfileInfo.tsx";
 import BookingHistory from "./BookingHistory/BookingHistory.tsx";
+import WatchedMovies from "./WatchedMovies/WatchedMovies.tsx";
 import ChangePassword from "./ChangePassword/ChangePassword.tsx";
 import Button from "../../../components/Button/Button.tsx";
 import { useLanguage } from "../../../contextAPI/LanguageContext.tsx";
@@ -67,15 +68,15 @@ const compressImageToBlob = (file: File, maxWidth = 200, maxHeight = 200): Promi
 };
 
 export default function Profile() {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const dispatch = useDispatch();
     const { isAuthenticated, user } = useSelector((state: RootState) => state.login);
     const [searchParams, setSearchParams] = useSearchParams();
     
     // Get default tab from query parameter '?tab=...'
     const queryTab = searchParams.get("tab");
-    const [activeTab, setActiveTab] = useState<"info" | "tickets" | "password">(
-        queryTab === "tickets" ? "tickets" : queryTab === "password" ? "password" : "info"
+    const [activeTab, setActiveTab] = useState<"info" | "tickets" | "watched" | "password">(
+        queryTab === "tickets" ? "tickets" : queryTab === "password" ? "password" : queryTab === "watched" ? "watched" : "info"
     );
 
     // Sync tab state with query parameter changes
@@ -84,6 +85,8 @@ export default function Profile() {
             setActiveTab("tickets");
         } else if (queryTab === "password") {
             setActiveTab("password");
+        } else if (queryTab === "watched") {
+            setActiveTab("watched");
         } else {
             setActiveTab("info");
         }
@@ -94,7 +97,7 @@ export default function Profile() {
         window.scrollTo({ top: 0, behavior: "instant" as any });
     }, [activeTab]);
 
-    const handleTabChange = (tab: "info" | "tickets" | "password") => {
+    const handleTabChange = (tab: "info" | "tickets" | "watched" | "password") => {
         setActiveTab(tab);
         setSearchParams({ tab });
     };
@@ -216,6 +219,16 @@ export default function Profile() {
                             >
                                 <span>{t("ticket_history_title")}</span>
                             </button>
+                            <button
+                                onClick={() => handleTabChange("watched")}
+                                className={`px-1 py-3.5 text-sm sm:text-base font-bold border-b-2 transition-all duration-200 cursor-pointer whitespace-nowrap ${
+                                    activeTab === "watched"
+                                        ? "border-violet-500 dark:border-[#a599ff] text-violet-600 dark:text-[#a599ff] font-black"
+                                        : "border-transparent text-gray-555 hover:text-violet-500 dark:text-gray-400 dark:hover:text-violet-300"
+                                }`}
+                            >
+                                <span>{language === "vi" ? "Phim đã xem" : "Watched Movies"}</span>
+                            </button>
                         </div>
                     </div>
 
@@ -225,6 +238,8 @@ export default function Profile() {
                             <ProfileInfo user={user} />
                         ) : activeTab === "tickets" ? (
                             <BookingHistory />
+                        ) : activeTab === "watched" ? (
+                            <WatchedMovies />
                         ) : (
                             <ChangePassword />
                         )}
