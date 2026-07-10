@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { User, Menu, X, Ticket, LogOut, Lock, Sun, Moon, Globe, Bell, LayoutDashboard } from "lucide-react";
+import { User, Menu, X, Ticket, LogOut, Lock, Sun, Moon, Globe, Bell, LayoutDashboard, Film } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../store/index.tsx";
 import { logout, updateUser } from "../../pages/User/Login/slice.ts";
@@ -735,6 +735,15 @@ export default function Header({
                                             >
                                                 <Ticket className="h-4.5 w-4.5 text-violet-500" />
                                                 <span>{t("booked_tickets")}</span>
+                                            </Link>
+
+                                            <Link
+                                                to="/profile?tab=watched"
+                                                onClick={() => setUserMenuOpen(false)}
+                                                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-600 dark:text-zinc-300 hover:bg-violet-50 dark:hover:bg-zinc-800 hover:text-violet-700 dark:hover:text-violet-400 transition-all duration-200"
+                                            >
+                                                <Film className="h-4.5 w-4.5 text-violet-500" />
+                                                <span>{language === "vi" ? "Phim đã xem" : "Watched Movies"}</span>
                                             </Link>
 
                                             <Link
