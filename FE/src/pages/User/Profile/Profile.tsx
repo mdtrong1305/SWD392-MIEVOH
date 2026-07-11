@@ -227,7 +227,7 @@ export default function Profile() {
                                         : "border-transparent text-gray-555 hover:text-violet-500 dark:text-gray-400 dark:hover:text-violet-300"
                                 }`}
                             >
-                                <span>{language === "vi" ? "Phim đã xem" : "Watched Movies"}</span>
+                                <span>{language === "vi" ? "Phim của tôi" : "My Movies"}</span>
                             </button>
                         </div>
                     </div>
